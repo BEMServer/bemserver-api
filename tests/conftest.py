@@ -1,40 +1,41 @@
 """Global conftest"""
 
-import os
 import datetime as dt
-import pytest
-from dotenv import load_dotenv
 
 from bemserver_core.database import db
 from bemserver_core import model
+from bemserver_core.testutils import setup_db
+
+import pytest
+from pytest_postgresql import factories as ppf
+
 from bemserver_api import create_app
 from bemserver_api.settings import Config
 
 
-load_dotenv('.env')
+postgresql_proc = ppf.postgresql_proc(
+    postgres_options="-c shared_preload_libraries='timescaledb'"
+)
+postgresql = ppf.postgresql('postgresql_proc')
 
 
 class TestConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.getenv("TEST_SQLALCHEMY_DATABASE_URI")
     TESTING = True
 
 
 @pytest.fixture
-def app():
-    application = create_app(TestConfig)
-    db.setup_tables()
-    yield application
-    db.session.remove()
+def database(postgresql):
+    yield from setup_db(postgresql)
 
 
 @pytest.fixture
-def database():
-    db.set_db_url(os.getenv("TEST_SQLALCHEMY_DATABASE_URI"))
-    db.setup_tables()
-    yield db
-    db.session.remove()
-    # Destroy DB engine, mainly for threaded code (as MQTT service).
-    db.dispose()
+def app(database):
+
+    class AppConfig(TestConfig):
+        SQLALCHEMY_DATABASE_URI = database.url
+
+    application = create_app(AppConfig)
+    yield application
 
 
 @pytest.fixture(params=[{}])
