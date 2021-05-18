@@ -34,7 +34,11 @@ setup(
         "marshmallow>=3.10.0,<4.0",
         "marshmallow-sqlalchemy>=0.24.0",
         "flask_smorest>=0.29.0<0.30",
-        "bemserver-core @ git+ssh://git@github.com/BEMServer/bemserver-core.git@35b3b38#egg=bemserver-core",
+        (
+            "bemserver-core "
+            "@ git+https://git@github.com/BEMServer/bemserver-core.git@bd573b2"
+            "#egg=bemserver-core"
+        ),
     ],
     packages=find_packages(exclude=["tests*"]),
 )
