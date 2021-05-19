@@ -29,11 +29,11 @@ setup(
     ],
     python_requires=">=3.7",
     install_requires=[
-        "flask>=1.1.0",
+        "flask>=2.0.0",
         "python-dotenv>=0.9.0",
         "marshmallow>=3.10.0,<4.0",
         "marshmallow-sqlalchemy>=0.24.0",
-        "flask_smorest>=0.29.0<0.30",
+        "flask_smorest>=0.31.0,<0.32",
         (
             "bemserver-core "
             "@ git+https://git@github.com/BEMServer/bemserver-core.git@bd573b2"
