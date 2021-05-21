@@ -1,12 +1,16 @@
 """REST API extension"""
-
 import marshmallow as ma
 import flask_smorest
 import marshmallow_sqlalchemy as msa
 
+from .ma_fields import Timezone
+
 
 class Api(flask_smorest.Api):
     """Api class"""
+    def init_app(self, app, *, spec_kwargs=None):
+        super().init_app(app, spec_kwargs=spec_kwargs)
+        self.register_field(Timezone, 'string', 'IANA timezone')
 
 
 class Blueprint(flask_smorest.Blueprint):
