@@ -34,9 +34,10 @@ setup(
         "marshmallow>=3.10.0,<4.0",
         "marshmallow-sqlalchemy>=0.24.0",
         "flask_smorest>=0.31.0,<0.32",
+        "flask-httpauth>=0.5.0",
         (
             "bemserver-core "
-            "@ git+https://git@github.com/BEMServer/bemserver-core.git@bd573b2"
+            "@ git+https://git@github.com/BEMServer/bemserver-core.git@37a20e8"
             "#egg=bemserver-core"
         ),
     ],
