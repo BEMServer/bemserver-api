@@ -1,5 +1,4 @@
 """Global conftest"""
-
 import datetime as dt
 
 from bemserver_core.database import db
@@ -10,17 +9,14 @@ import pytest
 from pytest_postgresql import factories as ppf
 
 from bemserver_api import create_app
-from bemserver_api.settings import Config
+
+from tests.common import TestConfig
 
 
 postgresql_proc = ppf.postgresql_proc(
     postgres_options="-c shared_preload_libraries='timescaledb'"
 )
 postgresql = ppf.postgresql('postgresql_proc')
-
-
-class TestConfig(Config):
-    TESTING = True
 
 
 @pytest.fixture
