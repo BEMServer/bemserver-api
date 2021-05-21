@@ -3,12 +3,14 @@
 from . import timeseries
 from . import timeseries_data
 from . import events
+from . import users
 
 
 MODULES = (
     timeseries,
     timeseries_data,
     events,
+    users,
 )
 
 
