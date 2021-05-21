@@ -24,10 +24,10 @@ def database(postgresql):
     yield from setup_db(postgresql)
 
 
-@pytest.fixture
-def app(database):
+@pytest.fixture(params=(TestConfig, ))
+def app(request, database):
 
-    class AppConfig(TestConfig):
+    class AppConfig(request.param):
         SQLALCHEMY_DATABASE_URI = database.url
 
     application = create_app(AppConfig)
