@@ -34,6 +34,28 @@ def app(request, database):
     yield application
 
 
+@pytest.fixture
+def users(database):
+    active_user = model.User(
+        name="Active",
+        email="active_user@test.com",
+        is_admin=False,
+        is_active=True
+    )
+    inactive_user = model.User(
+        name="Inactive",
+        email="inactive_user@test.com",
+        is_admin=False,
+        is_active=False
+    )
+    active_user.set_password("@ctive")
+    inactive_user.set_password("in@ctive")
+    db.session.add(active_user)
+    db.session.add(inactive_user)
+    db.session.commit()
+    return active_user, inactive_user
+
+
 @pytest.fixture(params=[{}])
 def timeseries_data(request, database):
 

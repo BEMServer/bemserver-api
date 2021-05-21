@@ -3,7 +3,9 @@ import flask
 import click
 
 from . import database
-from .extensions import Api, Blueprint, Schema, AutoSchema, SQLCursorPage  # noqa
+from .extensions import (  # noqa
+    Api, Blueprint, Schema, AutoSchema, SQLCursorPage, authentication
+)
 from .resources import register_blueprints
 
 
@@ -25,6 +27,7 @@ def create_app(config_override=None):
     app.config.from_object(config_override)
 
     database.init_app(app)
+    authentication.init_app(app)
     api = Api()
     api.init_app(app)
     register_blueprints(api)
