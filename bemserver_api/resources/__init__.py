@@ -5,6 +5,7 @@ from . import timeseries_data
 from . import events
 from . import users
 from . import campaigns
+from . import users_by_campaigns
 
 
 MODULES = (
@@ -13,6 +14,7 @@ MODULES = (
     events,
     users,
     campaigns,
+    users_by_campaigns
 )
 
 

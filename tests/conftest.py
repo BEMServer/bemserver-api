@@ -53,7 +53,21 @@ def users(database):
     db.session.add(active_user)
     db.session.add(inactive_user)
     db.session.commit()
-    return active_user, inactive_user
+    return active_user.id, inactive_user.id
+
+
+@pytest.fixture
+def campaigns(database):
+    campaign_1 = model.Campaign(
+        name="Campaign 1",
+    )
+    campaign_2 = model.Campaign(
+        name="Campaign 2",
+    )
+    db.session.add(campaign_1)
+    db.session.add(campaign_2)
+    db.session.commit()
+    return campaign_1.id, campaign_2.id
 
 
 @pytest.fixture(params=[{}])
