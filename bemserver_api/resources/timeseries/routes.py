@@ -1,5 +1,4 @@
 """Timeseries resources"""
-
 from flask.views import MethodView
 from flask_smorest import abort
 
@@ -7,6 +6,7 @@ from bemserver_core.model import Timeseries
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
+from bemserver_api.extensions import catch_integrity_error
 
 from .schemas import TimeseriesSchema, TimeseriesQueryArgsSchema
 
@@ -33,6 +33,7 @@ class TimeseriesViews(MethodView):
     @blp.etag
     @blp.arguments(TimeseriesSchema)
     @blp.response(201, TimeseriesSchema)
+    @catch_integrity_error()
     def post(self, new_item):
         """Add a new timeseries"""
         item = Timeseries(**new_item)
@@ -56,6 +57,7 @@ class TimeseriesByIdViews(MethodView):
     @blp.etag
     @blp.arguments(TimeseriesSchema)
     @blp.response(200, TimeseriesSchema)
+    @catch_integrity_error()
     def put(self, new_item, item_id):
         """Update an existing timeseries"""
         item = db.session.get(Timeseries, item_id)
@@ -69,6 +71,7 @@ class TimeseriesByIdViews(MethodView):
 
     @blp.etag
     @blp.response(204)
+    @catch_integrity_error()
     def delete(self, item_id):
         """Delete a timeseries"""
         item = db.session.get(Timeseries, item_id)

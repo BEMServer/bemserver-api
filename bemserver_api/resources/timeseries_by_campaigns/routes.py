@@ -6,6 +6,7 @@ from bemserver_core.model import TimeseriesByCampaign
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
+from bemserver_api.extensions import catch_integrity_error
 
 from .schemas import (
     TimeseriesByCampaignSchema,
@@ -34,6 +35,7 @@ class TimeseriesByCampaignViews(MethodView):
     @blp.etag
     @blp.arguments(TimeseriesByCampaignSchema)
     @blp.response(201, TimeseriesByCampaignSchema)
+    @catch_integrity_error()
     def post(self, new_item):
         """Add a new campaign x timeseries association"""
         item = TimeseriesByCampaign(**new_item)
@@ -55,6 +57,7 @@ class TimeseriesByCampaignByIdViews(MethodView):
         return item
 
     @blp.response(204)
+    @catch_integrity_error()
     def delete(self, item_id):
         """Delete a campaign x timeseries association"""
         item = db.session.get(TimeseriesByCampaign, item_id)

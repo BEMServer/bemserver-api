@@ -6,6 +6,7 @@ from bemserver_core.model import UserByCampaign
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
+from bemserver_api.extensions import catch_integrity_error
 
 from .schemas import UserByCampaignSchema, UserByCampaignQueryArgsSchema
 
@@ -31,6 +32,7 @@ class UserByCampaignViews(MethodView):
     @blp.etag
     @blp.arguments(UserByCampaignSchema)
     @blp.response(201, UserByCampaignSchema)
+    @catch_integrity_error()
     def post(self, new_item):
         """Add a new campaign x user association"""
         item = UserByCampaign(**new_item)

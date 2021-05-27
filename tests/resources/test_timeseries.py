@@ -20,13 +20,16 @@ class TestTimeseriesApi:
             'name': 'Timeseries 1',
             'description': 'Timeseries example 1'
         }
-
         ret = client.post(TIMESERIES_URL, json=timeseries_1)
         assert ret.status_code == 201
         ret_val = ret.json
         timeseries_1_id = ret_val.pop('id')
         timeseries_1_etag = ret.headers['ETag']
         assert ret_val == timeseries_1
+
+        # POST violating unique constraint
+        ret = client.post(TIMESERIES_URL, json=timeseries_1)
+        assert ret.status_code == 409
 
         # GET list
         ret = client.get(TIMESERIES_URL)
@@ -64,12 +67,34 @@ class TestTimeseriesApi:
         )
         assert ret.status_code == 404
 
+        # POST TS 2
+        timeseries_2 = {
+            'name': 'Timeseries 2',
+        }
+        ret = client.post(TIMESERIES_URL, json=timeseries_2)
+        ret_val = ret.json
+        timeseries_2_id = ret_val.pop('id')
+        timeseries_2_etag = ret.headers['ETag']
+
+        # PUT violating unique constraint
+        timeseries_2['name'] = timeseries_1['name']
+        ret = client.put(
+            f"{TIMESERIES_URL}{timeseries_2_id}",
+            json=timeseries_2,
+            headers={'If-Match': timeseries_2_etag}
+        )
+        assert ret.status_code == 409
+
         # DELETE
         ret = client.delete(
             f"{TIMESERIES_URL}{timeseries_1_id}",
             headers={'If-Match': timeseries_1_etag}
         )
         assert ret.status_code == 204
+        ret = client.delete(
+            f"{TIMESERIES_URL}{timeseries_2_id}",
+            headers={'If-Match': timeseries_2_etag}
+        )
 
         # GET list
         ret = client.get(TIMESERIES_URL)

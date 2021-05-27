@@ -1,6 +1,8 @@
 """User by campaign routes tests"""
 DUMMY_ID = "69"
 
+USERS_URL = "/users/"
+CAMPAIGNS_URL = "/campaigns/"
 USERS_BY_CAMPAIGNS_URL = "/usersbycampaigns/"
 
 
@@ -25,6 +27,10 @@ class TestUsersByCampaignsApi:
         ret_val = ret.json
         ubc_1_id = ret_val.pop("id")
         ubc_1_etag = ret.headers["ETag"]
+
+        # POST violating unique constraint
+        ret = client.post(USERS_BY_CAMPAIGNS_URL, json=ubc_1)
+        assert ret.status_code == 409
 
         # GET list
         ret = client.get(USERS_BY_CAMPAIGNS_URL)
@@ -77,6 +83,24 @@ class TestUsersByCampaignsApi:
         # DELETE wrong ID -> 404
         ret = client.delete(f"{USERS_BY_CAMPAIGNS_URL}{DUMMY_ID}")
         assert ret.status_code == 404
+
+        # DELETE user violating fkey constraint
+        ret = client.get(f"{USERS_URL}{user_1_id}")
+        user_1_etag = ret.headers['ETag']
+        ret = client.delete(
+            f"{USERS_URL}{user_1_id}",
+            headers={'If-Match': user_1_etag}
+        )
+        assert ret.status_code == 409
+
+        # DELETE campaign violating fkey constraint
+        ret = client.get(f"{CAMPAIGNS_URL}{campaign_1_id}")
+        campaign_1_etag = ret.headers['ETag']
+        ret = client.delete(
+            f"{CAMPAIGNS_URL}{campaign_1_id}",
+            headers={'If-Match': campaign_1_etag}
+        )
+        assert ret.status_code == 409
 
         # DELETE
         ret = client.delete(f"{USERS_BY_CAMPAIGNS_URL}{ubc_1_id}")
