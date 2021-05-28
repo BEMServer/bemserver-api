@@ -23,4 +23,6 @@ class catch_integrity_error(contextlib.ContextDecorator):
                 abort(409, "Unique constraint violation")
             if isinstance(exc_value.orig, ppe.ForeignKeyViolation):
                 abort(409, "Foreign key constraint violation")
+            # Shouldn't happen
+            abort(409)
         return False

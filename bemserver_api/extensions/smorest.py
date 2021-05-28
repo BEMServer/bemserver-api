@@ -1,4 +1,6 @@
 """REST API extension"""
+from copy import deepcopy
+from functools import wraps
 import http
 
 import marshmallow as ma
@@ -7,6 +9,7 @@ import marshmallow_sqlalchemy as msa
 
 from .ma_fields import Timezone
 from .authentication import auth
+from . import integrity_error
 
 
 class Api(flask_smorest.Api):
@@ -44,6 +47,29 @@ class Blueprint(flask_smorest.Blueprint):
     @staticmethod
     def current_user():
         return auth.current_user()
+
+    @staticmethod
+    def catch_integrity_error(func=None):
+        """Catch DB integrity errors"""
+        def decorator(func):
+
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                with integrity_error.catch_integrity_error():
+                    return func(*args, **kwargs)
+
+            # Store doc in wrapper function
+            # The deepcopy avoids modifying the wrapped function doc
+            wrapper._apidoc = deepcopy(getattr(wrapper, '_apidoc', {}))
+            wrapper._apidoc.setdefault(
+                'response', {}
+            ).setdefault('responses', {})[409] = http.HTTPStatus(409).name
+
+            return wrapper
+
+        if func is None:
+            return decorator
+        return decorator(func)
 
 
 class Schema(ma.Schema):

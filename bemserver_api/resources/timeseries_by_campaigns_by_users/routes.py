@@ -6,7 +6,6 @@ from bemserver_core.model import TimeseriesByCampaignByUser
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
-from bemserver_api.extensions import catch_integrity_error
 
 from .schemas import (
     TimeseriesByCampaignByUserSchema,
@@ -35,7 +34,7 @@ class TimeseriesByCampaignViews(MethodView):
     @blp.etag
     @blp.arguments(TimeseriesByCampaignByUserSchema)
     @blp.response(201, TimeseriesByCampaignByUserSchema)
-    @catch_integrity_error()
+    @blp.catch_integrity_error
     def post(self, new_item):
         """Add a new campaign x timeseries x user association"""
         item = TimeseriesByCampaignByUser(**new_item)
