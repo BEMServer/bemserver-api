@@ -14,7 +14,7 @@ def init_app(app):
 
     @auth.verify_password
     def verify_password(username, password):
-        if not app.config["AUTH_ENABLED"]:
+        if not app.config.get("AUTH_ENABLED", False):
             return True
 
         user = db.session.execute(

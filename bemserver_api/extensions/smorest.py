@@ -14,7 +14,7 @@ class Api(flask_smorest.Api):
     def init_app(self, app, *, spec_kwargs=None):
         super().init_app(app, spec_kwargs=spec_kwargs)
         self.register_field(Timezone, 'string', 'IANA timezone')
-        if app.config["AUTH_ENABLED"]:
+        if app.config.get("AUTH_ENABLED", False):
             self.spec.components.security_scheme(
                 "BasicAuthentication", {"type": "http", "scheme": "basic"}
             )
