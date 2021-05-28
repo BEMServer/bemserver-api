@@ -31,6 +31,7 @@ class UserViews(MethodView):
     @blp.etag
     @blp.arguments(UserSchema)
     @blp.response(201, UserSchema)
+    @blp.catch_integrity_error
     def post(self, new_item):
         """Add a new user"""
         password = new_item.pop("password")
@@ -58,6 +59,7 @@ class UserByIdViews(MethodView):
     @blp.etag
     @blp.arguments(UserSchema)
     @blp.response(200, UserSchema)
+    @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing user"""
         password = new_item.pop("password")
@@ -73,6 +75,7 @@ class UserByIdViews(MethodView):
 
     @blp.etag
     @blp.response(204)
+    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a user"""
         item = db.session.get(User, item_id)

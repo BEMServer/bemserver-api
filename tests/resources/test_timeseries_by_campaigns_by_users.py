@@ -54,6 +54,14 @@ class TestTimeseriesByCampaignsByUsersApi:
         tbcbu_1_id = ret_val.pop("id")
         tbcbu_1_etag = ret.headers["ETag"]
 
+        # POST violating unique constraint
+        ret = client.post(TIMESERIES_BY_CAMPAIGNS_BY_USERS_URL, json=tbcbu_1)
+        assert ret.status_code == 409
+
+        # DELETE Timeseries x Campaign association violating fkey constraint
+        ret = client.delete(f"{TIMESERIES_BY_CAMPAIGNS_URL}{tbc_1_id}")
+        assert ret.status_code == 409
+
         # GET list
         ret = client.get(TIMESERIES_BY_CAMPAIGNS_BY_USERS_URL)
         assert ret.status_code == 200

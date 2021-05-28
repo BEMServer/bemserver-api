@@ -34,6 +34,7 @@ class TimeseriesByCampaignViews(MethodView):
     @blp.etag
     @blp.arguments(TimeseriesByCampaignByUserSchema)
     @blp.response(201, TimeseriesByCampaignByUserSchema)
+    @blp.catch_integrity_error
     def post(self, new_item):
         """Add a new campaign x timeseries x user association"""
         item = TimeseriesByCampaignByUser(**new_item)

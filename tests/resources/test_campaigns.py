@@ -28,13 +28,16 @@ class TestCampaignsApi:
                 dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
             ),
         }
-
         ret = client.post(CAMPAIGNS_URL, json=campaign_1)
         assert ret.status_code == 201
         ret_val = ret.json
         campaign_1_id = ret_val.pop("id")
         campaign_1_etag = ret.headers["ETag"]
         assert ret_val == campaign_1
+
+        # POST violating unique constraint
+        ret = client.post(CAMPAIGNS_URL, json=campaign_1)
+        assert ret.status_code == 409
 
         # GET list
         ret = client.get(CAMPAIGNS_URL)
@@ -72,6 +75,30 @@ class TestCampaignsApi:
         )
         assert ret.status_code == 404
 
+        # POST campaign 2
+        campaign_2 = {
+            "name": "Campaign 2",
+            "start_time": (
+                dt.datetime(2016, 4, 8, tzinfo=dt.timezone.utc).isoformat()
+            ),
+            "end_time": (
+                dt.datetime(2019, 9, 20, tzinfo=dt.timezone.utc).isoformat()
+            ),
+        }
+        ret = client.post(CAMPAIGNS_URL, json=campaign_2)
+        ret_val = ret.json
+        campaign_2_id = ret_val.pop("id")
+        campaign_2_etag = ret.headers["ETag"]
+
+        # PUT violating unique constraint
+        campaign_2["name"] = campaign_1["name"]
+        ret = client.put(
+            f"{CAMPAIGNS_URL}{campaign_2_id}",
+            json=campaign_2,
+            headers={"If-Match": campaign_2_etag}
+        )
+        assert ret.status_code == 409
+
         # DELETE wrong ID -> 404
         ret = client.delete(
             f"{CAMPAIGNS_URL}{DUMMY_ID}",
@@ -83,6 +110,10 @@ class TestCampaignsApi:
         ret = client.delete(
             f"{CAMPAIGNS_URL}{campaign_1_id}",
             headers={"If-Match": campaign_1_etag}
+        )
+        ret = client.delete(
+            f"{CAMPAIGNS_URL}{campaign_2_id}",
+            headers={"If-Match": campaign_2_etag}
         )
         assert ret.status_code == 204
 

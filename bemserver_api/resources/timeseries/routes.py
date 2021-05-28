@@ -1,5 +1,4 @@
 """Timeseries resources"""
-
 from flask.views import MethodView
 from flask_smorest import abort
 
@@ -33,6 +32,7 @@ class TimeseriesViews(MethodView):
     @blp.etag
     @blp.arguments(TimeseriesSchema)
     @blp.response(201, TimeseriesSchema)
+    @blp.catch_integrity_error
     def post(self, new_item):
         """Add a new timeseries"""
         item = Timeseries(**new_item)
@@ -56,6 +56,7 @@ class TimeseriesByIdViews(MethodView):
     @blp.etag
     @blp.arguments(TimeseriesSchema)
     @blp.response(200, TimeseriesSchema)
+    @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing timeseries"""
         item = db.session.get(Timeseries, item_id)
@@ -69,6 +70,7 @@ class TimeseriesByIdViews(MethodView):
 
     @blp.etag
     @blp.response(204)
+    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a timeseries"""
         item = db.session.get(Timeseries, item_id)

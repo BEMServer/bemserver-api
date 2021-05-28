@@ -31,6 +31,7 @@ class CampaignViews(MethodView):
     @blp.etag
     @blp.arguments(CampaignSchema)
     @blp.response(201, CampaignSchema)
+    @blp.catch_integrity_error
     def post(self, new_item):
         """Add a new campaign"""
         item = Campaign(**new_item)
@@ -54,6 +55,7 @@ class CampaignByIdViews(MethodView):
     @blp.etag
     @blp.arguments(CampaignSchema)
     @blp.response(200, CampaignSchema)
+    @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing campaign"""
         item = db.session.get(Campaign, item_id)
@@ -67,6 +69,7 @@ class CampaignByIdViews(MethodView):
 
     @blp.etag
     @blp.response(204)
+    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a campaign"""
         item = db.session.get(Campaign, item_id)

@@ -27,13 +27,16 @@ class TestUsersApi:
             "is_admin": False,
             "is_active": True,
         }
-
         ret = client.post(USERS_URL, json=user_1)
         assert ret.status_code == 201
         ret_val = ret.json
         user_1_id = ret_val.pop("id")
         user_1_etag = ret.headers["ETag"]
         assert ret_val == user_1_expected_get
+
+        # POST violating unique constraint
+        ret = client.post(USERS_URL, json=user_1)
+        assert ret.status_code == 409
 
         # GET list
         ret = client.get(USERS_URL)
@@ -100,6 +103,15 @@ class TestUsersApi:
         ret_val = ret.json
         user_2_id = ret_val.pop("id")
         user_2_etag = ret.headers["ETag"]
+
+        # PUT violating unique constraint
+        user_2["name"] = user_1["name"]
+        ret = client.put(
+            f"{USERS_URL}{user_2_id}",
+            json=user_2,
+            headers={"If-Match": user_2_etag}
+        )
+        assert ret.status_code == 409
 
         # Set inactive
         ret = client.put(

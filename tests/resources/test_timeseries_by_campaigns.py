@@ -4,6 +4,7 @@ import pytest
 
 DUMMY_ID = "69"
 
+TIMESERIES_URL = '/timeseries/'
 TIMESERIES_BY_CAMPAIGNS_URL = "/timeseriesbycampaigns/"
 
 
@@ -36,6 +37,10 @@ class TestTimeseriesByCampaignsApi:
         ret_val = ret.json
         tbc_1_id = ret_val.pop("id")
         tbc_1_etag = ret.headers["ETag"]
+
+        # POST violating unique constraint
+        ret = client.post(TIMESERIES_BY_CAMPAIGNS_URL, json=tbc_1)
+        assert ret.status_code == 409
 
         # GET list
         ret = client.get(TIMESERIES_BY_CAMPAIGNS_URL)
@@ -91,6 +96,15 @@ class TestTimeseriesByCampaignsApi:
         # DELETE wrong ID -> 404
         ret = client.delete(f"{TIMESERIES_BY_CAMPAIGNS_URL}{DUMMY_ID}")
         assert ret.status_code == 404
+
+        # DELETE TS violating fkey constraint
+        ret = client.get(f"{TIMESERIES_URL}{ts_1_id}")
+        ts_1_etag = ret.headers['ETag']
+        ret = client.delete(
+            f"{TIMESERIES_URL}{ts_1_id}",
+            headers={'If-Match': ts_1_etag}
+        )
+        assert ret.status_code == 409
 
         # DELETE
         ret = client.delete(f"{TIMESERIES_BY_CAMPAIGNS_URL}{tbc_1_id}")
