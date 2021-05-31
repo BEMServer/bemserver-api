@@ -12,7 +12,7 @@ from .resources import register_blueprints
 @click.command()
 @flask.cli.with_appcontext
 def setup_db():
-    database.db.setup_tables()
+    database.db.create_all()
 
 
 def create_app(config_override=None):
