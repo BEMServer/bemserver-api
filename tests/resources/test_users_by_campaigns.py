@@ -61,7 +61,7 @@ class TestUsersByCampaignsApi:
         assert len(ret_val) == 1
         assert ret_val[0]["id"] == ubc_1_id
         assert ret_val[0]["user_id"] == user_1_id
-        assert ret_val[0]["campaign_id"] == user_1_id
+        assert ret_val[0]["campaign_id"] == campaign_1_id
         ret = client.get(
             USERS_BY_CAMPAIGNS_URL,
             query_string={"campaign_id": campaign_2_id}
@@ -71,7 +71,7 @@ class TestUsersByCampaignsApi:
         assert len(ret_val) == 1
         assert ret_val[0]["id"] == ubc_2_id
         assert ret_val[0]["user_id"] == user_2_id
-        assert ret_val[0]["campaign_id"] == user_2_id
+        assert ret_val[0]["campaign_id"] == campaign_2_id
         ret = client.get(
             USERS_BY_CAMPAIGNS_URL,
             query_string={"user_id": user_1_id, "campaign_id": campaign_2_id}
