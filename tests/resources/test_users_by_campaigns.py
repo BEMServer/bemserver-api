@@ -10,7 +10,8 @@ class TestUsersByCampaignsApi:
 
     def test_users_by_campaigns_api(self, app, users, campaigns):
 
-        user_1_id, user_2_id = users
+        user_1_id = users["Active"]["id"]
+        user_2_id = users["Inactive"]["id"]
         campaign_1_id, campaign_2_id = campaigns
 
         client = app.test_client()

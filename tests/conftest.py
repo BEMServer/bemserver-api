@@ -1,4 +1,5 @@
 """Global conftest"""
+import base64
 import datetime as dt
 
 from bemserver_core.database import db
@@ -34,26 +35,30 @@ def app(request, database):
     yield application
 
 
-@pytest.fixture
-def users(database):
-    active_user = model.User(
-        name="Active",
-        email="active_user@test.com",
-        is_admin=False,
-        is_active=True
-    )
-    inactive_user = model.User(
-        name="Inactive",
-        email="inactive_user@test.com",
-        is_admin=False,
-        is_active=False
-    )
-    active_user.set_password("@ctive")
-    inactive_user.set_password("in@ctive")
-    db.session.add(active_user)
-    db.session.add(inactive_user)
-    db.session.commit()
-    return active_user.id, inactive_user.id
+USERS = (
+    ("Chuck", "N0rris", "chuck@test.com", True, True),
+    ("Active", "@ctive", "active@test.com", False, True),
+    ("Inactive", "in@ctive", "inactive@test.com", False, False),
+)
+
+
+@pytest.fixture(params=(USERS, ))
+def users(database, request):
+    ret = {}
+    for user in request.param:
+        name, password, email, is_admin, is_active = user
+        user = model.User(
+            name=name,
+            email=email,
+            is_admin=is_admin,
+            is_active=is_active
+        )
+        user.set_password(password)
+        creds = base64.b64encode(f"{email}:{password}".encode()).decode()
+        db.session.add(user)
+        db.session.commit()
+        ret[name] = {"id": user.id, "creds": creds}
+    return ret
 
 
 @pytest.fixture

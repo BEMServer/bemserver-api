@@ -21,7 +21,8 @@ class TestTimeseriesByCampaignsByUsersApi:
 
         ts_1_id, _, _, _ = timeseries_data[0]
         ts_2_id, _, _, _ = timeseries_data[1]
-        user_1_id, user_2_id = users
+        user_1_id = users["Active"]["id"]
+        user_2_id = users["Inactive"]["id"]
         campaign_1_id, campaign_2_id = campaigns
 
         client = app.test_client()

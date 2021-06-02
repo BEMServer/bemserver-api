@@ -1,17 +1,11 @@
 """Test authentication extension"""
-import base64
-
 from flask import jsonify
 
 import pytest
 
 from bemserver_api import Blueprint
 
-from tests.common import TestConfig
-
-
-class AuthTestConfig(TestConfig):
-    AUTH_ENABLED = True
+from tests.common import TestConfig, AuthTestConfig
 
 
 class TestAuthentication:
@@ -19,20 +13,11 @@ class TestAuthentication:
     @pytest.mark.parametrize(
         "app", (TestConfig, AuthTestConfig, ), indirect=True
     )
-    @pytest.mark.usefixtures("users")
-    def test_auth_login_required(self, app):
+    def test_auth_login_required(self, app, users):
 
-        active_user_creds = (
-            base64.b64encode('active_user@test.com:@ctive'.encode())
-            .decode()
-        )
-        inactive_user_creds = (
-            base64.b64encode('inactive_user@test.com:in@ctive'.encode())
-            .decode()
-        )
-
+        active_user_creds = users["Active"]["creds"]
+        inactive_user_creds = users["Inactive"]["creds"]
         api = app.extensions['flask-smorest']['ext_obj']
-
         blp = Blueprint('AuthTest', __name__, url_prefix='/auth_test')
 
         @blp.route('/auth')
@@ -93,13 +78,9 @@ class TestAuthentication:
         assert "401" not in no_auth_spec["get"]["responses"]
         assert "security" not in no_auth_spec["get"]
 
-    @pytest.mark.usefixtures("users")
-    def test_auth_current_user(self, app):
+    def test_auth_current_user(self, app, users):
 
-        active_user_creds = (
-            base64.b64encode('active_user@test.com:@ctive'.encode())
-            .decode()
-        )
+        active_user_creds = users["Active"]["creds"]
         api = app.extensions['flask-smorest']['ext_obj']
         app.config["AUTH_ENABLED"] = True
 
