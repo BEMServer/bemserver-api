@@ -2,6 +2,8 @@
 import base64
 import datetime as dt
 
+import flask.testing
+
 from bemserver_core.database import db
 from bemserver_core import model
 from bemserver_core.testutils import setup_db
@@ -11,13 +13,25 @@ from pytest_postgresql import factories as ppf
 
 from bemserver_api import create_app
 
-from tests.common import TestConfig
+from tests.common import TestConfig, AUTH_HEADER
 
 
 postgresql_proc = ppf.postgresql_proc(
     postgres_options="-c shared_preload_libraries='timescaledb'"
 )
 postgresql = ppf.postgresql('postgresql_proc')
+
+
+class TestClient(flask.testing.FlaskClient):
+    def open(self, *args, **kwargs):
+        auth_header = AUTH_HEADER.get()
+        if auth_header:
+            (
+                kwargs
+                .setdefault("headers", {})
+                .setdefault("Authorization", auth_header)
+            )
+        return super().open(*args, **kwargs)
 
 
 @pytest.fixture
@@ -32,6 +46,7 @@ def app(request, database):
         SQLALCHEMY_DATABASE_URI = database.url
 
     application = create_app(AppConfig)
+    application.test_client_class = TestClient
     yield application
 
 
