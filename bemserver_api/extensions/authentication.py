@@ -31,3 +31,10 @@ def init_app(app):
     def auth_error(status):
         # Call abort to trigger error handler and get consistent JSON output
         abort(status, message="Authentication error")
+
+    @auth.get_user_roles
+    def get_user_roles(user):
+        # Authentication disabled
+        if user is None or user.is_admin:
+            return ("admin", )
+        return ("user", )

@@ -30,18 +30,28 @@ class Blueprint(flask_smorest.Blueprint):
         self._prepare_doc_cbks.append(self._prepare_auth_doc)
 
     @staticmethod
-    def login_required(func):
-        # Note: we don't use "role" and "optional" parameters in the app,
-        # we always call login_required with no parameter
-        func = auth.login_required(func)
-        getattr(func, "_apidoc", {})["auth"] = True
-        return func
+    def login_required(func=None, **kwargs):
+        def decorator(function):
+            doc = {}
+            if "role" in kwargs:
+                roles = kwargs["role"]
+                if isinstance(roles, str):
+                    roles = [roles]
+                doc["role"] = roles
+            function = auth.login_required(**kwargs)(function)
+            getattr(function, "_apidoc", {})["auth"] = doc
+            return function
+        if func is None:
+            return decorator
+        return decorator(func)
 
     @staticmethod
     def _prepare_auth_doc(doc, doc_info, **kwargs):
-        if doc_info.get("auth", False):
+        if "auth" in doc_info:
             doc.setdefault("responses", {})["401"] = http.HTTPStatus(401).name
-            doc["security"] = [{"BasicAuthentication": []}]
+            doc["security"] = [
+                {"BasicAuthentication": doc_info["auth"].get("role", [])}
+            ]
         return doc
 
     @staticmethod
