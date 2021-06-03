@@ -21,6 +21,7 @@ blp = Blueprint(
 @blp.route('/')
 class UserViews(MethodView):
 
+    @blp.login_required(role="admin")
     @blp.etag
     @blp.arguments(UserQueryArgsSchema, location='query')
     @blp.response(200, UserSchema(many=True))
@@ -28,6 +29,7 @@ class UserViews(MethodView):
         """List users"""
         return db.session.query(User).filter_by(**args)
 
+    @blp.login_required(role="admin")
     @blp.etag
     @blp.arguments(UserSchema)
     @blp.response(201, UserSchema)
@@ -46,21 +48,29 @@ class UserViews(MethodView):
 @blp.route('/<int:item_id>')
 class UserByIdViews(MethodView):
 
+    @blp.login_required(role=["admin", "user"])
     @blp.etag
     @blp.response(200, UserSchema)
     def get(self, item_id):
         """Get user by ID"""
+        if blp.current_user() and not blp.current_user().is_admin:
+            if blp.current_user().id != item_id:
+                abort(403)
         item = db.session.get(User, item_id)
         if item is None:
             abort(404)
         return item
 
+    @blp.login_required(role=["admin", "user"])
     @blp.etag
     @blp.arguments(UserSchema)
     @blp.response(200, UserSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing user"""
+        if blp.current_user() and not blp.current_user().is_admin:
+            if blp.current_user().id != item_id:
+                abort(403)
         password = new_item.pop("password")
         item = db.session.get(User, item_id)
         if item is None:
@@ -71,6 +81,7 @@ class UserByIdViews(MethodView):
         db.session.commit()
         return item
 
+    @blp.login_required(role="admin")
     @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
@@ -85,6 +96,7 @@ class UserByIdViews(MethodView):
 
 
 @blp.route('/<int:item_id>/set_admin', methods=('PUT', ))
+@blp.login_required(role="admin")
 @blp.etag
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)
@@ -99,6 +111,7 @@ def set_admin(args, item_id):
 
 
 @blp.route('/<int:item_id>/set_active', methods=('PUT', ))
+@blp.login_required(role="admin")
 @blp.etag
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)
