@@ -14,10 +14,15 @@ class Config:
     # API parameters
     API_TITLE = "BEMServer API"
     API_VERSION = 0.1
-    OPENAPI_VERSION = '3.0.2'
+    OPENAPI_VERSION = '3.1.0'
     OPENAPI_JSON_PATH = "api-spec.json"
     OPENAPI_URL_PREFIX = "/"
-    OPENAPI_REDOC_PATH = "/"
-    OPENAPI_REDOC_URL = (
-        "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"
+    OPENAPI_RAPIDOC_PATH = "/"
+    OPENAPI_RAPIDOC_URL = (
+        "https://cdn.jsdelivr.net/npm/rapidoc/dist/rapidoc-min.js"
     )
+    OPENAPI_RAPIDOC_CONFIG = {
+        "theme": "dark",
+        "show-header": "false",
+        "render-style": "focused",
+    }
