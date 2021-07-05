@@ -46,12 +46,15 @@ class Blueprint(flask_smorest.Blueprint):
         return decorator(func)
 
     @staticmethod
-    def _prepare_auth_doc(doc, doc_info, **kwargs):
-        if "auth" in doc_info:
-            doc.setdefault("responses", {})["401"] = http.HTTPStatus(401).name
-            doc["security"] = [
-                {"BasicAuthentication": doc_info["auth"].get("role", [])}
-            ]
+    def _prepare_auth_doc(doc, doc_info, *, app, **kwargs):
+        if app.config.get("AUTH_ENABLED", False):
+            if "auth" in doc_info:
+                doc.setdefault(
+                    "responses", {}
+                )["401"] = http.HTTPStatus(401).name
+                doc["security"] = [
+                    {"BasicAuthentication": doc_info["auth"].get("role", [])}
+                ]
         return doc
 
     @staticmethod

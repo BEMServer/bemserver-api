@@ -69,11 +69,17 @@ class TestAuthentication:
                 spec["components"].get("securitySchemes", {})
             )
         auth_spec = spec["paths"]["/auth_test/auth"]
-        assert (
-            auth_spec["get"]["responses"]["401"] ==
-            {'$ref': '#/components/responses/UNAUTHORIZED'}
-        )
-        assert auth_spec["get"]["security"] == [{'BasicAuthentication': []}]
+        if app.config["AUTH_ENABLED"]:
+            assert (
+                auth_spec["get"]["responses"]["401"] ==
+                {'$ref': '#/components/responses/UNAUTHORIZED'}
+            )
+            assert auth_spec["get"]["security"] == [
+                {'BasicAuthentication': []}
+            ]
+        else:
+            assert "401" not in auth_spec["get"]["responses"]
+            assert "security" not in auth_spec["get"]
         no_auth_spec = spec["paths"]["/auth_test/no_auth"]
         assert "401" not in no_auth_spec["get"]["responses"]
         assert "security" not in no_auth_spec["get"]
