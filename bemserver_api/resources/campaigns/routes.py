@@ -1,8 +1,9 @@
 """Campaign resources"""
 from flask.views import MethodView
 from flask_smorest import abort
+import sqlalchemy as sqla
 
-from bemserver_core.model import Campaign
+from bemserver_core.model import Campaign, UserByCampaign
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
@@ -21,13 +22,20 @@ blp = Blueprint(
 @blp.route('/')
 class CampaignViews(MethodView):
 
+    @blp.login_required(role=["admin", "user"])
     @blp.etag
     @blp.arguments(CampaignQueryArgsSchema, location='query')
     @blp.response(200, CampaignSchema(many=True))
     def get(self, args):
         """List campaigns"""
-        return db.session.query(Campaign).filter_by(**args)
+        ret = db.session.query(Campaign).filter_by(**args)
+        if blp.current_user() and not blp.current_user().is_admin:
+            ret = ret.join(UserByCampaign).filter(
+                UserByCampaign.user_id == blp.current_user().id
+            )
+        return ret
 
+    @blp.login_required(role="admin")
     @blp.etag
     @blp.arguments(CampaignSchema)
     @blp.response(201, CampaignSchema)
@@ -42,6 +50,7 @@ class CampaignViews(MethodView):
 @blp.route('/<int:item_id>')
 class CampaignByIdViews(MethodView):
 
+    @blp.login_required(role=["admin", "user"])
     @blp.etag
     @blp.response(200, CampaignSchema)
     def get(self, item_id):
@@ -49,8 +58,18 @@ class CampaignByIdViews(MethodView):
         item = db.session.get(Campaign, item_id)
         if item is None:
             abort(404)
+        if blp.current_user() and not blp.current_user().is_admin:
+            stmt = sqla.select(UserByCampaign).where(
+                sqla.and_(
+                    UserByCampaign.user_id == blp.current_user().id,
+                    UserByCampaign.campaign_id == item_id
+                )
+            )
+            if not db.session.execute(stmt).all():
+                abort(403)
         return item
 
+    @blp.login_required(role="admin")
     @blp.etag
     @blp.arguments(CampaignSchema)
     @blp.response(200, CampaignSchema)
@@ -65,6 +84,7 @@ class CampaignByIdViews(MethodView):
         db.session.commit()
         return item
 
+    @blp.login_required(role="admin")
     @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error

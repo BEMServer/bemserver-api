@@ -90,6 +90,22 @@ def campaigns(database):
     return campaign_1.id, campaign_2.id
 
 
+@pytest.fixture
+def users_by_campaigns(campaigns, users):
+    user_by_campaign_1 = model.UserByCampaign(
+        user_id=users["Active"]["id"],
+        campaign_id=campaigns[0],
+    )
+    user_by_campaign_2 = model.UserByCampaign(
+        user_id=users["Inactive"]["id"],
+        campaign_id=campaigns[1],
+    )
+    db.session.add(user_by_campaign_1)
+    db.session.add(user_by_campaign_2)
+    db.session.commit()
+    return user_by_campaign_1.id, user_by_campaign_2.id
+
+
 @pytest.fixture(params=[{}])
 def timeseries_data(request, database):
 
