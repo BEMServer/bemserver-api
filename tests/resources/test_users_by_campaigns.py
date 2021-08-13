@@ -1,4 +1,9 @@
 """User by campaign routes tests"""
+import pytest
+
+from tests.common import AuthTestConfig, AuthHeader
+
+
 DUMMY_ID = "69"
 
 USERS_URL = "/users/"
@@ -118,3 +123,127 @@ class TestUsersByCampaignsApi:
         # GET by id -> 404
         ret = client.get(f"{USERS_BY_CAMPAIGNS_URL}{ubc_1_id}")
         assert ret.status_code == 404
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    def test_users_by_campaigns_as_admin_api(self, app, users, campaigns):
+
+        creds = users["Chuck"]["creds"]
+        user_1_id = users["Active"]["id"]
+        campaign_1_id, _ = campaigns
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+
+            # GET list
+            ret = client.get(USERS_BY_CAMPAIGNS_URL)
+            assert ret.status_code == 200
+
+            # POST
+            ubc_1 = {"campaign_id": campaign_1_id, "user_id": user_1_id}
+            ret = client.post(USERS_BY_CAMPAIGNS_URL, json=ubc_1)
+            assert ret.status_code == 201
+            ubc_1_id = ret.json["id"]
+
+            # GET by id
+            ret = client.get(f"{USERS_BY_CAMPAIGNS_URL}{ubc_1_id}")
+            assert ret.status_code == 200
+
+            # DELETE
+            ret = client.delete(f"{USERS_BY_CAMPAIGNS_URL}{ubc_1_id}")
+            assert ret.status_code == 204
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.usefixtures("users_by_campaigns")
+    def test_users_by_campaigns_as_user_api(self, app, users, campaigns):
+
+        user_creds = users["Active"]["creds"]
+        user_1_id = users["Active"]["id"]
+        user_2_id = users["Inactive"]["id"]
+        campaign_1_id, campaign_2_id = campaigns
+
+        client = app.test_client()
+
+        with AuthHeader(user_creds):
+
+            # GET list
+            ret = client.get(USERS_BY_CAMPAIGNS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ubc_1 = ret_val[0]
+            ubc_1_id = ubc_1["id"]
+            assert ubc_1_id == campaign_1_id
+
+            # POST
+            ubc_3 = {"campaign_id": campaign_1_id, "user_id": user_1_id}
+            ret = client.post(USERS_BY_CAMPAIGNS_URL, json=ubc_3)
+            assert ret.status_code == 403
+
+            # GET by id
+            ret = client.get(f"{USERS_BY_CAMPAIGNS_URL}{ubc_1_id}")
+            assert ret.status_code == 200
+
+            # GET list (filtered)
+            ret = client.get(
+                USERS_BY_CAMPAIGNS_URL,
+                query_string={"user_id": user_1_id}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == ubc_1_id
+            assert ret_val[0]["user_id"] == user_1_id
+            assert ret_val[0]["campaign_id"] == campaign_1_id
+            ret = client.get(
+                USERS_BY_CAMPAIGNS_URL,
+                query_string={"campaign_id": campaign_2_id}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(
+                USERS_BY_CAMPAIGNS_URL,
+                query_string={"user_id": user_2_id}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+
+            # DELETE
+            ret = client.delete(f"{USERS_BY_CAMPAIGNS_URL}{ubc_1_id}")
+            assert ret.status_code == 403
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    def test_users_by_campaigns_as_anonym_api(
+        self, app, users, campaigns, users_by_campaigns
+    ):
+
+        user_1_id = users["Active"]["id"]
+        campaign_1_id, _ = campaigns
+        ubc_1_id, _ = users_by_campaigns
+
+        client = app.test_client()
+
+        # GET list
+        ret = client.get(USERS_BY_CAMPAIGNS_URL)
+        assert ret.status_code == 401
+
+        # POST
+        ubc_1 = {"campaign_id": campaign_1_id, "user_id": user_1_id}
+        ret = client.post(USERS_BY_CAMPAIGNS_URL, json=ubc_1)
+        assert ret.status_code == 401
+
+        # GET by id
+        ret = client.get(f"{USERS_BY_CAMPAIGNS_URL}{ubc_1_id}")
+        assert ret.status_code == 401
+
+        # DELETE
+        ret = client.delete(f"{USERS_BY_CAMPAIGNS_URL}{ubc_1_id}")
+        assert ret.status_code == 401
