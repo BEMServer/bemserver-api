@@ -53,12 +53,11 @@ class UserByIdViews(MethodView):
     @blp.response(200, UserSchema)
     def get(self, item_id):
         """Get user by ID"""
-        if blp.current_user() and not blp.current_user().is_admin:
-            if blp.current_user().id != item_id:
-                abort(403)
         item = db.session.get(User, item_id)
         if item is None:
             abort(404)
+        if blp.current_user() and not item.can_read(blp.current_user()):
+            abort(403)
         return item
 
     @blp.login_required(role=["admin", "user"])
@@ -68,13 +67,12 @@ class UserByIdViews(MethodView):
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing user"""
-        if blp.current_user() and not blp.current_user().is_admin:
-            if blp.current_user().id != item_id:
-                abort(403)
-        password = new_item.pop("password")
         item = db.session.get(User, item_id)
         if item is None:
             abort(404)
+        if blp.current_user() and not item.can_write(blp.current_user()):
+            abort(403)
+        password = new_item.pop("password")
         blp.check_etag(item, UserSchema)
         item.update(**new_item)
         item.set_password(password)
