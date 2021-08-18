@@ -63,7 +63,7 @@ class TimeseriesByIdViews(MethodView):
         if item is None:
             abort(404)
         blp.check_etag(item, TimeseriesSchema)
-        TimeseriesSchema().update(item, new_item)
+        item.update(**new_item)
         db.session.add(item)
         db.session.commit()
         return item

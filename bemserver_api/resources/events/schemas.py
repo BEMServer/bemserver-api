@@ -6,7 +6,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.model import (
     EventState, EventCategory, EventLevel, EventTarget, Event)
 
-from bemserver_api import Schema, AutoSchema
+from bemserver_api import AutoSchema
 
 
 class EventStateSchema(AutoSchema):
@@ -58,7 +58,7 @@ class EventSchema(AutoSchema):
     timestamp_last_update = msa.auto_field()
 
 
-class EventPostArgsSchema(Schema):
+class EventPostArgsSchema(ma.Schema):
 
     source = ma.fields.Str(required=True)
     category = ma.fields.Str(required=True)
@@ -69,12 +69,12 @@ class EventPostArgsSchema(Schema):
     description = ma.fields.Str()
 
 
-class EventClosePostArgsSchema(Schema):
+class EventClosePostArgsSchema(ma.Schema):
 
     timestamp_end = ma.fields.AwareDateTime()
 
 
-class EventQueryArgsSchema(Schema):
+class EventQueryArgsSchema(ma.Schema):
     source = ma.fields.Str()
     category = ma.fields.Str()
     target_type = ma.fields.Str()

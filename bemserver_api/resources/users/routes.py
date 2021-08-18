@@ -67,7 +67,7 @@ class UserByIdViews(MethodView):
         if item is None:
             abort(404)
         blp.check_etag(item, UserSchema)
-        UserSchema().update(item, new_item)
+        item.update(**new_item)
         item.set_password(password)
         db.session.add(item)
         db.session.commit()
