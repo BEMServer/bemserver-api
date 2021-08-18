@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import TimeseriesByCampaign
 
-from bemserver_api import Schema, AutoSchema
+from bemserver_api import AutoSchema
 
 
 class TimeseriesByCampaignSchema(AutoSchema):
@@ -16,6 +16,6 @@ class TimeseriesByCampaignSchema(AutoSchema):
     timeseries_id = msa.auto_field()
 
 
-class TimeseriesByCampaignQueryArgsSchema(Schema):
+class TimeseriesByCampaignQueryArgsSchema(ma.Schema):
     campaign_id = ma.fields.Int()
     timeseries_id = ma.fields.Int()

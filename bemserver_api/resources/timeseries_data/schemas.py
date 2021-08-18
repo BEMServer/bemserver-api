@@ -5,7 +5,7 @@ from flask_smorest.fields import Upload
 from bemserver_core.model import TimeseriesData
 from bemserver_core.csv_io import AGGREGATION_FUNCTIONS
 
-from bemserver_api import Schema, AutoSchema
+from bemserver_api import AutoSchema
 from bemserver_api.extensions.ma_fields import Timezone
 
 
@@ -14,7 +14,7 @@ class TimeseriesDataSchema(AutoSchema):
         table = TimeseriesData.__table__
 
 
-class TimeseriesDataQueryArgsSchema(Schema):
+class TimeseriesDataQueryArgsSchema(ma.Schema):
     """Timeseries values GET query parameters schema"""
 
     start_time = ma.fields.AwareDateTime(

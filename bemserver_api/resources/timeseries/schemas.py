@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Timeseries
 
-from bemserver_api import Schema, AutoSchema
+from bemserver_api import AutoSchema
 
 
 class TimeseriesSchema(AutoSchema):
@@ -17,6 +17,6 @@ class TimeseriesSchema(AutoSchema):
     unit = msa.auto_field(validate=ma.validate.Length(1, 20))
 
 
-class TimeseriesQueryArgsSchema(Schema):
+class TimeseriesQueryArgsSchema(ma.Schema):
     name = ma.fields.Str()
     unit = ma.fields.Str()

@@ -73,20 +73,23 @@ class Blueprint(flask_smorest.Blueprint):
 
 
 class Schema(ma.Schema):
-    """Schema class"""
+    """Schema class used to load/dump SQLAlchemy objects
 
+    The API assumes missing = None/null, so we treat missing fields as None
+    unless they are read-only.
+    """
     # Ensures the fields are ordered
     set_class = ma.orderedset.OrderedSet
 
-    def update(self, obj, data):
-        """Update object nullifying missing data"""
+    @ma.post_load
+    def set_missing_expected_values_to_none(self, data, **kwargs):
         loadable_fields = [
             k for k, v in self.fields.items() if not v.dump_only
         ]
         for name in loadable_fields:
-            setattr(obj, name, data.get(name))
+            data.setdefault(name, None)
+        return data
 
-    # The API assumes missing = None/null
     @ma.post_dump
     def remove_none_values(self, data, **kwargs):
         return {

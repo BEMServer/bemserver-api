@@ -62,7 +62,7 @@ class CampaignByIdViews(MethodView):
         if item is None:
             abort(404)
         blp.check_etag(item, CampaignSchema)
-        CampaignSchema().update(item, new_item)
+        item.update(**new_item)
         db.session.add(item)
         db.session.commit()
         return item

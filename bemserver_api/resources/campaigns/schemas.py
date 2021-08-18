@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Campaign
 
-from bemserver_api import Schema, AutoSchema
+from bemserver_api import AutoSchema
 
 
 class CampaignSchema(AutoSchema):
@@ -18,5 +18,5 @@ class CampaignSchema(AutoSchema):
     end_time = ma.fields.AwareDateTime()
 
 
-class CampaignQueryArgsSchema(Schema):
+class CampaignQueryArgsSchema(ma.Schema):
     name = ma.fields.Str()
