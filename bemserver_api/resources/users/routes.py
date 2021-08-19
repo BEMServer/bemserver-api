@@ -27,7 +27,7 @@ class UserViews(MethodView):
     @blp.response(200, UserSchema(many=True))
     def get(self, args):
         """List users"""
-        return db.session.query(User).filter_by(**args)
+        return User.get(**args)
 
     @blp.login_required(role="admin")
     @blp.etag
@@ -53,11 +53,9 @@ class UserByIdViews(MethodView):
     @blp.response(200, UserSchema)
     def get(self, item_id):
         """Get user by ID"""
-        item = db.session.get(User, item_id)
+        item = User.get_by_id(item_id)
         if item is None:
             abort(404)
-        if blp.current_user() and not item.can_read(blp.current_user()):
-            abort(403)
         return item
 
     @blp.login_required(role=["admin", "user"])
@@ -67,13 +65,11 @@ class UserByIdViews(MethodView):
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing user"""
-        item = db.session.get(User, item_id)
+        item = User.get_by_id(item_id)
         if item is None:
             abort(404)
-        if blp.current_user() and not item.can_write(blp.current_user()):
-            abort(403)
-        password = new_item.pop("password")
         blp.check_etag(item, UserSchema)
+        password = new_item.pop("password")
         item.update(**new_item)
         item.set_password(password)
         db.session.commit()
@@ -85,11 +81,11 @@ class UserByIdViews(MethodView):
     @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a user"""
-        item = db.session.get(User, item_id)
+        item = User.get_by_id(item_id)
         if item is None:
             abort(404)
         blp.check_etag(item, UserSchema)
-        db.session.delete(item)
+        item.delete()
         db.session.commit()
 
 
@@ -99,7 +95,7 @@ class UserByIdViews(MethodView):
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)
 def set_admin(args, item_id):
-    item = db.session.get(User, item_id)
+    item = User.get_by_id(item_id)
     if item is None:
         abort(404)
     blp.check_etag(item, UserSchema)
@@ -114,7 +110,7 @@ def set_admin(args, item_id):
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)
 def set_active(args, item_id):
-    item = db.session.get(User, item_id)
+    item = User.get_by_id(item_id)
     if item is None:
         abort(404)
     blp.check_etag(item, UserSchema)

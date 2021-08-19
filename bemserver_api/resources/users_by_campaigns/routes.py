@@ -27,9 +27,7 @@ class UserByCampaignViews(MethodView):
     @blp.response(200, UserByCampaignSchema(many=True))
     def get(self, args):
         """List campaign x user associations"""
-        if not blp.current_user():
-            return db.session.query(UserByCampaign).filter_by(**args)
-        return UserByCampaign.get_by_user(blp.current_user(), **args)
+        return UserByCampaign.get(**args)
 
     @blp.login_required(role="admin")
     @blp.etag
@@ -51,19 +49,17 @@ class UserByCampaignByIdViews(MethodView):
     @blp.response(200, UserByCampaignSchema)
     def get(self, item_id):
         """Get campaign x user association by ID"""
-        item = db.session.get(UserByCampaign, item_id)
+        item = UserByCampaign.get_by_id(item_id)
         if item is None:
             abort(404)
-        if blp.current_user() and not item.can_read(blp.current_user()):
-            abort(403)
         return item
 
     @blp.login_required(role="admin")
     @blp.response(204)
     def delete(self, item_id):
         """Delete a campaign x user association"""
-        item = db.session.get(UserByCampaign, item_id)
+        item = UserByCampaign.get_by_id(item_id)
         if item is None:
             abort(404)
-        db.session.delete(item)
+        item.delete()
         db.session.commit()
