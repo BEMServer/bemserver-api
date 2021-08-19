@@ -111,7 +111,7 @@ def timeseries_data(request, database):
 
     param = request.param
 
-    nb_ts = param.get("nb_ts", 1)
+    nb_ts = param.get("nb_ts", 2)
     nb_tsd = param.get("nb_tsd", 24 * 100)
 
     ts_l = []
@@ -142,3 +142,19 @@ def timeseries_data(request, database):
         (ts.id, nb_tsd, start_dt, start_dt + dt.timedelta(hours=nb_tsd))
         for ts in ts_l
     ]
+
+
+@pytest.fixture
+def timeseries_by_campaigns(timeseries_data, campaigns):
+    ts_by_campaign_1 = model.TimeseriesByCampaign(
+        timeseries_id=timeseries_data[0][0],
+        campaign_id=campaigns[0],
+    )
+    ts_by_campaign_2 = model.TimeseriesByCampaign(
+        timeseries_id=timeseries_data[1][0],
+        campaign_id=campaigns[1],
+    )
+    db.session.add(ts_by_campaign_1)
+    db.session.add(ts_by_campaign_2)
+    db.session.commit()
+    return ts_by_campaign_1.id, ts_by_campaign_2.id

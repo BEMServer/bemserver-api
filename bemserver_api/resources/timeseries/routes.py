@@ -7,8 +7,9 @@ from bemserver_core.model import Timeseries
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
-from .schemas import TimeseriesSchema, TimeseriesQueryArgsSchema
-
+from .schemas import (
+    TimeseriesSchema, TimeseriesQueryArgsSchema, TimeseriesByIdQueryArgsSchema
+)
 
 blp = Blueprint(
     'Timeseries',
@@ -21,14 +22,16 @@ blp = Blueprint(
 @blp.route('/')
 class TimeseriesViews(MethodView):
 
+    @blp.login_required(role=["admin", "user"])
     @blp.etag
     @blp.arguments(TimeseriesQueryArgsSchema, location='query')
     @blp.response(200, TimeseriesSchema(many=True))
     @blp.paginate(SQLCursorPage)
     def get(self, args):
         """List timeseries"""
-        return db.session.query(Timeseries).filter_by(**args)
+        return Timeseries.get(**args)
 
+    @blp.login_required(role="admin")
     @blp.etag
     @blp.arguments(TimeseriesSchema)
     @blp.response(201, TimeseriesSchema)
@@ -43,22 +46,25 @@ class TimeseriesViews(MethodView):
 @blp.route('/<int:item_id>')
 class TimeseriesByIdViews(MethodView):
 
+    @blp.login_required(role=["admin", "user"])
     @blp.etag
+    @blp.arguments(TimeseriesByIdQueryArgsSchema, location='query')
     @blp.response(200, TimeseriesSchema)
-    def get(self, item_id):
+    def get(self, args, item_id):
         """Get timeseries by ID"""
-        item = db.session.get(Timeseries, item_id)
+        item = Timeseries.get_by_id(item_id, **args)
         if item is None:
             abort(404)
         return item
 
+    @blp.login_required(role="admin")
     @blp.etag
     @blp.arguments(TimeseriesSchema)
     @blp.response(200, TimeseriesSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing timeseries"""
-        item = db.session.get(Timeseries, item_id)
+        item = Timeseries.get_by_id(item_id)
         if item is None:
             abort(404)
         blp.check_etag(item, TimeseriesSchema)
@@ -66,14 +72,15 @@ class TimeseriesByIdViews(MethodView):
         db.session.commit()
         return item
 
+    @blp.login_required(role="admin")
     @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a timeseries"""
-        item = db.session.get(Timeseries, item_id)
+        item = Timeseries.get_by_id(item_id)
         if item is None:
             abort(404)
         blp.check_etag(item, TimeseriesSchema)
-        db.session.delete(item)
+        item.delete()
         db.session.commit()

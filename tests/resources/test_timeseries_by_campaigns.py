@@ -93,6 +93,16 @@ class TestTimeseriesByCampaignsApi:
         ret_val = ret.json
         assert len(ret_val) == 0
 
+        # GET TS list filtered by campaign
+        ret = client.get(
+            TIMESERIES_URL,
+            query_string={"campaign_id": campaign_1_id}
+        )
+        assert ret.status_code == 200
+        ret_val = ret.json
+        assert len(ret_val) == 1
+        assert ret_val[0]['id'] == ts_1_id
+
         # DELETE wrong ID -> 404
         ret = client.delete(f"{TIMESERIES_BY_CAMPAIGNS_URL}{DUMMY_ID}")
         assert ret.status_code == 404
