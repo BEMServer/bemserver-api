@@ -1,12 +1,48 @@
 """Authentication"""
+from functools import wraps
+
 import sqlalchemy as sqla
 from flask_httpauth import HTTPBasicAuth
 from flask_smorest import abort
 from bemserver_core.model.users import User
+from bemserver_core.auth import CurrentUser, BEMServerAuthorizationError
 
 from bemserver_api.database import db
 
-auth = HTTPBasicAuth()
+
+class Auth(HTTPBasicAuth):
+    """Authentication and authorization management"""
+
+    def login_required(self, f=None, role=None, optional=None):
+        """Decorator providing authentication and authorization
+
+        Uses HTTPBasicAuth.login_required authenticate user
+        Sets CurrentUser context variable to authenticated user for the request
+        Catches Authorization error and aborts accordingly
+        """
+        def decorator(func):
+
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                with CurrentUser(self.current_user()):
+                    try:
+                        resp = func(*args, **kwargs)
+                    except BEMServerAuthorizationError:
+                        abort(403, message="Authorization error")
+                return resp
+
+            # Wrap this inside HTTPAuth.login_required
+            # to get authenticated user
+            return super(Auth, self).login_required(
+                role=role, optional=optional
+            )(wrapper)
+
+        if f:
+            return decorator(f)
+        return decorator
+
+
+auth = Auth()
 
 
 def init_app(app):
