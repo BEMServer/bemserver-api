@@ -158,13 +158,15 @@ class TestUsersByCampaignsApi:
     @pytest.mark.parametrize(
         "app", (AuthTestConfig, ), indirect=True
     )
-    @pytest.mark.usefixtures("users_by_campaigns")
-    def test_users_by_campaigns_as_user_api(self, app, users, campaigns):
+    def test_users_by_campaigns_as_user_api(
+        self, app, users, campaigns, users_by_campaigns
+    ):
 
         user_creds = users["Active"]["creds"]
         user_1_id = users["Active"]["id"]
         user_2_id = users["Inactive"]["id"]
         campaign_1_id, campaign_2_id = campaigns
+        ubc_1_id, ubc_2_id = users_by_campaigns
 
         client = app.test_client()
 
@@ -176,8 +178,7 @@ class TestUsersByCampaignsApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             ubc_1 = ret_val[0]
-            ubc_1_id = ubc_1["id"]
-            assert ubc_1_id == campaign_1_id
+            assert ubc_1["id"] == ubc_1_id
 
             # POST
             ubc_3 = {"campaign_id": campaign_1_id, "user_id": user_1_id}
@@ -187,6 +188,8 @@ class TestUsersByCampaignsApi:
             # GET by id
             ret = client.get(f"{USERS_BY_CAMPAIGNS_URL}{ubc_1_id}")
             assert ret.status_code == 200
+            ret = client.get(f"{USERS_BY_CAMPAIGNS_URL}{ubc_2_id}")
+            assert ret.status_code == 403
 
             # GET list (filtered)
             ret = client.get(
