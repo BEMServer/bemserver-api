@@ -6,6 +6,7 @@ from bemserver_core.model import Timeseries
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
+from bemserver_api.resources.campaigns import blp as campaigns_blp
 
 from .schemas import (
     TimeseriesSchema, TimeseriesQueryArgsSchema, TimeseriesByIdQueryArgsSchema
@@ -22,7 +23,7 @@ blp = Blueprint(
 @blp.route('/')
 class TimeseriesViews(MethodView):
 
-    @blp.login_required(role=["admin", "user"])
+    @blp.login_required(role=["admin"])
     @blp.etag
     @blp.arguments(TimeseriesQueryArgsSchema, location='query')
     @blp.response(200, TimeseriesSchema(many=True))
@@ -46,7 +47,7 @@ class TimeseriesViews(MethodView):
 @blp.route('/<int:item_id>')
 class TimeseriesByIdViews(MethodView):
 
-    @blp.login_required(role=["admin", "user"])
+    @blp.login_required(role=["admin"])
     @blp.etag
     @blp.arguments(TimeseriesByIdQueryArgsSchema, location='query')
     @blp.response(200, TimeseriesSchema)
@@ -84,3 +85,33 @@ class TimeseriesByIdViews(MethodView):
         blp.check_etag(item, TimeseriesSchema)
         item.delete()
         db.session.commit()
+
+
+@campaigns_blp.route('/<int:campaign_id>/timeseries/')
+class TimeseriesForCampaignViews(MethodView):
+
+    @campaigns_blp.login_required(role=["admin", "user"])
+    @campaigns_blp.etag
+    @campaigns_blp.arguments(
+        TimeseriesQueryArgsSchema(exclude=("campaign_id", )),
+        location='query'
+    )
+    @campaigns_blp.response(200, TimeseriesSchema(many=True))
+    @campaigns_blp.paginate(SQLCursorPage)
+    def get(self, args, campaign_id):
+        """List timeseries for campaign"""
+        return Timeseries.get(campaign_id=campaign_id, **args)
+
+
+@campaigns_blp.route('/<int:campaign_id>/timeseries/<int:item_id>')
+class TimeseriesForCampaignByIdViews(MethodView):
+
+    @campaigns_blp.login_required(role=["admin", "user"])
+    @campaigns_blp.etag
+    @campaigns_blp.response(200, TimeseriesSchema)
+    def get(self, campaign_id, item_id):
+        """Get timeseries by ID for campaign"""
+        item = Timeseries.get_by_id(item_id, campaign_id=campaign_id)
+        if item is None:
+            abort(404)
+        return item

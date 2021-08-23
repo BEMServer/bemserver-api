@@ -1,4 +1,6 @@
 """Timeseries tests"""
+import contextlib
+
 import pytest
 
 from tests.common import AuthTestConfig, AuthHeader
@@ -7,6 +9,7 @@ from tests.common import AuthTestConfig, AuthHeader
 DUMMY_ID = '69'
 
 TIMESERIES_URL = '/timeseries/'
+CAMPAIGNS_URL = '/campaigns/'
 
 
 class TestTimeseriesApi:
@@ -159,111 +162,102 @@ class TestTimeseriesApi:
     @pytest.mark.parametrize(
         "app", (AuthTestConfig, ), indirect=True
     )
-    @pytest.mark.usefixtures("timeseries_by_campaigns")
-    @pytest.mark.usefixtures("users_by_campaigns")
-    def test_timeseries_as_user_api(
-        self, app, users, campaigns, timeseries_data
+    @pytest.mark.parametrize("user", ("user", "anonym"))
+    def test_timeseries_as_user_or_anonym_api(
+        self, app, user, users, timeseries_data
     ):
 
-        campaign_1_id, _ = campaigns
+        timeseries_1_id = timeseries_data[0][0]
 
-        user_creds = users["Active"]["creds"]
+        if user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+            status_code = 403
+        else:
+            auth_context = contextlib.nullcontext()
+            status_code = 401
 
         client = app.test_client()
 
-        with AuthHeader(user_creds):
+        with auth_context:
 
-            # GET list without campaign
+            # GET list
             ret = client.get(TIMESERIES_URL)
-            assert ret.status_code == 403
-
-            # GET list with campaign
-            ret = client.get(
-                TIMESERIES_URL,
-                query_string={"campaign_id": campaign_1_id}
-            )
-            assert ret.status_code == 200
-            ret_val = ret.json
-            assert len(ret_val) == 1
-            ts_1 = ret_val[0]
-            ts_1_id = ts_1["id"]
-            assert ts_1_id == timeseries_data[0][0]
+            assert ret.status_code == status_code
 
             # POST
             timeseries_1 = {
-                'name': 'Dummy timeseries 1',
-                'description': 'Dummy timeseries example 1'
+                'name': 'Timeseries 1',
+                'description': 'Timeseries example 1'
             }
             ret = client.post(TIMESERIES_URL, json=timeseries_1)
-            assert ret.status_code == 403
+            assert ret.status_code == status_code
 
-            # GET by id without campaign
-            ret = client.get(f"{TIMESERIES_URL}{ts_1_id}")
-            assert ret.status_code == 403
-
-            # GET by id with campaign
-            ret = client.get(
-                f"{TIMESERIES_URL}{ts_1_id}",
-                query_string={"campaign_id": campaign_1_id}
-            )
-            assert ret.status_code == 200
-            ts_1_etag = ret.headers["ETag"]
+            # GET by id
+            ret = client.get(f"{TIMESERIES_URL}{timeseries_1_id}")
+            assert ret.status_code == status_code
 
             # PUT
-            del ts_1['description']
+            del timeseries_1['description']
             ret = client.put(
-                f"{TIMESERIES_URL}{ts_1_id}",
+                f"{TIMESERIES_URL}{timeseries_1_id}",
                 json=timeseries_1,
-                headers={'If-Match': ts_1_etag}
+                headers={'If-Match': "Dummy-ETag"}
             )
-            assert ret.status_code == 403
+            # ETag is wrong but we get rejected before ETag check anyway
+            assert ret.status_code == status_code
 
             # DELETE
             ret = client.delete(
-                f"{TIMESERIES_URL}{ts_1_id}",
-                headers={'If-Match': ts_1_etag}
+                f"{TIMESERIES_URL}{timeseries_1_id}",
+                headers={'If-Match': "Dummy-ETag"}
             )
-            assert ret.status_code == 403
+            # ETag is wrong but we get rejected before ETag check anyway
+            assert ret.status_code == status_code
+
+
+class TestTimeseriesForCampaignApi:
 
     @pytest.mark.parametrize(
         "app", (AuthTestConfig, ), indirect=True
     )
-    def test_timeseries_as_anonym_api(self, app, timeseries_data):
-
+    @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
+    @pytest.mark.usefixtures("timeseries_by_campaigns")
+    @pytest.mark.usefixtures("users_by_campaigns")
+    def test_timeseries_for_campaign_api(
+        self, app, user, users, campaigns, timeseries_data
+    ):
+        campaign_1_id, _ = campaigns
         timeseries_1_id = timeseries_data[0][0]
+
+        if user == "admin":
+            creds = users["Chuck"]["creds"]
+            auth_context = AuthHeader(creds)
+        elif user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+        else:
+            auth_context = contextlib.nullcontext()
 
         client = app.test_client()
 
-        # GET list
-        ret = client.get(TIMESERIES_URL)
-        assert ret.status_code == 401
+        with auth_context:
 
-        # POST
-        timeseries_1 = {
-            'name': 'Timeseries 1',
-            'description': 'Timeseries example 1'
-        }
-        ret = client.post(TIMESERIES_URL, json=timeseries_1)
-        assert ret.status_code == 401
+            # GET list
+            ret = client.get(f"{CAMPAIGNS_URL}{campaign_1_id}/timeseries/")
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                ret_val = ret.json
+                assert len(ret_val) == 1
+                assert ret_val[0]["id"] == timeseries_1_id
 
-        # GET by id
-        ret = client.get(f"{TIMESERIES_URL}{timeseries_1_id}")
-        assert ret.status_code == 401
-
-        # PUT
-        del timeseries_1['description']
-        ret = client.put(
-            f"{TIMESERIES_URL}{timeseries_1_id}",
-            json=timeseries_1,
-            headers={'If-Match': "Dummy-ETag"}
-        )
-        # ETag is wrong but we get rejected before ETag check anyway
-        assert ret.status_code == 401
-
-        # DELETE
-        ret = client.delete(
-            f"{TIMESERIES_URL}{timeseries_1_id}",
-            headers={'If-Match': "Dummy-ETag"}
-        )
-        # ETag is wrong but we get rejected before ETag check anyway
-        assert ret.status_code == 401
+            # GET by id
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_1_id}/timeseries/{timeseries_1_id}")
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                assert ret.json["id"] == timeseries_1_id
