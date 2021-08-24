@@ -158,3 +158,19 @@ def timeseries_by_campaigns(timeseries_data, campaigns):
     db.session.add(ts_by_campaign_2)
     db.session.commit()
     return ts_by_campaign_1.id, ts_by_campaign_2.id
+
+
+@pytest.fixture
+def timeseries_by_campaigns_by_users(timeseries_by_campaigns, users):
+    tbcbu_1 = model.TimeseriesByCampaignByUser(
+        timeseries_by_campaign_id=timeseries_by_campaigns[0],
+        user_id=users["Active"]["id"],
+    )
+    tbcbu_2 = model.TimeseriesByCampaignByUser(
+        timeseries_by_campaign_id=timeseries_by_campaigns[1],
+        user_id=users["Inactive"]["id"],
+    )
+    db.session.add(tbcbu_1)
+    db.session.add(tbcbu_2)
+    db.session.commit()
+    return tbcbu_1.id, tbcbu_2.id
