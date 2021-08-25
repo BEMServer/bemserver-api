@@ -80,9 +80,12 @@ def users(database, request):
 def campaigns(database):
     campaign_1 = model.Campaign(
         name="Campaign 1",
+        start_time=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
     )
     campaign_2 = model.Campaign(
         name="Campaign 2",
+        start_time=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
+        end_time=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
     )
     db.session.add(campaign_1)
     db.session.add(campaign_2)

@@ -1,10 +1,14 @@
 """Timeseries data tests"""
+import contextlib
 import io
 import datetime as dt
 
 import pytest
 
-TIMESERIES_URL = '/timeseries-data/'
+from tests.common import AuthTestConfig, AuthHeader
+
+TIMESERIES_DATA_URL = '/timeseries-data/'
+CAMPAIGNS_URL = '/campaigns/'
 
 
 class TestTimeseriesDataApi:
@@ -22,7 +26,7 @@ class TestTimeseriesDataApi:
         ts_1_id, _, _, _ = timeseries_data[1]
 
         ret = client.get(
-            TIMESERIES_URL,
+            TIMESERIES_DATA_URL,
             query_string={
                 "start_time": start_time.isoformat(),
                 "end_time": end_time.isoformat(),
@@ -44,6 +48,74 @@ class TestTimeseriesDataApi:
         )
 
     @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.parametrize(
+            'timeseries_data',
+            ({"nb_ts": 2, "nb_tsd": 4}, ),
+            indirect=True
+    )
+    def test_timeseries_data_get_as_admin(self, app, users, timeseries_data):
+
+        ts_0_id, _, start_time, end_time = timeseries_data[0]
+        ts_1_id, _, _, _ = timeseries_data[1]
+
+        creds = users["Chuck"]["creds"]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+
+            ret = client.get(
+                TIMESERIES_DATA_URL,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id, ts_1_id],
+                }
+            )
+            assert ret.status_code == 200
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.parametrize(
+            'timeseries_data',
+            ({"nb_ts": 2, "nb_tsd": 4}, ),
+            indirect=True
+    )
+    @pytest.mark.parametrize("user", ("user", "anonym"))
+    def test_timeseries_data_get_as_user_or_anonym(
+        self, app, user, users, timeseries_data
+    ):
+
+        ts_0_id, _, start_time, end_time = timeseries_data[0]
+        ts_1_id, _, _, _ = timeseries_data[1]
+
+        if user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+            status_code = 403
+        else:
+            auth_context = contextlib.nullcontext()
+            status_code = 401
+
+        client = app.test_client()
+
+        with auth_context:
+
+            ret = client.get(
+                TIMESERIES_DATA_URL,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id, ts_1_id],
+                }
+            )
+            assert ret.status_code == status_code
+
+
+    @pytest.mark.parametrize(
             'timeseries_data',
             ({"nb_ts": 2, "nb_tsd": 48}, ),
             indirect=True
@@ -57,7 +129,7 @@ class TestTimeseriesDataApi:
 
         # UTC timezone, avg
         ret = client.get(
-            TIMESERIES_URL + "aggregate",
+            TIMESERIES_DATA_URL + "aggregate",
             query_string={
                 "start_time": start_time.isoformat(),
                 "end_time": end_time.isoformat(),
@@ -80,7 +152,7 @@ class TestTimeseriesDataApi:
 
         # Local timezone, avg
         ret = client.get(
-            TIMESERIES_URL + "aggregate",
+            TIMESERIES_DATA_URL + "aggregate",
             query_string={
                 "start_time": start_time.isoformat(),
                 "end_time": end_time.isoformat(),
@@ -104,7 +176,7 @@ class TestTimeseriesDataApi:
 
         # UTC timezone, sum
         ret = client.get(
-            TIMESERIES_URL + "aggregate",
+            TIMESERIES_DATA_URL + "aggregate",
             query_string={
                 "start_time": start_time.isoformat(),
                 "end_time": end_time.isoformat(),
@@ -127,6 +199,81 @@ class TestTimeseriesDataApi:
         )
 
     @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.parametrize(
+            'timeseries_data',
+            ({"nb_ts": 2, "nb_tsd": 48}, ),
+            indirect=True
+    )
+    def test_timeseries_data_get_aggregate_as_admin(
+        self, app, users, timeseries_data
+    ):
+
+        ts_0_id, _, start_time, end_time = timeseries_data[0]
+        ts_1_id, _, _, _ = timeseries_data[1]
+
+        creds = users["Chuck"]["creds"]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+
+            # UTC timezone, avg
+            ret = client.get(
+                TIMESERIES_DATA_URL + "aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id, ts_1_id],
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                }
+            )
+            assert ret.status_code == 200
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.parametrize(
+            'timeseries_data',
+            ({"nb_ts": 2, "nb_tsd": 48}, ),
+            indirect=True
+    )
+    @pytest.mark.parametrize("user", ("user", "anonym"))
+    def test_timeseries_data_get_aggregate_as_user_or_anonym(
+        self, app, user, users, timeseries_data
+    ):
+
+        ts_0_id, _, start_time, end_time = timeseries_data[0]
+        ts_1_id, _, _, _ = timeseries_data[1]
+
+        if user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+            status_code = 403
+        else:
+            auth_context = contextlib.nullcontext()
+            status_code = 401
+
+        client = app.test_client()
+
+        with auth_context:
+
+            # UTC timezone, avg
+            ret = client.get(
+                TIMESERIES_DATA_URL + "aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id, ts_1_id],
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                }
+            )
+            assert ret.status_code == status_code
+
+    @pytest.mark.parametrize(
             'timeseries_data',
             ({"nb_ts": 2, "nb_tsd": 0}, ),
             indirect=True
@@ -143,7 +290,7 @@ class TestTimeseriesDataApi:
 
         # Check there is no data
         ret = client.get(
-            TIMESERIES_URL,
+            TIMESERIES_DATA_URL,
             query_string={
                 "start_time": start_time.isoformat(),
                 "end_time": end_time.isoformat(),
@@ -168,7 +315,7 @@ class TestTimeseriesDataApi:
         )
 
         ret = client.post(
-            TIMESERIES_URL,
+            TIMESERIES_DATA_URL,
             data={
                 "csv_file": (io.BytesIO(csv_str.encode()), 'timeseries.csv')
             }
@@ -177,7 +324,7 @@ class TestTimeseriesDataApi:
 
         # Check data was written in DB
         ret = client.get(
-            TIMESERIES_URL,
+            TIMESERIES_DATA_URL,
             query_string={
                 "start_time": start_time.isoformat(),
                 "end_time": end_time.isoformat(),
@@ -214,12 +361,13 @@ class TestTimeseriesDataApi:
             "Datetime,1\n2020-01-01T00:00:00+00:00,a",
         )
     )
-    def test_timeseries_data_post_error(self, app, timeseries_data, csv_str):
+    @pytest.mark.usefixtures("timeseries_data")
+    def test_timeseries_data_post_error(self, app, csv_str):
 
         client = app.test_client()
 
         ret = client.post(
-            TIMESERIES_URL,
+            TIMESERIES_DATA_URL,
             data={
                 "csv_file": (io.BytesIO(csv_str.encode()), 'timeseries.csv')
             }
@@ -229,3 +377,394 @@ class TestTimeseriesDataApi:
             "code": 422,
             "status": "Unprocessable Entity",
         }
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.parametrize(
+            'timeseries_data',
+            ({"nb_ts": 2, "nb_tsd": 0}, ),
+            indirect=True
+    )
+    def test_timeseries_data_post_as_admin(self, app, users, timeseries_data):
+
+        ts_0_id, _, _, _ = timeseries_data[0]
+        ts_1_id, _, _, _ = timeseries_data[1]
+
+        creds = users["Chuck"]["creds"]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+
+            csv_str = (
+                f"Datetime,{ts_0_id},{ts_1_id}\n"
+                "2020-01-01T00:00:00+00:00,0,10\n"
+                "2020-01-01T01:00:00+00:00,1,11\n"
+                "2020-01-01T02:00:00+00:00,2,12\n"
+                "2020-01-01T03:00:00+00:00,3,13\n"
+            )
+
+            ret = client.post(
+                TIMESERIES_DATA_URL,
+                data={
+                    "csv_file": (io.BytesIO(csv_str.encode()), 'timeseries.csv')
+                }
+            )
+            assert ret.status_code == 201
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.parametrize(
+            'timeseries_data',
+            ({"nb_ts": 2, "nb_tsd": 0}, ),
+            indirect=True
+    )
+    @pytest.mark.parametrize("user", ("user", "anonym"))
+    def test_timeseries_data_post_as_user_or_anonym(
+        self, app, user, users, timeseries_data
+    ):
+
+        ts_0_id, _, _, _ = timeseries_data[0]
+        ts_1_id, _, _, _ = timeseries_data[1]
+
+        if user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+            status_code = 403
+        else:
+            auth_context = contextlib.nullcontext()
+            status_code = 401
+
+        client = app.test_client()
+
+        with auth_context:
+
+            csv_str = (
+                f"Datetime,{ts_0_id},{ts_1_id}\n"
+                "2020-01-01T00:00:00+00:00,0,10\n"
+                "2020-01-01T01:00:00+00:00,1,11\n"
+                "2020-01-01T02:00:00+00:00,2,12\n"
+                "2020-01-01T03:00:00+00:00,3,13\n"
+            )
+
+            ret = client.post(
+                TIMESERIES_DATA_URL,
+                data={
+                    "csv_file": (
+                        io.BytesIO(csv_str.encode()),
+                        'timeseries.csv'
+                    )
+                }
+            )
+            assert ret.status_code == status_code
+
+
+class TestTimeseriesDataForCampaignApi:
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.parametrize(
+            'timeseries_data',
+            ({"nb_ts": 2, "nb_tsd": 4}, ),
+            indirect=True
+    )
+    @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
+    @pytest.mark.usefixtures("users_by_campaigns")
+    @pytest.mark.usefixtures("timeseries_by_campaigns")
+    def test_timeseries_data_for_campaign_get(
+        self, app, user, users, campaigns, timeseries_data,
+    ):
+
+        ts_0_id, _, start_time, end_time = timeseries_data[0]
+        ts_1_id, _, _, _ = timeseries_data[1]
+        campaign_1_id, campaign_2_id = campaigns
+
+        if user == "admin":
+            creds = users["Chuck"]["creds"]
+            auth_context = AuthHeader(creds)
+        elif user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+        else:
+            auth_context = contextlib.nullcontext()
+
+        client = app.test_client()
+
+        with auth_context:
+
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_1_id}/timeseries_data/",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id, ],
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+
+            # Timeseries not in Campaign
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_2_id}/timeseries_data/",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id, ],
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 403
+
+            # User not in Campaign
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_2_id}/timeseries_data/",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_1_id, ],
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            elif user == "user":
+                assert ret.status_code == 403
+            else:
+                assert ret.status_code == 200
+
+            # Time range exceeds Campaign
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_1_id}/timeseries_data/",
+                query_string={
+                    "start_time": (
+                        start_time - dt.timedelta(days=1)
+                    ).isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id, ],
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 403
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.parametrize(
+            'timeseries_data',
+            ({"nb_ts": 2, "nb_tsd": 4}, ),
+            indirect=True
+    )
+    @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
+    @pytest.mark.usefixtures("users_by_campaigns")
+    @pytest.mark.usefixtures("timeseries_by_campaigns")
+    def test_timeseries_data_for_campaign_get_aggregate(
+        self, app, user, users, campaigns, timeseries_data,
+    ):
+
+        ts_0_id, _, start_time, end_time = timeseries_data[0]
+        ts_1_id, _, _, _ = timeseries_data[1]
+        campaign_1_id, campaign_2_id = campaigns
+
+        if user == "admin":
+            creds = users["Chuck"]["creds"]
+            auth_context = AuthHeader(creds)
+        elif user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+        else:
+            auth_context = contextlib.nullcontext()
+
+        client = app.test_client()
+
+        with auth_context:
+
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_1_id}/timeseries_data/aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id],
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+
+            # Timeseries not in Campaign
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_2_id}/timeseries_data/aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id],
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 403
+
+            # User not in Campaign
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_2_id}/timeseries_data/aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_1_id],
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            elif user == "user":
+                assert ret.status_code == 403
+            else:
+                assert ret.status_code == 200
+
+            # Time range exceeds Campaign
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_1_id}/timeseries_data/aggregate",
+                query_string={
+                    "start_time": (
+                        start_time - dt.timedelta(days=1)
+                    ).isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [ts_0_id],
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 403
+
+    @pytest.mark.parametrize(
+        "app", (AuthTestConfig, ), indirect=True
+    )
+    @pytest.mark.parametrize(
+            'timeseries_data',
+            ({"nb_ts": 2, "nb_tsd": 0}, ),
+            indirect=True
+    )
+    @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
+    @pytest.mark.usefixtures("users_by_campaigns")
+    @pytest.mark.usefixtures("timeseries_by_campaigns")
+    @pytest.mark.usefixtures("timeseries_by_campaigns_by_users")
+    def test_timeseries_data_for_campaign_post(
+            self, app, user, users, campaigns, timeseries_data
+    ):
+
+        ts_0_id, _, _, _ = timeseries_data[0]
+        ts_1_id, _, _, _ = timeseries_data[1]
+        campaign_1_id, campaign_2_id = campaigns
+
+        if user == "admin":
+            creds = users["Chuck"]["creds"]
+            auth_context = AuthHeader(creds)
+        elif user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+        else:
+            auth_context = contextlib.nullcontext()
+
+        client = app.test_client()
+
+        with auth_context:
+
+            csv_str = (
+                f"Datetime,{ts_0_id}\n"
+                "2020-01-01T00:00:00+00:00,0\n"
+                "2020-01-01T01:00:00+00:00,1\n"
+                "2020-01-01T02:00:00+00:00,2\n"
+                "2020-01-01T03:00:00+00:00,3\n"
+            )
+            ret = client.post(
+                f"{CAMPAIGNS_URL}{campaign_1_id}/timeseries_data/",
+                data={
+                    "csv_file": (
+                        io.BytesIO(csv_str.encode()), 'timeseries.csv')
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 201
+
+            # Timeseries not in Campaign
+            csv_str = (
+                f"Datetime,{ts_1_id}\n"
+                "2020-01-01T00:00:00+00:00,0\n"
+                "2020-01-01T01:00:00+00:00,1\n"
+                "2020-01-01T02:00:00+00:00,2\n"
+                "2020-01-01T03:00:00+00:00,3\n"
+            )
+            ret = client.post(
+                f"{CAMPAIGNS_URL}{campaign_1_id}/timeseries_data/",
+                data={
+                    "csv_file": (
+                        io.BytesIO(csv_str.encode()), 'timeseries.csv')
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 403
+
+            # User not in Campaign
+            csv_str = (
+                f"Datetime,{ts_1_id}\n"
+                "2020-01-01T00:00:00+00:00,0\n"
+                "2020-01-01T01:00:00+00:00,1\n"
+                "2020-01-01T02:00:00+00:00,2\n"
+                "2020-01-01T03:00:00+00:00,3\n"
+            )
+            ret = client.post(
+                f"{CAMPAIGNS_URL}{campaign_2_id}/timeseries_data/",
+                data={
+                    "csv_file": (
+                        io.BytesIO(csv_str.encode()), 'timeseries.csv')
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            elif user == "user":
+                assert ret.status_code == 403
+            else:
+                assert ret.status_code == 201
+
+            # TODO: User not in Campaign x Timeseries
+
+            # Time range exceeds Campaign
+            csv_str = (
+                f"Datetime,{ts_0_id}\n"
+                "2019-01-01T00:00:00+00:00,0\n"
+                "2020-01-01T01:00:00+00:00,1\n"
+                "2020-01-01T02:00:00+00:00,2\n"
+                "2020-01-01T03:00:00+00:00,3\n"
+            )
+            ret = client.post(
+                f"{CAMPAIGNS_URL}{campaign_1_id}/timeseries_data/",
+                data={
+                    "csv_file": (
+                        io.BytesIO(csv_str.encode()), 'timeseries.csv')
+                }
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 403
