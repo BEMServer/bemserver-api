@@ -8,9 +8,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = ""
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Auth config
-    AUTH_ENABLED = True
-
     # API parameters
     API_TITLE = "BEMServer API"
     API_VERSION = 0.1

@@ -6,11 +6,6 @@ from bemserver_api.settings import Config
 
 class TestConfig(Config):
     TESTING = True
-    AUTH_ENABLED = False
-
-
-class AuthTestConfig(TestConfig):
-    AUTH_ENABLED = True
 
 
 AUTH_HEADER = ContextVar("auth_header", default=None)

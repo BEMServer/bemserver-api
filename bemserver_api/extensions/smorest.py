@@ -17,10 +17,9 @@ class Api(flask_smorest.Api):
     def init_app(self, app, *, spec_kwargs=None):
         super().init_app(app, spec_kwargs=spec_kwargs)
         self.register_field(Timezone, 'string', 'IANA timezone')
-        if app.config.get("AUTH_ENABLED", False):
-            self.spec.components.security_scheme(
-                "BasicAuthentication", {"type": "http", "scheme": "basic"}
-            )
+        self.spec.components.security_scheme(
+            "BasicAuthentication", {"type": "http", "scheme": "basic"}
+        )
 
 
 class Blueprint(flask_smorest.Blueprint):
@@ -47,14 +46,13 @@ class Blueprint(flask_smorest.Blueprint):
 
     @staticmethod
     def _prepare_auth_doc(doc, doc_info, *, app, **kwargs):
-        if app.config.get("AUTH_ENABLED", False):
-            if "auth" in doc_info:
-                doc.setdefault(
-                    "responses", {}
-                )["401"] = http.HTTPStatus(401).name
-                doc["security"] = [
-                    {"BasicAuthentication": doc_info["auth"].get("role", [])}
-                ]
+        if "auth" in doc_info:
+            doc.setdefault(
+                "responses", {}
+            )["401"] = http.HTTPStatus(401).name
+            doc["security"] = [
+                {"BasicAuthentication": doc_info["auth"].get("role", [])}
+            ]
         return doc
 
     @staticmethod
