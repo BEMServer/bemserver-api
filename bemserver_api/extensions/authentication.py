@@ -53,12 +53,9 @@ def init_app(app):
         user = db.session.execute(
             sqla.select(User).where(User.email == username)
         ).scalar()
-        if (
-            user is not None and
-            user.is_active and
+        if user is not None:
             user.check_password(password)
-        ):
-            return user
+        return user
 
     @auth.error_handler
     def auth_error(status):

@@ -3,6 +3,8 @@ from flask import jsonify
 
 from bemserver_api import Blueprint
 
+from bemserver_core.auth import get_current_user
+
 
 class TestAuthentication:
 
@@ -17,7 +19,7 @@ class TestAuthentication:
         @blp.login_required
         @blp.response(200)
         def auth():
-            return None
+            return get_current_user().name
 
         @blp.route('/no_auth')
         @blp.response(204)
@@ -27,24 +29,26 @@ class TestAuthentication:
         api.register_blueprint(blp)
         client = app.test_client()
 
-        # Anonymous or inactive user
-        for headers in (
-            {},
-            {'Authorization': 'Basic ' + inactive_user_creds},
-        ):
-            resp = client.get("/auth_test/auth", headers=headers)
-            assert resp.status_code == 401
-            resp = client.get("/auth_test/no_auth", headers=headers)
-            assert resp.status_code == 204
+        # Anonymous user
+        headers = {}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 401
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
+
+        # Inactive user
+        headers = {'Authorization': 'Basic ' + inactive_user_creds}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 403
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
 
         # Active user
-        for headers in (
-            {'Authorization': 'Basic ' + active_user_creds},
-        ):
-            resp = client.get("/auth_test/auth", headers=headers)
-            assert resp.status_code == 200
-            resp = client.get("/auth_test/no_auth", headers=headers)
-            assert resp.status_code == 204
+        headers = {'Authorization': 'Basic ' + active_user_creds}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 200
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
 
         # Check OpenAPI spec
         spec = api.spec.to_dict()
