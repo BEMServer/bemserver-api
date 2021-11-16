@@ -3,7 +3,7 @@ from flask import jsonify
 
 from bemserver_api import Blueprint
 
-from bemserver_core.auth import get_current_user
+from bemserver_core.authentication import get_current_user
 
 
 class TestAuthentication:

@@ -5,7 +5,7 @@ import datetime as dt
 import flask.testing
 
 from bemserver_core.database import db
-from bemserver_core.auth import CurrentUser
+from bemserver_core.authentication import CurrentUser, OpenBar
 from bemserver_core import model
 from bemserver_core.testutils import setup_db
 
@@ -51,14 +51,15 @@ def app(request, database):
     yield application
 
 
-AdminUser = CurrentUser(
-    model.User(
-        name="Chuck",
-        email="chuck@test.com",
-        is_admin=True,
-        is_active=True
+with OpenBar():
+    AdminUser = CurrentUser(
+        model.User(
+            name="Chuck",
+            email="chuck@test.com",
+            is_admin=True,
+            is_active=True
+        )
     )
-)
 
 
 USERS = (
@@ -70,7 +71,7 @@ USERS = (
 
 @pytest.fixture(params=(USERS, ))
 def users(database, request):
-    with AdminUser:
+    with OpenBar():
         ret = {}
         for user in request.param:
             name, password, email, is_admin, is_active = user
