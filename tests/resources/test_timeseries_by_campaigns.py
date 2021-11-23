@@ -165,15 +165,15 @@ class TestTimeseriesByCampaignsApi:
 
             # GET list
             ret = client.get(TIMESERIES_BY_CAMPAIGNS_URL)
-            assert ret.status_code == status_code
+            if user == "user":
+                assert ret.status_code == 200
+                assert not ret.json
+            else:
+                assert ret.status_code == status_code
 
             # POST
             tbc = {"campaign_id": campaign_1_id, "timeseries_id": ts_1_id}
             ret = client.post(TIMESERIES_BY_CAMPAIGNS_URL, json=tbc)
-            assert ret.status_code == status_code
-
-            # GET list
-            ret = client.get(TIMESERIES_BY_CAMPAIGNS_URL)
             assert ret.status_code == status_code
 
             # GET by id

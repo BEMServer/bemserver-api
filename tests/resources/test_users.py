@@ -201,7 +201,9 @@ class TestUsersApi:
 
             # GET list
             ret = client.get(USERS_URL)
-            assert ret.status_code == 403
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
 
             # POST
             new_user = {

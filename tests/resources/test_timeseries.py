@@ -138,7 +138,11 @@ class TestTimeseriesApi:
 
             # GET list
             ret = client.get(TIMESERIES_URL)
-            assert ret.status_code == status_code
+            if user == "user":
+                assert ret.status_code == 200
+                assert not ret.json
+            else:
+                assert ret.status_code == status_code
 
             # POST
             timeseries_1 = {

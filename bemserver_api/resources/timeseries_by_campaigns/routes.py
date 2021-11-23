@@ -25,7 +25,7 @@ blp = Blueprint(
 @blp.route('/')
 class TimeseriesByCampaignViews(MethodView):
 
-    @blp.login_required(role=["admin"])
+    @blp.login_required
     @blp.etag
     @blp.arguments(TimeseriesByCampaignQueryArgsSchema, location='query')
     @blp.response(200, TimeseriesByCampaignSchema(many=True))
@@ -33,7 +33,7 @@ class TimeseriesByCampaignViews(MethodView):
         """List campaign x timeseries associations"""
         return TimeseriesByCampaign.get(**args)
 
-    @blp.login_required(role=["admin"])
+    @blp.login_required
     @blp.etag
     @blp.arguments(TimeseriesByCampaignSchema)
     @blp.response(201, TimeseriesByCampaignSchema)
@@ -48,7 +48,7 @@ class TimeseriesByCampaignViews(MethodView):
 @blp.route('/<int:item_id>')
 class TimeseriesByCampaignByIdViews(MethodView):
 
-    @blp.login_required(role=["admin"])
+    @blp.login_required
     @blp.etag
     @blp.response(200, TimeseriesByCampaignSchema)
     def get(self, item_id):
@@ -58,7 +58,7 @@ class TimeseriesByCampaignByIdViews(MethodView):
             abort(404)
         return item
 
-    @blp.login_required(role=["admin"])
+    @blp.login_required
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
@@ -73,7 +73,7 @@ class TimeseriesByCampaignByIdViews(MethodView):
 @campaigns_blp.route('/<int:campaign_id>/timeseriesbycampaigns/')
 class TimeseriesByCampaignForCampaignViews(MethodView):
 
-    @campaigns_blp.login_required(role=["admin", "user"])
+    @campaigns_blp.login_required
     @campaigns_blp.etag
     @campaigns_blp.arguments(
         TimeseriesByCampaignQueryArgsSchema(exclude=("campaign_id", )),
@@ -88,7 +88,7 @@ class TimeseriesByCampaignForCampaignViews(MethodView):
 @campaigns_blp.route('/<int:campaign_id>/timeseriesbycampaigns/<int:item_id>')
 class TimeseriesByCampaignForCampaignByIdViews(MethodView):
 
-    @campaigns_blp.login_required(role=["admin", "user"])
+    @campaigns_blp.login_required
     @campaigns_blp.etag
     @campaigns_blp.response(200, TimeseriesByCampaignSchema)
     def get(self, campaign_id, item_id):

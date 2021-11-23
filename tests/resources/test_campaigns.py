@@ -170,7 +170,7 @@ class TestCampaignsApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             campaign_1 = ret_val[0]
-            assert campaign_1["id"] == campaign_1_id
+            assert campaign_1.pop("id") == campaign_1_id
 
             # GET list with filters
             ret = client.get(

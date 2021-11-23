@@ -14,7 +14,7 @@ from bemserver_api.database import db
 class Auth(HTTPBasicAuth):
     """Authentication and authorization management"""
 
-    def login_required(self, f=None, role=None, optional=None):
+    def login_required(self, f=None, **kwargs):
         """Decorator providing authentication and authorization
 
         Uses HTTPBasicAuth.login_required authenticate user
@@ -24,19 +24,17 @@ class Auth(HTTPBasicAuth):
         def decorator(func):
 
             @wraps(func)
-            def wrapper(*args, **kwargs):
+            def wrapper(*args, **func_kwargs):
                 with CurrentUser(self.current_user()):
                     try:
-                        resp = func(*args, **kwargs)
+                        resp = func(*args, **func_kwargs)
                     except BEMServerAuthorizationError:
                         abort(403, message="Authorization error")
                 return resp
 
             # Wrap this inside HTTPAuth.login_required
             # to get authenticated user
-            return super(Auth, self).login_required(
-                role=role, optional=optional
-            )(wrapper)
+            return super(Auth, self).login_required(**kwargs)(wrapper)
 
         if f:
             return decorator(f)
@@ -62,10 +60,3 @@ def init_app(app):
     def auth_error(status):
         # Call abort to trigger error handler and get consistent JSON output
         abort(status, message="Authentication error")
-
-    @auth.get_user_roles
-    def get_user_roles(user):
-        # Authentication disabled
-        if user is None or user.is_admin:
-            return ("admin", )
-        return ("user", )

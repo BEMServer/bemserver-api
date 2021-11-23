@@ -21,7 +21,7 @@ blp = Blueprint(
 @blp.route('/')
 class UserViews(MethodView):
 
-    @blp.login_required(role="admin")
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserQueryArgsSchema, location='query')
     @blp.response(200, UserSchema(many=True))
@@ -29,7 +29,7 @@ class UserViews(MethodView):
         """List users"""
         return User.get(**args)
 
-    @blp.login_required(role="admin")
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserSchema)
     @blp.response(201, UserSchema)
@@ -48,7 +48,7 @@ class UserViews(MethodView):
 @blp.route('/<int:item_id>')
 class UserByIdViews(MethodView):
 
-    @blp.login_required(role=["admin", "user"])
+    @blp.login_required
     @blp.etag
     @blp.response(200, UserSchema)
     def get(self, item_id):
@@ -58,7 +58,7 @@ class UserByIdViews(MethodView):
             abort(404)
         return item
 
-    @blp.login_required(role=["admin", "user"])
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserSchema)
     @blp.response(200, UserSchema)
@@ -75,7 +75,7 @@ class UserByIdViews(MethodView):
         db.session.commit()
         return item
 
-    @blp.login_required(role="admin")
+    @blp.login_required
     @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
@@ -90,7 +90,7 @@ class UserByIdViews(MethodView):
 
 
 @blp.route('/<int:item_id>/set_admin', methods=('PUT', ))
-@blp.login_required(role="admin")
+@blp.login_required
 @blp.etag
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)
@@ -105,7 +105,7 @@ def set_admin(args, item_id):
 
 
 @blp.route('/<int:item_id>/set_active', methods=('PUT', ))
-@blp.login_required(role="admin")
+@blp.login_required
 @blp.etag
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)

@@ -26,7 +26,7 @@ blp = Blueprint(
 
 
 @blp.route('/', methods=('GET', ))
-@blp.login_required(role=["admin"])
+@blp.login_required
 @blp.arguments(TimeseriesDataQueryArgsSchema, location='query')
 @blp.response(200)
 def get_csv(args):
@@ -47,7 +47,7 @@ def get_csv(args):
 
 
 @blp.route('/aggregate', methods=('GET', ))
-@blp.login_required(role=["admin"])
+@blp.login_required
 @blp.arguments(TimeseriesDataAggregateQueryArgsSchema, location='query')
 @blp.response(200)
 def get_aggregate_csv(args):
@@ -73,7 +73,7 @@ def get_aggregate_csv(args):
 # TODO: document response
 # https://github.com/marshmallow-code/flask-smorest/issues/142
 @blp.route('/', methods=('POST', ))
-@blp.login_required(role=["admin"])
+@blp.login_required
 @blp.arguments(TimeseriesCSVFileSchema, location='files')
 @blp.response(201)
 def post_csv(files):
@@ -87,7 +87,7 @@ def post_csv(files):
 
 
 @campaigns_blp.route('/<int:campaign_id>/timeseries_data/', methods=('GET', ))
-@campaigns_blp.login_required(role=["admin", "user"])
+@campaigns_blp.login_required
 @campaigns_blp.arguments(TimeseriesDataQueryArgsSchema, location='query')
 @campaigns_blp.response(200)
 def get_csv_for_campaign(args, campaign_id):
@@ -110,7 +110,7 @@ def get_csv_for_campaign(args, campaign_id):
 
 @campaigns_blp.route(
     '/<int:campaign_id>/timeseries_data/aggregate', methods=('GET', ))
-@campaigns_blp.login_required(role=["admin", "user"])
+@campaigns_blp.login_required
 @campaigns_blp.arguments(
     TimeseriesDataAggregateQueryArgsSchema, location='query')
 @campaigns_blp.response(200)
@@ -138,7 +138,7 @@ def get_aggregate_csv_for_campaign(args, campaign_id):
 # TODO: document response
 # https://github.com/marshmallow-code/flask-smorest/issues/142
 @campaigns_blp.route('/<int:campaign_id>/timeseries_data/', methods=('POST', ))
-@campaigns_blp.login_required(role=["admin", "user"])
+@campaigns_blp.login_required
 @campaigns_blp.arguments(TimeseriesCSVFileSchema, location='files')
 @campaigns_blp.response(201)
 def post_csv_for_campaign(files, campaign_id):

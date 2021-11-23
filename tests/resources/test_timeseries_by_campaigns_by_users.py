@@ -145,7 +145,7 @@ class TestTimeseriesByCampaignsByUsersApi:
     ):
         user_1_id = users["Active"]["id"]
         tbc_1_id, _ = timeseries_by_campaigns
-        tbcbu_1_id, _ = timeseries_by_campaigns_by_users
+        tbcbu_1_id, tbcbu_2_id = timeseries_by_campaigns_by_users
 
         if user == "user":
             creds = users["Active"]["creds"]
@@ -161,7 +161,12 @@ class TestTimeseriesByCampaignsByUsersApi:
 
             # GET list
             ret = client.get(TIMESERIES_BY_CAMPAIGNS_BY_USERS_URL)
-            assert ret.status_code == status_code
+            if user == "user":
+                assert ret.status_code == 200
+                ret_val = ret.json
+                assert len(ret_val) == 1
+            else:
+                assert ret.status_code == status_code
 
             # POST
             tbcbu = {
@@ -172,13 +177,15 @@ class TestTimeseriesByCampaignsByUsersApi:
                 TIMESERIES_BY_CAMPAIGNS_BY_USERS_URL, json=tbcbu)
             assert ret.status_code == status_code
 
-            # GET list
-            ret = client.get(TIMESERIES_BY_CAMPAIGNS_BY_USERS_URL)
-            assert ret.status_code == status_code
-
             # GET by id
             ret = client.get(
                 f"{TIMESERIES_BY_CAMPAIGNS_BY_USERS_URL}{tbcbu_1_id}")
+            if user == "user":
+                assert ret.status_code == 200
+            else:
+                assert ret.status_code == status_code
+            ret = client.get(
+                f"{TIMESERIES_BY_CAMPAIGNS_BY_USERS_URL}{tbcbu_2_id}")
             assert ret.status_code == status_code
 
             # DELETE

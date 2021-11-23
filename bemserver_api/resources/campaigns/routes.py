@@ -21,7 +21,7 @@ blp = Blueprint(
 @blp.route('/')
 class CampaignViews(MethodView):
 
-    @blp.login_required(role=["admin", "user"])
+    @blp.login_required
     @blp.etag
     @blp.arguments(CampaignQueryArgsSchema, location='query')
     @blp.response(200, CampaignSchema(many=True))
@@ -29,7 +29,7 @@ class CampaignViews(MethodView):
         """List campaigns"""
         return Campaign.get(**args)
 
-    @blp.login_required(role="admin")
+    @blp.login_required
     @blp.etag
     @blp.arguments(CampaignSchema)
     @blp.response(201, CampaignSchema)
@@ -44,7 +44,7 @@ class CampaignViews(MethodView):
 @blp.route('/<int:item_id>')
 class CampaignByIdViews(MethodView):
 
-    @blp.login_required(role=["admin", "user"])
+    @blp.login_required
     @blp.etag
     @blp.response(200, CampaignSchema)
     def get(self, item_id):
@@ -54,7 +54,7 @@ class CampaignByIdViews(MethodView):
             abort(404)
         return item
 
-    @blp.login_required(role="admin")
+    @blp.login_required
     @blp.etag
     @blp.arguments(CampaignSchema)
     @blp.response(200, CampaignSchema)
@@ -69,7 +69,7 @@ class CampaignByIdViews(MethodView):
         db.session.commit()
         return item
 
-    @blp.login_required(role="admin")
+    @blp.login_required
     @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error

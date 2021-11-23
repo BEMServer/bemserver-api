@@ -21,7 +21,7 @@ blp = Blueprint(
 @blp.route('/')
 class UserByCampaignViews(MethodView):
 
-    @blp.login_required(role=["admin", "user"])
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserByCampaignQueryArgsSchema, location='query')
     @blp.response(200, UserByCampaignSchema(many=True))
@@ -29,7 +29,7 @@ class UserByCampaignViews(MethodView):
         """List campaign x user associations"""
         return UserByCampaign.get(**args)
 
-    @blp.login_required(role="admin")
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserByCampaignSchema)
     @blp.response(201, UserByCampaignSchema)
@@ -44,7 +44,7 @@ class UserByCampaignViews(MethodView):
 @blp.route('/<int:item_id>')
 class UserByCampaignByIdViews(MethodView):
 
-    @blp.login_required(role=["admin", "user"])
+    @blp.login_required
     @blp.etag
     @blp.response(200, UserByCampaignSchema)
     def get(self, item_id):
@@ -54,7 +54,7 @@ class UserByCampaignByIdViews(MethodView):
             abort(404)
         return item
 
-    @blp.login_required(role="admin")
+    @blp.login_required
     @blp.response(204)
     def delete(self, item_id):
         """Delete a campaign x user association"""

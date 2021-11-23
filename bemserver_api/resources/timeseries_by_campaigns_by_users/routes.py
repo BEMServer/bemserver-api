@@ -25,7 +25,7 @@ blp = Blueprint(
 @blp.route('/')
 class TimeseriesByCampaignByUserViews(MethodView):
 
-    @blp.login_required(role=["admin"])
+    @blp.login_required
     @blp.etag
     @blp.arguments(TimeseriesByCampaignByUserQueryArgsSchema, location='query')
     @blp.response(200, TimeseriesByCampaignByUserSchema(many=True))
@@ -33,7 +33,7 @@ class TimeseriesByCampaignByUserViews(MethodView):
         """List campaign x timeseries x users associations"""
         return TimeseriesByCampaignByUser.get(**args)
 
-    @blp.login_required(role=["admin"])
+    @blp.login_required
     @blp.etag
     @blp.arguments(TimeseriesByCampaignByUserSchema)
     @blp.response(201, TimeseriesByCampaignByUserSchema)
@@ -48,7 +48,7 @@ class TimeseriesByCampaignByUserViews(MethodView):
 @blp.route('/<int:item_id>')
 class TimeseriesByCampaignByUserByIdViews(MethodView):
 
-    @blp.login_required(role=["admin"])
+    @blp.login_required
     @blp.etag
     @blp.response(200, TimeseriesByCampaignByUserSchema)
     def get(self, item_id):
@@ -58,7 +58,7 @@ class TimeseriesByCampaignByUserByIdViews(MethodView):
             abort(404)
         return item
 
-    @blp.login_required(role=["admin"])
+    @blp.login_required
     @blp.response(204)
     def delete(self, item_id):
         """Delete a campaign x timeseries x user association"""
@@ -72,7 +72,7 @@ class TimeseriesByCampaignByUserByIdViews(MethodView):
 @campaigns_blp.route('/<int:campaign_id>/timeseriesbycampaignsbyusers/')
 class TimeseriesByCampaignByUserForCampaignViews(MethodView):
 
-    @campaigns_blp.login_required(role=["admin", "user"])
+    @campaigns_blp.login_required
     @campaigns_blp.etag
     @campaigns_blp.arguments(
         TimeseriesByCampaignByUserQueryArgsSchema,
@@ -88,7 +88,7 @@ class TimeseriesByCampaignByUserForCampaignViews(MethodView):
     '/<int:campaign_id>/timeseriesbycampaignsbyusers/<int:item_id>')
 class TimeseriesByCampaignByUserForCampaignByIdViews(MethodView):
 
-    @campaigns_blp.login_required(role=["admin", "user"])
+    @campaigns_blp.login_required
     @campaigns_blp.etag
     @campaigns_blp.response(200, TimeseriesByCampaignByUserSchema)
     def get(self, campaign_id, item_id):

@@ -31,14 +31,8 @@ class Blueprint(flask_smorest.Blueprint):
     @staticmethod
     def login_required(func=None, **kwargs):
         def decorator(function):
-            doc = {}
-            if "role" in kwargs:
-                roles = kwargs["role"]
-                if isinstance(roles, str):
-                    roles = [roles]
-                doc["role"] = roles
             function = auth.login_required(**kwargs)(function)
-            getattr(function, "_apidoc", {})["auth"] = doc
+            getattr(function, "_apidoc", {})["auth"] = True
             return function
         if func is None:
             return decorator
@@ -46,13 +40,11 @@ class Blueprint(flask_smorest.Blueprint):
 
     @staticmethod
     def _prepare_auth_doc(doc, doc_info, *, app, **kwargs):
-        if "auth" in doc_info:
+        if doc_info.get("auth", False):
             doc.setdefault(
                 "responses", {}
             )["401"] = http.HTTPStatus(401).name
-            doc["security"] = [
-                {"BasicAuthentication": doc_info["auth"].get("role", [])}
-            ]
+            doc["security"] = [{"BasicAuthentication": []}]
         return doc
 
     @staticmethod
