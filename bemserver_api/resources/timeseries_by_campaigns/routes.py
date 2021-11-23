@@ -2,7 +2,7 @@
 from flask.views import MethodView
 from flask_smorest import abort
 
-from bemserver_core.model import TimeseriesByCampaign
+from bemserver_core.model import TimeseriesByCampaign, Campaign
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
@@ -82,6 +82,8 @@ class TimeseriesByCampaignForCampaignViews(MethodView):
     @campaigns_blp.response(200, TimeseriesByCampaignSchema(many=True))
     def get(self, args, campaign_id):
         """List campaign x timeseries associations for campaign"""
+        if Campaign.get_by_id(campaign_id) is None:
+            abort(404)
         return TimeseriesByCampaign.get(campaign_id=campaign_id, **args)
 
 
@@ -93,6 +95,8 @@ class TimeseriesByCampaignForCampaignByIdViews(MethodView):
     @campaigns_blp.response(200, TimeseriesByCampaignSchema)
     def get(self, campaign_id, item_id):
         """Get campaign x timeseries association by ID for campaign"""
+        if Campaign.get_by_id(campaign_id) is None:
+            abort(404)
         item = TimeseriesByCampaign.get_by_id(item_id, campaign_id=campaign_id)
         if item is None:
             abort(404)

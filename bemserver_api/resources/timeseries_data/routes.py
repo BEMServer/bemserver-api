@@ -4,6 +4,7 @@ import io
 from flask import Response
 from flask_smorest import abort
 
+from bemserver_core.model import Campaign
 from bemserver_core.csv_io import tscsvio
 from bemserver_core.exceptions import TimeseriesCSVIOError
 
@@ -92,6 +93,8 @@ def post_csv(files):
 @campaigns_blp.response(200)
 def get_csv_for_campaign(args, campaign_id):
     """Get timeseries data as CSV file"""
+    if Campaign.get_by_id(campaign_id) is None:
+        abort(404)
     csv_str = tscsvio.export_csv(
         args['start_time'],
         args['end_time'],
@@ -116,6 +119,8 @@ def get_csv_for_campaign(args, campaign_id):
 @campaigns_blp.response(200)
 def get_aggregate_csv_for_campaign(args, campaign_id):
     """Get aggregated timeseries data as CSV file"""
+    if Campaign.get_by_id(campaign_id) is None:
+        abort(404)
     csv_str = tscsvio.export_csv_bucket(
         args['start_time'],
         args['end_time'],
@@ -143,6 +148,8 @@ def get_aggregate_csv_for_campaign(args, campaign_id):
 @campaigns_blp.response(201)
 def post_csv_for_campaign(files, campaign_id):
     """Post timeseries data as CSV file"""
+    if Campaign.get_by_id(campaign_id) is None:
+        abort(404)
     csv_file = files['csv_file']
     with io.TextIOWrapper(csv_file) as csv_file_txt:
         try:
