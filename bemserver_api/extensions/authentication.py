@@ -5,7 +5,7 @@ import sqlalchemy as sqla
 from flask_httpauth import HTTPBasicAuth
 from flask_smorest import abort
 from bemserver_core.model.users import User
-from bemserver_core.authentication import (
+from bemserver_core.authorization import (
     CurrentUser, BEMServerAuthorizationError)
 
 from bemserver_api.database import db
