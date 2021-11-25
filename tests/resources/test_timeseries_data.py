@@ -565,7 +565,6 @@ class TestTimeseriesDataForCampaignApi:
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_campaigns")
     @pytest.mark.usefixtures("timeseries_by_campaigns")
-    @pytest.mark.usefixtures("timeseries_by_campaigns_by_users")
     def test_timeseries_data_for_campaign_post(
             self, app, user, users, campaigns, timeseries_data
     ):
@@ -647,8 +646,6 @@ class TestTimeseriesDataForCampaignApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 201
-
-            # TODO: User not in Campaign x Timeseries
 
             # Time range exceeds Campaign
             csv_str = (
