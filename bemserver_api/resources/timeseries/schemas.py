@@ -21,7 +21,3 @@ class TimeseriesQueryArgsSchema(ma.Schema):
     name = ma.fields.Str()
     unit = ma.fields.Str()
     campaign_id = ma.fields.Int()
-
-
-class TimeseriesByIdQueryArgsSchema(ma.Schema):
-    campaign_id = ma.fields.Int()

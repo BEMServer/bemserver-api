@@ -6,6 +6,7 @@ from flask_smorest import abort
 
 from bemserver_core.model import Campaign
 from bemserver_core.csv_io import tscsvio
+from bemserver_core.authorization import CurrentCampaign
 from bemserver_core.exceptions import TimeseriesCSVIOError
 
 from bemserver_api import Blueprint
@@ -93,14 +94,15 @@ def post_csv(files):
 @campaigns_blp.response(200)
 def get_csv_for_campaign(args, campaign_id):
     """Get timeseries data as CSV file"""
-    if Campaign.get_by_id(campaign_id) is None:
+    campaign = Campaign.get_by_id(campaign_id)
+    if campaign is None:
         abort(404)
-    csv_str = tscsvio.export_csv(
-        args['start_time'],
-        args['end_time'],
-        args['timeseries'],
-        campaign_id=campaign_id,
-    )
+    with CurrentCampaign(campaign):
+        csv_str = tscsvio.export_csv(
+            args['start_time'],
+            args['end_time'],
+            args['timeseries'],
+        )
 
     response = Response(csv_str, mimetype='text/csv')
     response.headers.set(
@@ -119,17 +121,18 @@ def get_csv_for_campaign(args, campaign_id):
 @campaigns_blp.response(200)
 def get_aggregate_csv_for_campaign(args, campaign_id):
     """Get aggregated timeseries data as CSV file"""
-    if Campaign.get_by_id(campaign_id) is None:
+    campaign = Campaign.get_by_id(campaign_id)
+    if campaign is None:
         abort(404)
-    csv_str = tscsvio.export_csv_bucket(
-        args['start_time'],
-        args['end_time'],
-        args['timeseries'],
-        args['bucket_width'],
-        args['timezone'],
-        args['aggregation'],
-        campaign_id=campaign_id,
-    )
+    with CurrentCampaign(campaign):
+        csv_str = tscsvio.export_csv_bucket(
+            args['start_time'],
+            args['end_time'],
+            args['timeseries'],
+            args['bucket_width'],
+            args['timezone'],
+            args['aggregation'],
+        )
 
     response = Response(csv_str, mimetype='text/csv')
     response.headers.set(
@@ -148,11 +151,13 @@ def get_aggregate_csv_for_campaign(args, campaign_id):
 @campaigns_blp.response(201)
 def post_csv_for_campaign(files, campaign_id):
     """Post timeseries data as CSV file"""
-    if Campaign.get_by_id(campaign_id) is None:
+    campaign = Campaign.get_by_id(campaign_id)
+    if campaign is None:
         abort(404)
     csv_file = files['csv_file']
-    with io.TextIOWrapper(csv_file) as csv_file_txt:
-        try:
-            tscsvio.import_csv(csv_file_txt, campaign_id=campaign_id)
-        except TimeseriesCSVIOError:
-            abort(422, "Invalid csv file content")
+    with CurrentCampaign(campaign):
+        with io.TextIOWrapper(csv_file) as csv_file_txt:
+            try:
+                tscsvio.import_csv(csv_file_txt)
+            except TimeseriesCSVIOError:
+                abort(422, "Invalid csv file content")

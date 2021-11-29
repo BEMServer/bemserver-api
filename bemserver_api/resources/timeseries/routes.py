@@ -2,15 +2,13 @@
 from flask.views import MethodView
 from flask_smorest import abort
 
-from bemserver_core.model import Timeseries, Campaign
+from bemserver_core.model import Timeseries
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
-from bemserver_api.resources.campaigns import blp as campaigns_blp
 
-from .schemas import (
-    TimeseriesSchema, TimeseriesQueryArgsSchema, TimeseriesByIdQueryArgsSchema
-)
+from .schemas import TimeseriesSchema, TimeseriesQueryArgsSchema
+
 
 blp = Blueprint(
     'Timeseries',
@@ -49,11 +47,10 @@ class TimeseriesByIdViews(MethodView):
 
     @blp.login_required
     @blp.etag
-    @blp.arguments(TimeseriesByIdQueryArgsSchema, location='query')
     @blp.response(200, TimeseriesSchema)
-    def get(self, args, item_id):
+    def get(self, item_id):
         """Get timeseries by ID"""
-        item = Timeseries.get_by_id(item_id, **args)
+        item = Timeseries.get_by_id(item_id)
         if item is None:
             abort(404)
         return item
@@ -85,37 +82,3 @@ class TimeseriesByIdViews(MethodView):
         blp.check_etag(item, TimeseriesSchema)
         item.delete()
         db.session.commit()
-
-
-@campaigns_blp.route('/<int:campaign_id>/timeseries/')
-class TimeseriesForCampaignViews(MethodView):
-
-    @campaigns_blp.login_required
-    @campaigns_blp.etag
-    @campaigns_blp.arguments(
-        TimeseriesQueryArgsSchema(exclude=("campaign_id", )),
-        location='query'
-    )
-    @campaigns_blp.response(200, TimeseriesSchema(many=True))
-    @campaigns_blp.paginate(SQLCursorPage)
-    def get(self, args, campaign_id):
-        """List timeseries for campaign"""
-        if Campaign.get_by_id(campaign_id) is None:
-            abort(404)
-        return Timeseries.get(campaign_id=campaign_id, **args)
-
-
-@campaigns_blp.route('/<int:campaign_id>/timeseries/<int:item_id>')
-class TimeseriesForCampaignByIdViews(MethodView):
-
-    @campaigns_blp.login_required
-    @campaigns_blp.etag
-    @campaigns_blp.response(200, TimeseriesSchema)
-    def get(self, campaign_id, item_id):
-        """Get timeseries by ID for campaign"""
-        if Campaign.get_by_id(campaign_id) is None:
-            abort(404)
-        item = Timeseries.get_by_id(item_id, campaign_id=campaign_id)
-        if item is None:
-            abort(404)
-        return item
