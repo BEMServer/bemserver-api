@@ -81,7 +81,7 @@ class EventsViews(MethodView):
         Create an event with a `NEW` state.
         """
         item = Event.open(**new_item)
-        item.save()
+        db.session.commit()
         return item
 
 
@@ -106,6 +106,7 @@ class EventsByIdViews(MethodView):
             abort(404)
         blp.check_etag(item, EventSchema)
         item.delete()
+        db.session.commit()
 
 
 @blp.route('/<int:item_id>/extend', methods=('PUT',))
@@ -127,6 +128,7 @@ def put_extend(item_id):
         item.extend()
     except EventError as exc:
         abort(400, str(exc))
+    db.session.commit()
     return item
 
 
@@ -145,4 +147,5 @@ def put_close(args, item_id):
         abort(404)
     blp.check_etag(item, EventSchema)
     item.close(**args)
+    db.session.commit()
     return item

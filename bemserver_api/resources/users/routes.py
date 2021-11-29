@@ -35,11 +35,10 @@ class UserViews(MethodView):
     def post(self, new_item):
         """Add a new user"""
         password = new_item.pop("password")
-        item = User(**new_item)
+        item = User.new(**new_item)
         item.set_password(password)
         item.is_admin = False
         item.is_active = True
-        db.session.add(item)
         db.session.commit()
         return item
 
@@ -69,7 +68,6 @@ class UserByIdViews(MethodView):
         blp.check_etag(item, UserSchema)
         item.update(**new_item)
         item.set_password(password)
-        db.session.add(item)
         db.session.commit()
         return item
 

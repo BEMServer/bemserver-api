@@ -35,8 +35,7 @@ class TimeseriesViews(MethodView):
     @blp.catch_integrity_error
     def post(self, new_item):
         """Add a new timeseries"""
-        item = Timeseries(**new_item)
-        db.session.add(item)
+        item = Timeseries.new(**new_item)
         db.session.commit()
         return item
 
@@ -64,7 +63,6 @@ class TimeseriesByIdViews(MethodView):
             abort(404)
         blp.check_etag(item, TimeseriesSchema)
         item.update(**new_item)
-        db.session.add(item)
         db.session.commit()
         return item
 

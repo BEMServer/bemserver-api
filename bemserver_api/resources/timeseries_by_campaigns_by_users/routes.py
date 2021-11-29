@@ -37,8 +37,7 @@ class TimeseriesByCampaignViews(MethodView):
     @blp.catch_integrity_error
     def post(self, new_item):
         """Add a new campaign x timeseries x user association"""
-        item = TimeseriesByCampaignByUser(**new_item)
-        db.session.add(item)
+        item = TimeseriesByCampaignByUser.new(**new_item)
         db.session.commit()
         return item
 
