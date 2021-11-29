@@ -34,8 +34,7 @@ class CampaignViews(MethodView):
     @blp.catch_integrity_error
     def post(self, new_item):
         """Add a new campaign"""
-        item = Campaign(**new_item)
-        db.session.add(item)
+        item = Campaign.new(**new_item)
         db.session.commit()
         return item
 
@@ -63,7 +62,6 @@ class CampaignByIdViews(MethodView):
             abort(404)
         blp.check_etag(item, CampaignSchema)
         item.update(**new_item)
-        db.session.add(item)
         db.session.commit()
         return item
 
