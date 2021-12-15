@@ -4,7 +4,9 @@ import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import (
-    EventState, EventCategory, EventLevel, EventTarget, Event)
+    EventState, EventCategory, EventLevel,
+    EventChannel, EventChannelByCampaign,
+)
 
 from bemserver_api import AutoSchema
 
@@ -34,50 +36,27 @@ class EventLevelSchema(AutoSchema):
     description = msa.auto_field(validate=ma.validate.Length(1, 250))
 
 
-class EventTargetSchema(AutoSchema):
+class EventChannelSchema(AutoSchema):
     class Meta:
-        table = EventTarget.__table__
+        table = EventChannel.__table__
 
     id = msa.auto_field(dump_only=True)
-    description = msa.auto_field(validate=ma.validate.Length(1, 250))
+    name = msa.auto_field(validate=ma.validate.Length(1, 80))
 
 
-class EventSchema(AutoSchema):
+class EventChannelQueryArgsSchema(ma.Schema):
+    name = ma.fields.Str()
+    campaign_id = ma.fields.Int()
+
+
+class EventChannelByCampaignSchema(AutoSchema):
     class Meta:
-        table = Event.__table__
+        table = EventChannelByCampaign.__table__
+        include_fk = True
 
     id = msa.auto_field(dump_only=True)
-    category = msa.auto_field()
-    level = msa.auto_field()
-    timestamp_start = msa.auto_field()
-    timestamp_end = msa.auto_field()
-    source = msa.auto_field()
-    target_type = msa.auto_field()
-    target_id = msa.auto_field()
-    state = msa.auto_field()
-    timestamp_last_update = msa.auto_field()
 
 
-class EventPostArgsSchema(ma.Schema):
-
-    source = ma.fields.Str(required=True)
-    category = ma.fields.Str(required=True)
-    target_type = ma.fields.Str(required=True)
-    target_id = ma.fields.Int(required=True)
-    level = ma.fields.Str()
-    timestamp_start = ma.fields.AwareDateTime()
-    description = ma.fields.Str()
-
-
-class EventClosePostArgsSchema(ma.Schema):
-
-    timestamp_end = ma.fields.AwareDateTime()
-
-
-class EventQueryArgsSchema(ma.Schema):
-    source = ma.fields.Str()
-    category = ma.fields.Str()
-    target_type = ma.fields.Str()
-    target_id = ma.fields.Int()
-    level = ma.fields.Str()
-    state = ma.fields.Str()
+class EventChannelByCampaignQueryArgsSchema(ma.Schema):
+    campaign_id = ma.fields.Int()
+    event_channel_id = ma.fields.Int()

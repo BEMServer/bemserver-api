@@ -172,3 +172,58 @@ def timeseries_by_campaigns(timeseries_data, campaigns):
         )
         db.session.commit()
     return ts_by_campaign_1.id, ts_by_campaign_2.id
+
+
+@pytest.fixture
+def event_channels(database):
+    with AdminUser:
+        event_channel_1 = model.EventChannel.new(
+            name="Event channel 1",
+        )
+        event_channel_2 = model.EventChannel.new(
+            name="Event channel 2",
+        )
+        db.session.commit()
+    return event_channel_1.id, event_channel_2.id
+
+
+@pytest.fixture
+def event_channels_by_campaigns(database, campaigns, event_channels):
+    with OpenBar():
+        ecc_1 = model.EventChannelByCampaign(
+            event_channel_id=event_channels[0],
+            campaign_id=campaigns[0],
+        )
+        db.session.add(ecc_1)
+        ecc_2 = model.EventChannelByCampaign(
+            event_channel_id=event_channels[1],
+            campaign_id=campaigns[1],
+        )
+        db.session.add(ecc_2)
+        db.session.commit()
+    return (ecc_1.id, ecc_2.id)
+
+
+@pytest.fixture
+def timeseries_events_by_campaigns(database, campaigns, event_channels):
+    with OpenBar():
+        tse_1 = model.TimeseriesEvent(
+            channel_id=event_channels[0],
+            timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
+            source="Event source",
+            category="observation_missing",
+            level="INFO",
+            state="NEW",
+        )
+        db.session.add(tse_1)
+        tse_2 = model.TimeseriesEvent(
+            channel_id=event_channels[1],
+            timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
+            source="Another event source",
+            category="observation_missing",
+            level="WARNING",
+            state="ONGOING",
+        )
+        db.session.add(tse_2)
+        db.session.commit()
+    return (tse_1.id, tse_2.id)

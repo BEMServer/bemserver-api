@@ -1,4 +1,5 @@
-from .routes import blp  # noqa
+from .routes import blp
+from .timeseries import routes  # noqa
 
 
 def register_blueprints(api):

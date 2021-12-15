@@ -1,181 +1,506 @@
 """Events tests"""
+import contextlib
 
-import datetime as dt
+import pytest
+
+from tests.common import AuthHeader
 
 
 DUMMY_ID = "69"
 
 EVENTS_URL = "/events/"
+EVENT_CHANNELS_URL = f"{EVENTS_URL}channels/"
+EVENT_CHANNELS_BY_CAMPAIGNS_URL = f"{EVENTS_URL}channelsbycampaigns/"
 
 
-class TestEventsApi:
+class TestEventStatesApi:
 
-    def test_event_states_api(self, app):
+    @pytest.mark.parametrize("user", ("user", "admin"))
+    def test_event_states_api_as_admin_or_user(self, app, user, users):
+
+        if user == "user":
+            creds = users["Active"]["creds"]
+        else:
+            creds = users["Chuck"]["creds"]
 
         client = app.test_client()
 
-        # GET state list
+        with AuthHeader(creds):
+            ret = client.get(f"{EVENTS_URL}states")
+            assert ret.status_code == 200
+            assert len(ret.json) == 3
+            for x in ret.json:
+                assert x["id"] in ("NEW", "ONGOING", "CLOSED",)
+
+    def test_event_states_api_as_anonym(self, app):
+
+        client = app.test_client()
+
         ret = client.get(f"{EVENTS_URL}states")
-        assert ret.status_code == 200
-        assert len(ret.json) == 3
-        for x in ret.json:
-            assert x["id"] in ("NEW", "ONGOING", "CLOSED",)
+        assert ret.status_code == 401
 
-    def test_event_levels_api(self, app):
+
+class TestEventLevelsApi:
+
+    @pytest.mark.parametrize("user", ("user", "admin"))
+    def test_event_levels_api_as_admin_or_user(self, app, user, users):
+
+        if user == "user":
+            creds = users["Active"]["creds"]
+        else:
+            creds = users["Chuck"]["creds"]
 
         client = app.test_client()
 
-        # GET level list
+        with AuthHeader(creds):
+
+            # GET level list
+            ret = client.get(f"{EVENTS_URL}levels")
+            assert ret.status_code == 200
+            assert len(ret.json) == 4
+            for x in ret.json:
+                assert x["id"] in ("INFO", "WARNING", "ERROR", "CRITICAL",)
+
+    def test_event_levels_api_as_anonym(self, app):
+
+        client = app.test_client()
+
         ret = client.get(f"{EVENTS_URL}levels")
-        assert ret.status_code == 200
-        assert len(ret.json) == 4
-        for x in ret.json:
-            assert x["id"] in ("INFO", "WARNING", "ERROR", "CRITICAL",)
+        assert ret.status_code == 401
 
-    def test_event_targets_api(self, app):
 
-        client = app.test_client()
+class TestEventCategoriesApi:
 
-        # GET target list
-        ret = client.get(f"{EVENTS_URL}targets")
-        assert ret.status_code == 200
-        assert len(ret.json) == 6
-        for x in ret.json:
-            assert x["id"] in (
-                "TIMESERIES", "SITE", "BUILDING", "FLOOR", "SPACE", "SENSOR",)
+    @pytest.mark.parametrize("user", ("user", "admin"))
+    def test_event_categories_api_as_admin_or_user(self, app, user, users):
 
-    def test_event_categories_api(self, app):
+        if user == "user":
+            creds = users["Active"]["creds"]
+        else:
+            creds = users["Chuck"]["creds"]
 
         client = app.test_client()
 
-        # GET category list
+        with AuthHeader(creds):
+
+            # GET category list
+            ret = client.get(f"{EVENTS_URL}categories")
+            assert ret.status_code == 200
+            assert len(ret.json) > 0
+
+    def test_event_categories_api_as_anonym(self, app):
+
+        client = app.test_client()
+
         ret = client.get(f"{EVENTS_URL}categories")
-        assert ret.status_code == 200
-        assert len(ret.json) > 0
+        assert ret.status_code == 401
 
-    def test_events_api(self, app):
+
+class TestEventChannelsApi:
+
+    def test_event_channels_api(self, app, users):
+
+        creds = users["Chuck"]["creds"]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_URL)
+            assert ret.status_code == 200
+            assert ret.json == []
+
+            # POST
+            event_channel_1 = {
+                "name": "Event channel 1",
+            }
+            ret = client.post(EVENT_CHANNELS_URL, json=event_channel_1)
+            assert ret.status_code == 201
+            ret_val = ret.json
+            event_channel_1_id = ret_val.pop("id")
+            event_channel_1_etag = ret.headers["ETag"]
+            assert ret_val == event_channel_1
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == event_channel_1_id
+
+            # GET by id
+            ret = client.get(f"{EVENT_CHANNELS_URL}{event_channel_1_id}")
+            assert ret.status_code == 200
+            assert ret.headers["ETag"] == event_channel_1_etag
+            ret_val = ret.json
+            ret_val.pop("id")
+            assert ret_val == event_channel_1
+
+            # PUT
+            event_channel_1["name"] = "Great event channel 1"
+            ret = client.put(
+                f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
+                json=event_channel_1,
+                headers={"If-Match": event_channel_1_etag}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            ret_val.pop("id")
+            event_channel_1_etag = ret.headers["ETag"]
+            assert ret_val == event_channel_1
+
+            # PUT wrong ID -> 404
+            ret = client.put(
+                f"{EVENT_CHANNELS_URL}{DUMMY_ID}",
+                json=event_channel_1,
+                headers={"If-Match": event_channel_1_etag}
+            )
+            assert ret.status_code == 404
+
+            # POST event_channel 2
+            event_channel_2 = {
+                "name": "Event channel 2",
+            }
+            ret = client.post(EVENT_CHANNELS_URL, json=event_channel_2)
+            ret_val = ret.json
+            event_channel_2_id = ret_val.pop("id")
+            event_channel_2_etag = ret.headers["ETag"]
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+
+            # GET list with filters
+            ret = client.get(
+                EVENT_CHANNELS_URL,
+                query_string={"name": "Great event channel 1"}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == event_channel_1_id
+
+            # DELETE wrong ID -> 404
+            ret = client.delete(
+                f"{EVENT_CHANNELS_URL}{DUMMY_ID}",
+                headers={"If-Match": event_channel_1_etag}
+            )
+            assert ret.status_code == 404
+
+            # DELETE
+            ret = client.delete(
+                f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
+                headers={"If-Match": event_channel_1_etag}
+            )
+            assert ret.status_code == 204
+            ret = client.delete(
+                f"{EVENT_CHANNELS_URL}{event_channel_2_id}",
+                headers={"If-Match": event_channel_2_etag}
+            )
+            assert ret.status_code == 204
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+
+            # GET by id -> 404
+            ret = client.get(f"{EVENT_CHANNELS_URL}{event_channel_1_id}")
+            assert ret.status_code == 404
+
+    @pytest.mark.usefixtures("users_by_campaigns")
+    @pytest.mark.usefixtures("event_channels_by_campaigns")
+    def test_event_channels_as_user_api(self, app, users, event_channels):
+
+        user_creds = users["Active"]["creds"]
+        event_channel_1_id, event_channel_2_id = event_channels
+
+        client = app.test_client()
+
+        with AuthHeader(user_creds):
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            event_channel_1 = ret_val[0]
+            assert event_channel_1.pop("id") == event_channel_1_id
+
+            # GET list with filters
+            ret = client.get(
+                EVENT_CHANNELS_URL, query_string={"name": "Event channel 1"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == event_channel_1_id
+            ret = client.get(
+                EVENT_CHANNELS_URL, query_string={"name": "Event channel 2"})
+            assert ret.status_code == 200
+            assert not ret.json
+
+            # POST
+            event_channel_3 = {
+                "name": "Event channel 3",
+            }
+            ret = client.post(EVENT_CHANNELS_URL, json=event_channel_3)
+            assert ret.status_code == 403
+
+            # GET by id
+            ret = client.get(f"{EVENT_CHANNELS_URL}{event_channel_1_id}")
+            assert ret.status_code == 200
+            event_channel_1_etag = ret.headers["ETag"]
+
+            ret = client.get(f"{EVENT_CHANNELS_URL}{event_channel_2_id}")
+            assert ret.status_code == 403
+
+            # PUT
+            event_channel_1["name"] = "Great event channel 1"
+            ret = client.put(
+                f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
+                json=event_channel_1,
+                headers={"If-Match": event_channel_1_etag}
+            )
+            assert ret.status_code == 403
+
+            # DELETE
+            ret = client.delete(
+                f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
+                headers={"If-Match": event_channel_1_etag}
+            )
+            assert ret.status_code == 403
+
+    def test_event_channels_as_anonym_api(self, app, event_channels):
+
+        event_channel_1_id, _ = event_channels
 
         client = app.test_client()
 
         # GET list
-        ret = client.get(EVENTS_URL)
-        assert ret.status_code == 200
-        assert ret.json == []
+        ret = client.get(EVENT_CHANNELS_URL)
+        assert ret.status_code == 401
 
         # POST
-        event_1 = {
-            "source": "timestamp-guardian",
-            "category": "observation_missing",
-            "target_type": "TIMESERIES",
-            "target_id": 42,
+        event_channel_3 = {
+            "name": "Event channel 3",
         }
-
-        ts_before_post = dt.datetime.now(dt.timezone.utc)
-        ret = client.post(EVENTS_URL, json=event_1)
-        ts_after_post = dt.datetime.now(dt.timezone.utc)
-        assert ret.status_code == 201
-        ret_val = ret.json
-        event_1_id = ret_val.pop("id")
-        event_1_etag = ret.headers["ETag"]
-        for k, v in event_1.items():
-            assert ret_val[k] == v
-        assert ret_val["state"] == "NEW"
-        assert ret_val["level"] == "ERROR"
-        event_1_ts_start = dt.datetime.fromisoformat(
-            ret_val["timestamp_start"].replace("Z", "00:00"))
-        event_1_ts_last_update = dt.datetime.fromisoformat(
-            ret_val["timestamp_last_update"].replace("Z", "00:00"))
-        assert event_1_ts_start == event_1_ts_last_update
-        assert ts_before_post < event_1_ts_start < ts_after_post
-        assert "timestamp_end" not in ret_val
-
-        # GET list
-        ret = client.get(EVENTS_URL)
-        assert ret.status_code == 200
-        ret_val = ret.json
-        assert len(ret_val) == 1
-        assert ret_val[0]["id"] == event_1_id
+        ret = client.post(EVENT_CHANNELS_URL, json=event_channel_3)
+        assert ret.status_code == 401
 
         # GET by id
-        ret = client.get(f"{EVENTS_URL}{event_1_id}")
-        assert ret.status_code == 200
-        assert ret.headers["ETag"] == event_1_etag
-        ret_val = ret.json
-        ret_val.pop("id")
-        for k, v in event_1.items():
-            assert ret_val[k] == v
-        assert ret_val["state"] == "NEW"
+        ret = client.get(f"{EVENT_CHANNELS_URL}{event_channel_1_id}")
+        assert ret.status_code == 401
 
-        # PUT extend by id
+        # PUT
+        event_channel_1 = {
+            "name": "Super Event channel 1",
+        }
         ret = client.put(
-            f"{EVENTS_URL}{event_1_id}/extend",
-            headers={'If-Match': event_1_etag})
-        assert ret.status_code == 201
-        assert ret.headers["ETag"] != event_1_etag
-        event_1_etag = ret.headers["ETag"]
-        ret_val = ret.json
-        ret_val.pop("id")
-        for k, v in event_1.items():
-            assert ret_val[k] == v
-        assert ret_val["state"] == "ONGOING"
-        assert ret_val["timestamp_start"] == event_1_ts_start.isoformat()
-        assert "timestamp_end" not in ret_val
-        ts_last_update = dt.datetime.fromisoformat(
-            ret_val["timestamp_last_update"].replace("Z", "00:00"))
-        assert ts_last_update > event_1_ts_last_update
-        event_1_ts_last_update = ts_last_update
-
-        # PUT close by id
-        ret = client.put(
-            f"{EVENTS_URL}{event_1_id}/close",
-            headers={'If-Match': event_1_etag})
-        assert ret.status_code == 201
-        assert ret.headers["ETag"] != event_1_etag
-        event_1_etag = ret.headers["ETag"]
-        ret_val = ret.json
-        ret_val.pop("id")
-        for k, v in event_1.items():
-            assert ret_val[k] == v
-        assert ret_val["state"] == "CLOSED"
-        assert ret_val["timestamp_start"] == event_1_ts_start.isoformat()
-        assert ret_val["timestamp_end"] == ret_val["timestamp_last_update"]
-        ts_last_update = dt.datetime.fromisoformat(
-            ret_val["timestamp_last_update"].replace("Z", "00:00"))
-        assert ts_last_update > event_1_ts_last_update
-        event_1_ts_last_update = ts_last_update
-
-        # PUT close by id -> event is already closed, no update
-        ret = client.put(
-            f"{EVENTS_URL}{event_1_id}/close",
-            headers={'If-Match': event_1_etag})
-        assert ret.status_code == 201
-        ret_val = ret.json
-        ts_last_update = dt.datetime.fromisoformat(
-            ret_val["timestamp_last_update"].replace("Z", "00:00"))
-        assert ts_last_update == event_1_ts_last_update
-
-        # PUT extend by id -> event is already closed, no extend
-        ret = client.put(
-            f"{EVENTS_URL}{event_1_id}/extend",
-            headers={'If-Match': event_1_etag})
-        assert ret.status_code == 400
-
-        # PUT extend by id -> wrong id
-        ret = client.put(
-            f"{EVENTS_URL}{DUMMY_ID}/extend",
-            headers={'If-Match': event_1_etag})
-        assert ret.status_code == 404
+            f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
+            json=event_channel_1,
+            headers={"If-Match": "Dummy-ETag"}
+        )
+        # ETag is wrong but we get rejected before ETag check anyway
+        assert ret.status_code == 401
 
         # DELETE
         ret = client.delete(
-            f"{EVENTS_URL}{event_1_id}", headers={"If-Match": event_1_etag})
-        assert ret.status_code == 204
+            f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
+            headers={"If-Match": "Dummy-Etag"}
+        )
+        # ETag is wrong but we get rejected before ETag check anyway
+        assert ret.status_code == 401
 
-        # GET list
-        ret = client.get(EVENTS_URL)
-        assert ret.status_code == 200
-        assert ret.json == []
 
-        # GET by id -> 404
-        ret = client.get(f"{EVENTS_URL}{event_1_id}")
-        assert ret.status_code == 404
+class TestEventChannelsByCampaignsApi:
+
+    def test_event_channels_by_campaigns_api(
+        self, app, users, event_channels, campaigns
+    ):
+        ec_1_id = event_channels[0]
+        ec_2_id = event_channels[1]
+        campaign_1_id, campaign_2_id = campaigns
+
+        creds = users["Chuck"]["creds"]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+
+            # GET list
+            ret = client.get(f"{EVENTS_URL}channelsbycampaigns/")
+            assert ret.status_code == 200
+            assert ret.json == []
+
+            # POST
+            ecbc_1 = {
+                "campaign_id": campaign_1_id,
+                "event_channel_id": ec_1_id,
+            }
+            ret = client.post(EVENT_CHANNELS_BY_CAMPAIGNS_URL, json=ecbc_1)
+            assert ret.status_code == 201
+            ret_val = ret.json
+            ecbc_1_id = ret_val.pop("id")
+            ecbc_1_etag = ret.headers["ETag"]
+
+            # POST violating unique constraint
+            ret = client.post(EVENT_CHANNELS_BY_CAMPAIGNS_URL, json=ecbc_1)
+            assert ret.status_code == 409
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_BY_CAMPAIGNS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == ecbc_1_id
+
+            # GET by id
+            ret = client.get(f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
+            assert ret.status_code == 200
+            assert ret.headers["ETag"] == ecbc_1_etag
+
+            # POST
+            ecbc_2 = {
+                "campaign_id": campaign_2_id,
+                "event_channel_id": ec_2_id,
+            }
+            ret = client.post(EVENT_CHANNELS_BY_CAMPAIGNS_URL, json=ecbc_2)
+            assert ret.status_code == 201
+            ret_val = ret.json
+            ecbc_2_id = ret_val.pop("id")
+
+            # GET list (filtered)
+            ret = client.get(
+                EVENT_CHANNELS_BY_CAMPAIGNS_URL,
+                query_string={"event_channel_id": ec_1_id}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == ecbc_1_id
+            assert ret_val[0]["event_channel_id"] == ec_1_id
+            assert ret_val[0]["campaign_id"] == campaign_1_id
+            ret = client.get(
+                EVENT_CHANNELS_BY_CAMPAIGNS_URL,
+                query_string={"campaign_id": campaign_2_id}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == ecbc_2_id
+            assert ret_val[0]["event_channel_id"] == ec_2_id
+            assert ret_val[0]["campaign_id"] == ec_2_id
+            ret = client.get(
+                EVENT_CHANNELS_BY_CAMPAIGNS_URL,
+                query_string={
+                    "event_channel_id": ec_1_id,
+                    "campaign_id": campaign_2_id,
+                }
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+
+            # GET channels list filtered by campaign
+            ret = client.get(
+                EVENT_CHANNELS_URL,
+                query_string={"campaign_id": campaign_1_id}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]['id'] == ec_1_id
+
+            # DELETE wrong ID -> 404
+            ret = client.delete(
+                f"{EVENTS_URL}channels_by_campaigns/{DUMMY_ID}")
+            assert ret.status_code == 404
+
+            # DELETE channel violating fkey constraint
+            ret = client.get(f"{EVENT_CHANNELS_URL}{ec_1_id}")
+            ec_1_etag = ret.headers['ETag']
+            ret = client.delete(
+                f"{EVENT_CHANNELS_URL}{ec_1_id}",
+                headers={'If-Match': ec_1_etag}
+            )
+            assert ret.status_code == 409
+
+            # DELETE
+            ret = client.delete(
+                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
+            assert ret.status_code == 204
+            ret = client.delete(
+                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_2_id}")
+            assert ret.status_code == 204
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_BY_CAMPAIGNS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+
+            # GET by id -> 404
+            ret = client.get(f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
+            assert ret.status_code == 404
+
+    @pytest.mark.parametrize("user", ("user", "anonym"))
+    @pytest.mark.usefixtures("users_by_campaigns")
+    def test_event_channel_by_campaigns_as_user_or_anonym_api(
+        self, app, user, users,
+        event_channels, campaigns, event_channels_by_campaigns
+    ):
+        ec_1_id = event_channels[0]
+        ecbc_1_id = event_channels_by_campaigns[0]
+        ecbc_2_id = event_channels_by_campaigns[1]
+        campaign_1_id = campaigns[0]
+
+        if user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+            status_code = 403
+        else:
+            auth_context = contextlib.nullcontext()
+            status_code = 401
+
+        client = app.test_client()
+
+        with auth_context:
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_BY_CAMPAIGNS_URL)
+            if user == "user":
+                assert ret.status_code == 200
+                assert len(ret.json) == 1
+            else:
+                assert ret.status_code == status_code
+
+            # POST
+            ecbc = {"campaign_id": campaign_1_id, "event_channel_id": ec_1_id}
+            ret = client.post(EVENT_CHANNELS_BY_CAMPAIGNS_URL, json=ecbc)
+            assert ret.status_code == status_code
+
+            # GET by id
+            ret = client.get(f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
+            if user == "user":
+                assert ret.status_code == 200
+            else:
+                assert ret.status_code == status_code
+
+            # DELETE
+            ret = client.delete(
+                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
+            assert ret.status_code == status_code
+
+            # GET by id
+            ret = client.get(
+                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_2_id}")
+            assert ret.status_code == status_code
+
+            # DELETE
+            ret = client.delete(
+                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
+            assert ret.status_code == status_code
