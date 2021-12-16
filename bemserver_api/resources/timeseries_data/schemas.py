@@ -42,13 +42,13 @@ class TimeseriesDataAggregateQueryArgsSchema(TimeseriesDataQueryArgsSchema):
         }
     )
     timezone = Timezone(
-        missing="UTC",
+        load_default="UTC",
         metadata={
             "description": "Timezone to use for the aggreagation",
         }
     )
     aggregation = ma.fields.String(
-        missing="avg",
+        load_default="avg",
         validate=ma.validate.OneOf(AGGREGATION_FUNCTIONS),
     )
 
