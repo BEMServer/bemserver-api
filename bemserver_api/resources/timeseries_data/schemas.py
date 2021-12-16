@@ -2,16 +2,9 @@
 import marshmallow as ma
 from flask_smorest.fields import Upload
 
-from bemserver_core.model import TimeseriesData
 from bemserver_core.csv_io import AGGREGATION_FUNCTIONS
 
-from bemserver_api import AutoSchema
 from bemserver_api.extensions.ma_fields import Timezone
-
-
-class TimeseriesDataSchema(AutoSchema):
-    class Meta:
-        table = TimeseriesData.__table__
 
 
 class TimeseriesDataQueryArgsSchema(ma.Schema):
