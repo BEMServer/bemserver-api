@@ -5,8 +5,7 @@ from . import campaigns
 from . import users_by_campaigns
 from . import timeseries
 from . import timeseries_by_campaigns
-from . import timeseries_by_campaigns_by_users
-from . import timeseries_data
+from . import timeseries_data  # noqa
 from . import events
 
 
@@ -16,8 +15,6 @@ MODULES = (
     users_by_campaigns,
     timeseries,
     timeseries_by_campaigns,
-    timeseries_by_campaigns_by_users,
-    timeseries_data,
     events,
 )
 

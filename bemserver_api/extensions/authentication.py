@@ -1,12 +1,47 @@
 """Authentication"""
+from functools import wraps
+
 import sqlalchemy as sqla
 from flask_httpauth import HTTPBasicAuth
 from flask_smorest import abort
 from bemserver_core.model.users import User
+from bemserver_core.authorization import (
+    CurrentUser, BEMServerAuthorizationError)
 
 from bemserver_api.database import db
 
-auth = HTTPBasicAuth()
+
+class Auth(HTTPBasicAuth):
+    """Authentication and authorization management"""
+
+    def login_required(self, f=None, **kwargs):
+        """Decorator providing authentication and authorization
+
+        Uses HTTPBasicAuth.login_required authenticate user
+        Sets CurrentUser context variable to authenticated user for the request
+        Catches Authorization error and aborts accordingly
+        """
+        def decorator(func):
+
+            @wraps(func)
+            def wrapper(*args, **func_kwargs):
+                with CurrentUser(self.current_user()):
+                    try:
+                        resp = func(*args, **func_kwargs)
+                    except BEMServerAuthorizationError:
+                        abort(403, message="Authorization error")
+                return resp
+
+            # Wrap this inside HTTPAuth.login_required
+            # to get authenticated user
+            return super(Auth, self).login_required(**kwargs)(wrapper)
+
+        if f:
+            return decorator(f)
+        return decorator
+
+
+auth = Auth()
 
 
 def init_app(app):
@@ -14,18 +49,12 @@ def init_app(app):
 
     @auth.verify_password
     def verify_password(username, password):
-        if not app.config.get("AUTH_ENABLED", False):
-            return True
-
         user = db.session.execute(
             sqla.select(User).where(User.email == username)
         ).scalar()
-        if (
-            user is not None and
-            user.is_active and
+        if user is not None:
             user.check_password(password)
-        ):
-            return user
+        return user
 
     @auth.error_handler
     def auth_error(status):

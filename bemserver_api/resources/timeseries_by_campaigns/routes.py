@@ -24,13 +24,15 @@ blp = Blueprint(
 @blp.route('/')
 class TimeseriesByCampaignViews(MethodView):
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(TimeseriesByCampaignQueryArgsSchema, location='query')
     @blp.response(200, TimeseriesByCampaignSchema(many=True))
     def get(self, args):
         """List campaign x timeseries associations"""
-        return db.session.query(TimeseriesByCampaign).filter_by(**args)
+        return TimeseriesByCampaign.get(**args)
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(TimeseriesByCampaignSchema)
     @blp.response(201, TimeseriesByCampaignSchema)
@@ -45,21 +47,23 @@ class TimeseriesByCampaignViews(MethodView):
 @blp.route('/<int:item_id>')
 class TimeseriesByCampaignByIdViews(MethodView):
 
+    @blp.login_required
     @blp.etag
     @blp.response(200, TimeseriesByCampaignSchema)
     def get(self, item_id):
         """Get campaign x timeseries association by ID"""
-        item = db.session.get(TimeseriesByCampaign, item_id)
+        item = TimeseriesByCampaign.get_by_id(item_id)
         if item is None:
             abort(404)
         return item
 
+    @blp.login_required
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a campaign x timeseries association"""
-        item = db.session.get(TimeseriesByCampaign, item_id)
+        item = TimeseriesByCampaign.get_by_id(item_id)
         if item is None:
             abort(404)
-        db.session.delete(item)
+        item.delete()
         db.session.commit()

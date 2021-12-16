@@ -17,10 +17,9 @@ class Api(flask_smorest.Api):
     def init_app(self, app, *, spec_kwargs=None):
         super().init_app(app, spec_kwargs=spec_kwargs)
         self.register_field(Timezone, 'string', 'IANA timezone')
-        if app.config.get("AUTH_ENABLED", False):
-            self.spec.components.security_scheme(
-                "BasicAuthentication", {"type": "http", "scheme": "basic"}
-            )
+        self.spec.components.security_scheme(
+            "BasicAuthentication", {"type": "http", "scheme": "basic"}
+        )
 
 
 class Blueprint(flask_smorest.Blueprint):
@@ -30,17 +29,21 @@ class Blueprint(flask_smorest.Blueprint):
         self._prepare_doc_cbks.append(self._prepare_auth_doc)
 
     @staticmethod
-    def login_required(func):
-        # Note: we don't use "role" and "optional" parameters in the app,
-        # we always call login_required with no parameter
-        func = auth.login_required(func)
-        getattr(func, "_apidoc", {})["auth"] = True
-        return func
+    def login_required(func=None, **kwargs):
+        def decorator(function):
+            function = auth.login_required(**kwargs)(function)
+            getattr(function, "_apidoc", {})["auth"] = True
+            return function
+        if func is None:
+            return decorator
+        return decorator(func)
 
     @staticmethod
-    def _prepare_auth_doc(doc, doc_info, **kwargs):
+    def _prepare_auth_doc(doc, doc_info, *, app, **kwargs):
         if doc_info.get("auth", False):
-            doc.setdefault("responses", {})["401"] = http.HTTPStatus(401).name
+            doc.setdefault(
+                "responses", {}
+            )["401"] = http.HTTPStatus(401).name
             doc["security"] = [{"BasicAuthentication": []}]
         return doc
 

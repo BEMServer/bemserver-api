@@ -37,7 +37,7 @@ setup(
         "flask-httpauth>=0.5.0",
         (
             "bemserver-core "
-            "@ git+https://git@github.com/BEMServer/bemserver-core.git@a94de92"
+            "@ git+https://git@github.com/BEMServer/bemserver-core.git@5d528c2"
             "#egg=bemserver-core"
         ),
     ],

@@ -10,6 +10,7 @@ from bemserver_api import AutoSchema
 class UserSchema(AutoSchema):
     class Meta:
         table = User.__table__
+        exclude = ("_is_active", "_is_admin")
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
@@ -18,8 +19,8 @@ class UserSchema(AutoSchema):
         validate=ma.validate.Length(1, 80),
         load_only=True
     )
-    is_admin = msa.auto_field(dump_only=True)
-    is_active = msa.auto_field(dump_only=True)
+    is_admin = ma.fields.Boolean(dump_only=True)
+    is_active = ma.fields.Boolean(dump_only=True)
 
 
 class UserQueryArgsSchema(ma.Schema):

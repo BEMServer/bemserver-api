@@ -21,13 +21,15 @@ blp = Blueprint(
 @blp.route('/')
 class UserByCampaignViews(MethodView):
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserByCampaignQueryArgsSchema, location='query')
     @blp.response(200, UserByCampaignSchema(many=True))
     def get(self, args):
         """List campaign x user associations"""
-        return db.session.query(UserByCampaign).filter_by(**args)
+        return UserByCampaign.get(**args)
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserByCampaignSchema)
     @blp.response(201, UserByCampaignSchema)
@@ -42,20 +44,22 @@ class UserByCampaignViews(MethodView):
 @blp.route('/<int:item_id>')
 class UserByCampaignByIdViews(MethodView):
 
+    @blp.login_required
     @blp.etag
     @blp.response(200, UserByCampaignSchema)
     def get(self, item_id):
         """Get campaign x user association by ID"""
-        item = db.session.get(UserByCampaign, item_id)
+        item = UserByCampaign.get_by_id(item_id)
         if item is None:
             abort(404)
         return item
 
+    @blp.login_required
     @blp.response(204)
     def delete(self, item_id):
         """Delete a campaign x user association"""
-        item = db.session.get(UserByCampaign, item_id)
+        item = UserByCampaign.get_by_id(item_id)
         if item is None:
             abort(404)
-        db.session.delete(item)
+        item.delete()
         db.session.commit()

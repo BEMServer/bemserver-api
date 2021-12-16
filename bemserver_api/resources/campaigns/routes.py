@@ -21,13 +21,15 @@ blp = Blueprint(
 @blp.route('/')
 class CampaignViews(MethodView):
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(CampaignQueryArgsSchema, location='query')
     @blp.response(200, CampaignSchema(many=True))
     def get(self, args):
         """List campaigns"""
-        return db.session.query(Campaign).filter_by(**args)
+        return Campaign.get(**args)
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(CampaignSchema)
     @blp.response(201, CampaignSchema)
@@ -42,22 +44,24 @@ class CampaignViews(MethodView):
 @blp.route('/<int:item_id>')
 class CampaignByIdViews(MethodView):
 
+    @blp.login_required
     @blp.etag
     @blp.response(200, CampaignSchema)
     def get(self, item_id):
         """Get campaign by ID"""
-        item = db.session.get(Campaign, item_id)
+        item = Campaign.get_by_id(item_id)
         if item is None:
             abort(404)
         return item
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(CampaignSchema)
     @blp.response(200, CampaignSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing campaign"""
-        item = db.session.get(Campaign, item_id)
+        item = Campaign.get_by_id(item_id)
         if item is None:
             abort(404)
         blp.check_etag(item, CampaignSchema)
@@ -65,14 +69,15 @@ class CampaignByIdViews(MethodView):
         db.session.commit()
         return item
 
+    @blp.login_required
     @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a campaign"""
-        item = db.session.get(Campaign, item_id)
+        item = Campaign.get_by_id(item_id)
         if item is None:
             abort(404)
         blp.check_etag(item, CampaignSchema)
-        db.session.delete(item)
+        item.delete()
         db.session.commit()

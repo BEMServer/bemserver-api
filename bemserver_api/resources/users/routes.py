@@ -21,13 +21,15 @@ blp = Blueprint(
 @blp.route('/')
 class UserViews(MethodView):
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserQueryArgsSchema, location='query')
     @blp.response(200, UserSchema(many=True))
     def get(self, args):
         """List users"""
-        return db.session.query(User).filter_by(**args)
+        return User.get(**args)
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserSchema)
     @blp.response(201, UserSchema)
@@ -46,50 +48,54 @@ class UserViews(MethodView):
 @blp.route('/<int:item_id>')
 class UserByIdViews(MethodView):
 
+    @blp.login_required
     @blp.etag
     @blp.response(200, UserSchema)
     def get(self, item_id):
         """Get user by ID"""
-        item = db.session.get(User, item_id)
+        item = User.get_by_id(item_id)
         if item is None:
             abort(404)
         return item
 
+    @blp.login_required
     @blp.etag
     @blp.arguments(UserSchema)
     @blp.response(200, UserSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing user"""
-        password = new_item.pop("password")
-        item = db.session.get(User, item_id)
+        item = User.get_by_id(item_id)
         if item is None:
             abort(404)
         blp.check_etag(item, UserSchema)
+        password = new_item.pop("password")
         item.update(**new_item)
         item.set_password(password)
         db.session.commit()
         return item
 
+    @blp.login_required
     @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a user"""
-        item = db.session.get(User, item_id)
+        item = User.get_by_id(item_id)
         if item is None:
             abort(404)
         blp.check_etag(item, UserSchema)
-        db.session.delete(item)
+        item.delete()
         db.session.commit()
 
 
 @blp.route('/<int:item_id>/set_admin', methods=('PUT', ))
+@blp.login_required
 @blp.etag
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)
 def set_admin(args, item_id):
-    item = db.session.get(User, item_id)
+    item = User.get_by_id(item_id)
     if item is None:
         abort(404)
     blp.check_etag(item, UserSchema)
@@ -99,11 +105,12 @@ def set_admin(args, item_id):
 
 
 @blp.route('/<int:item_id>/set_active', methods=('PUT', ))
+@blp.login_required
 @blp.etag
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)
 def set_active(args, item_id):
-    item = db.session.get(User, item_id)
+    item = User.get_by_id(item_id)
     if item is None:
         abort(404)
     blp.check_etag(item, UserSchema)

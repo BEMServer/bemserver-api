@@ -1,18 +1,13 @@
 """Test authentication extension"""
 from flask import jsonify
 
-import pytest
-
 from bemserver_api import Blueprint
 
-from tests.common import TestConfig, AuthTestConfig
+from bemserver_core.authorization import get_current_user
 
 
 class TestAuthentication:
 
-    @pytest.mark.parametrize(
-        "app", (TestConfig, AuthTestConfig, ), indirect=True
-    )
     def test_auth_login_required(self, app, users):
 
         active_user_creds = users["Active"]["creds"]
@@ -24,7 +19,7 @@ class TestAuthentication:
         @blp.login_required
         @blp.response(200)
         def auth():
-            return None
+            return get_current_user().name
 
         @blp.route('/no_auth')
         @blp.response(204)
@@ -34,46 +29,41 @@ class TestAuthentication:
         api.register_blueprint(blp)
         client = app.test_client()
 
-        # Anonymous or inactive user
-        for headers in (
-            {},
-            {'Authorization': 'Basic ' + inactive_user_creds},
-        ):
-            resp = client.get("/auth_test/auth", headers=headers)
-            if app.config["AUTH_ENABLED"]:
-                assert resp.status_code == 401
-            else:
-                assert resp.status_code == 200
-            resp = client.get("/auth_test/no_auth", headers=headers)
-            assert resp.status_code == 204
+        # Anonymous user
+        headers = {}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 401
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
+
+        # Inactive user
+        headers = {'Authorization': 'Basic ' + inactive_user_creds}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 403
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
 
         # Active user
-        for headers in (
-            {'Authorization': 'Basic ' + active_user_creds},
-        ):
-            resp = client.get("/auth_test/auth", headers=headers)
-            assert resp.status_code == 200
-            resp = client.get("/auth_test/no_auth", headers=headers)
-            assert resp.status_code == 204
+        headers = {'Authorization': 'Basic ' + active_user_creds}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 200
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
 
         # Check OpenAPI spec
         spec = api.spec.to_dict()
-        if app.config["AUTH_ENABLED"]:
-            assert (
-                spec["components"]["securitySchemes"]["BasicAuthentication"] ==
-                {"type": "http", "scheme": "basic"}
-            )
-        else:
-            assert (
-                "BasicAuthentication" not in
-                spec["components"].get("securitySchemes", {})
-            )
+        assert (
+            spec["components"]["securitySchemes"]["BasicAuthentication"] ==
+            {"type": "http", "scheme": "basic"}
+        )
         auth_spec = spec["paths"]["/auth_test/auth"]
         assert (
             auth_spec["get"]["responses"]["401"] ==
             {'$ref': '#/components/responses/UNAUTHORIZED'}
         )
-        assert auth_spec["get"]["security"] == [{'BasicAuthentication': []}]
+        assert auth_spec["get"]["security"] == [
+            {'BasicAuthentication': []}
+        ]
         no_auth_spec = spec["paths"]["/auth_test/no_auth"]
         assert "401" not in no_auth_spec["get"]["responses"]
         assert "security" not in no_auth_spec["get"]
@@ -82,7 +72,6 @@ class TestAuthentication:
 
         active_user_creds = users["Active"]["creds"]
         api = app.extensions['flask-smorest']['ext_obj']
-        app.config["AUTH_ENABLED"] = True
 
         blp = Blueprint('AuthTest', __name__, url_prefix='/auth_test')
 
