@@ -14,13 +14,10 @@ CAMPAIGNS_URL = "/campaigns/"
 
 
 class TestTimeseriesByCampaignsApi:
-    @pytest.mark.parametrize(
-        "timeseries_data", ({"nb_ts": 2, "nb_tsd": 0},), indirect=True
-    )
-    def test_timeseries_by_campaigns_api(self, app, users, timeseries_data, campaigns):
+    def test_timeseries_by_campaigns_api(self, app, users, timeseries, campaigns):
 
-        ts_1_id, _, _, _ = timeseries_data[0]
-        ts_2_id, _, _, _ = timeseries_data[1]
+        ts_1_id = timeseries[0]
+        ts_2_id = timeseries[1]
         campaign_1_id, campaign_2_id = campaigns
 
         creds = users["Chuck"]["creds"]
@@ -134,11 +131,11 @@ class TestTimeseriesByCampaignsApi:
 
     @pytest.mark.parametrize("user", ("user", "anonym"))
     def test_timeseries_by_campains_as_user_or_anonym_api(
-        self, app, user, users, timeseries_data, campaigns, timeseries_by_campaigns
+        self, app, user, users, timeseries, campaigns, timeseries_by_campaigns
     ):
 
-        ts_1_id, _, _, _ = timeseries_data[0]
-        tbc_1_id, _ = timeseries_by_campaigns
+        ts_1_id = timeseries[0]
+        tbc_1_id = timeseries_by_campaigns[0]
         campaign_1_id, _ = campaigns
 
         if user == "user":
