@@ -2,5 +2,6 @@ include LICENSE
 
 graft tests
 include tox.ini
+include requirements/*.txt
 
 global-exclude *.py[co]

@@ -3,21 +3,6 @@
 
 from setuptools import setup, find_packages
 
-EXTRAS_REQUIRE = {
-    "tests": [
-        "pytest>=4.4.4",
-        "pytest-postgresql>=3.0.0,<4.0.0",
-        "pytest-cov>=2.12.1",
-        "coverage>=5.3.0",
-    ],
-    "lint": [
-        "flake8>=3.9.2",
-        "flake8-bugbear>=21.4.3",
-        "pre-commit>=2.15",
-    ],
-}
-EXTRAS_REQUIRE["dev"] = EXTRAS_REQUIRE["tests"] + EXTRAS_REQUIRE["lint"]
-
 
 # Get the long description from the README file
 with open("README.rst", encoding="utf-8") as f:
@@ -52,11 +37,10 @@ setup(
         "flask_smorest>=0.35.0,<0.36",
         "flask-httpauth>=0.5.0",
         (
-            "bemserver-core "
-            "@ git+https://git@github.com/BEMServer/bemserver-core.git@5d528c2"
-            "#egg=bemserver-core"
+            # https://github.com/jazzband/pip-tools/issues/1359
+            "bemserver-core @ "
+            "https://github.com/BEMServer/bemserver-core/archive/5d528c2.tar.gz"
         ),
     ],
-    extras_require=EXTRAS_REQUIRE,
     packages=find_packages(exclude=["tests*"]),
 )
