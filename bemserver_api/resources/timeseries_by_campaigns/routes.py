@@ -7,26 +7,22 @@ from bemserver_core.model import TimeseriesByCampaign
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import (
-    TimeseriesByCampaignSchema,
-    TimeseriesByCampaignQueryArgsSchema
-)
+from .schemas import TimeseriesByCampaignSchema, TimeseriesByCampaignQueryArgsSchema
 
 
 blp = Blueprint(
-    'TimeseriesByCampaign',
+    "TimeseriesByCampaign",
     __name__,
-    url_prefix='/timeseriesbycampaigns',
-    description="Operations on timeseries x campaigns associations"
+    url_prefix="/timeseriesbycampaigns",
+    description="Operations on timeseries x campaigns associations",
 )
 
 
-@blp.route('/')
+@blp.route("/")
 class TimeseriesByCampaignViews(MethodView):
-
     @blp.login_required
     @blp.etag
-    @blp.arguments(TimeseriesByCampaignQueryArgsSchema, location='query')
+    @blp.arguments(TimeseriesByCampaignQueryArgsSchema, location="query")
     @blp.response(200, TimeseriesByCampaignSchema(many=True))
     def get(self, args):
         """List campaign x timeseries associations"""
@@ -44,9 +40,8 @@ class TimeseriesByCampaignViews(MethodView):
         return item
 
 
-@blp.route('/<int:item_id>')
+@blp.route("/<int:item_id>")
 class TimeseriesByCampaignByIdViews(MethodView):
-
     @blp.login_required
     @blp.etag
     @blp.response(200, TimeseriesByCampaignSchema)

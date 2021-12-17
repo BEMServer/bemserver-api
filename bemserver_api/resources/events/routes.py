@@ -4,30 +4,34 @@ from flask.views import MethodView
 from flask_smorest import abort
 
 from bemserver_core.model import (
-    EventState, EventCategory, EventLevel,
-    EventChannel, EventChannelByCampaign,)
+    EventState,
+    EventCategory,
+    EventLevel,
+    EventChannel,
+    EventChannelByCampaign,
+)
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    EventStateSchema, EventCategorySchema, EventLevelSchema,
-    EventChannelSchema, EventChannelQueryArgsSchema,
-    EventChannelByCampaignSchema, EventChannelByCampaignQueryArgsSchema,
+    EventStateSchema,
+    EventCategorySchema,
+    EventLevelSchema,
+    EventChannelSchema,
+    EventChannelQueryArgsSchema,
+    EventChannelByCampaignSchema,
+    EventChannelByCampaignQueryArgsSchema,
 )
 
 
 blp = Blueprint(
-    'Events',
-    __name__,
-    url_prefix='/events',
-    description="Operations on events"
+    "Events", __name__, url_prefix="/events", description="Operations on events"
 )
 
 
-@blp.route('/states')
+@blp.route("/states")
 class EventStatesViews(MethodView):
-
     @blp.login_required
     @blp.response(200, EventStateSchema(many=True))
     def get(self):
@@ -35,9 +39,8 @@ class EventStatesViews(MethodView):
         return EventState.get()
 
 
-@blp.route('/levels')
+@blp.route("/levels")
 class EventLevelsViews(MethodView):
-
     @blp.login_required
     @blp.response(200, EventLevelSchema(many=True))
     def get(self):
@@ -45,9 +48,8 @@ class EventLevelsViews(MethodView):
         return EventLevel.get()
 
 
-@blp.route('/categories')
+@blp.route("/categories")
 class EventCategoriesViews(MethodView):
-
     @blp.login_required
     @blp.response(200, EventCategorySchema(many=True))
     def get(self):
@@ -55,12 +57,11 @@ class EventCategoriesViews(MethodView):
         return EventCategory.get()
 
 
-@blp.route('/channels/')
+@blp.route("/channels/")
 class EventChannelViews(MethodView):
-
     @blp.login_required
     @blp.etag
-    @blp.arguments(EventChannelQueryArgsSchema, location='query')
+    @blp.arguments(EventChannelQueryArgsSchema, location="query")
     @blp.response(200, EventChannelSchema(many=True))
     def get(self, args):
         """List campaigns"""
@@ -78,9 +79,8 @@ class EventChannelViews(MethodView):
         return item
 
 
-@blp.route('/channels/<int:item_id>')
+@blp.route("/channels/<int:item_id>")
 class EventChannelByIdViews(MethodView):
-
     @blp.login_required
     @blp.etag
     @blp.response(200, EventChannelSchema)
@@ -120,12 +120,11 @@ class EventChannelByIdViews(MethodView):
         db.session.commit()
 
 
-@blp.route('/channelsbycampaigns/')
+@blp.route("/channelsbycampaigns/")
 class EventChannelByCampaignViews(MethodView):
-
     @blp.login_required
     @blp.etag
-    @blp.arguments(EventChannelByCampaignQueryArgsSchema, location='query')
+    @blp.arguments(EventChannelByCampaignQueryArgsSchema, location="query")
     @blp.response(200, EventChannelByCampaignSchema(many=True))
     def get(self, args):
         """List event channel x campaign associations"""
@@ -143,9 +142,8 @@ class EventChannelByCampaignViews(MethodView):
         return item
 
 
-@blp.route('/channelsbycampaigns/<int:item_id>')
+@blp.route("/channelsbycampaigns/<int:item_id>")
 class EventChannelByCampaignByIdViews(MethodView):
-
     @blp.login_required
     @blp.etag
     @blp.response(200, EventChannelByCampaignSchema)

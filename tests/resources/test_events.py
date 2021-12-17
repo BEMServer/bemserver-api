@@ -14,7 +14,6 @@ EVENT_CHANNELS_BY_CAMPAIGNS_URL = f"{EVENTS_URL}channelsbycampaigns/"
 
 
 class TestEventStatesApi:
-
     @pytest.mark.parametrize("user", ("user", "admin"))
     def test_event_states_api_as_admin_or_user(self, app, user, users):
 
@@ -30,7 +29,11 @@ class TestEventStatesApi:
             assert ret.status_code == 200
             assert len(ret.json) == 3
             for x in ret.json:
-                assert x["id"] in ("NEW", "ONGOING", "CLOSED",)
+                assert x["id"] in (
+                    "NEW",
+                    "ONGOING",
+                    "CLOSED",
+                )
 
     def test_event_states_api_as_anonym(self, app):
 
@@ -41,7 +44,6 @@ class TestEventStatesApi:
 
 
 class TestEventLevelsApi:
-
     @pytest.mark.parametrize("user", ("user", "admin"))
     def test_event_levels_api_as_admin_or_user(self, app, user, users):
 
@@ -59,7 +61,12 @@ class TestEventLevelsApi:
             assert ret.status_code == 200
             assert len(ret.json) == 4
             for x in ret.json:
-                assert x["id"] in ("INFO", "WARNING", "ERROR", "CRITICAL",)
+                assert x["id"] in (
+                    "INFO",
+                    "WARNING",
+                    "ERROR",
+                    "CRITICAL",
+                )
 
     def test_event_levels_api_as_anonym(self, app):
 
@@ -70,7 +77,6 @@ class TestEventLevelsApi:
 
 
 class TestEventCategoriesApi:
-
     @pytest.mark.parametrize("user", ("user", "admin"))
     def test_event_categories_api_as_admin_or_user(self, app, user, users):
 
@@ -97,7 +103,6 @@ class TestEventCategoriesApi:
 
 
 class TestEventChannelsApi:
-
     def test_event_channels_api(self, app, users):
 
         creds = users["Chuck"]["creds"]
@@ -142,7 +147,7 @@ class TestEventChannelsApi:
             ret = client.put(
                 f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
                 json=event_channel_1,
-                headers={"If-Match": event_channel_1_etag}
+                headers={"If-Match": event_channel_1_etag},
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -154,7 +159,7 @@ class TestEventChannelsApi:
             ret = client.put(
                 f"{EVENT_CHANNELS_URL}{DUMMY_ID}",
                 json=event_channel_1,
-                headers={"If-Match": event_channel_1_etag}
+                headers={"If-Match": event_channel_1_etag},
             )
             assert ret.status_code == 404
 
@@ -175,8 +180,7 @@ class TestEventChannelsApi:
 
             # GET list with filters
             ret = client.get(
-                EVENT_CHANNELS_URL,
-                query_string={"name": "Great event channel 1"}
+                EVENT_CHANNELS_URL, query_string={"name": "Great event channel 1"}
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -186,19 +190,19 @@ class TestEventChannelsApi:
             # DELETE wrong ID -> 404
             ret = client.delete(
                 f"{EVENT_CHANNELS_URL}{DUMMY_ID}",
-                headers={"If-Match": event_channel_1_etag}
+                headers={"If-Match": event_channel_1_etag},
             )
             assert ret.status_code == 404
 
             # DELETE
             ret = client.delete(
                 f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
-                headers={"If-Match": event_channel_1_etag}
+                headers={"If-Match": event_channel_1_etag},
             )
             assert ret.status_code == 204
             ret = client.delete(
                 f"{EVENT_CHANNELS_URL}{event_channel_2_id}",
-                headers={"If-Match": event_channel_2_etag}
+                headers={"If-Match": event_channel_2_etag},
             )
             assert ret.status_code == 204
 
@@ -233,13 +237,15 @@ class TestEventChannelsApi:
 
             # GET list with filters
             ret = client.get(
-                EVENT_CHANNELS_URL, query_string={"name": "Event channel 1"})
+                EVENT_CHANNELS_URL, query_string={"name": "Event channel 1"}
+            )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == event_channel_1_id
             ret = client.get(
-                EVENT_CHANNELS_URL, query_string={"name": "Event channel 2"})
+                EVENT_CHANNELS_URL, query_string={"name": "Event channel 2"}
+            )
             assert ret.status_code == 200
             assert not ret.json
 
@@ -263,14 +269,14 @@ class TestEventChannelsApi:
             ret = client.put(
                 f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
                 json=event_channel_1,
-                headers={"If-Match": event_channel_1_etag}
+                headers={"If-Match": event_channel_1_etag},
             )
             assert ret.status_code == 403
 
             # DELETE
             ret = client.delete(
                 f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
-                headers={"If-Match": event_channel_1_etag}
+                headers={"If-Match": event_channel_1_etag},
             )
             assert ret.status_code == 403
 
@@ -302,7 +308,7 @@ class TestEventChannelsApi:
         ret = client.put(
             f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
             json=event_channel_1,
-            headers={"If-Match": "Dummy-ETag"}
+            headers={"If-Match": "Dummy-ETag"},
         )
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401
@@ -310,14 +316,13 @@ class TestEventChannelsApi:
         # DELETE
         ret = client.delete(
             f"{EVENT_CHANNELS_URL}{event_channel_1_id}",
-            headers={"If-Match": "Dummy-Etag"}
+            headers={"If-Match": "Dummy-Etag"},
         )
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401
 
 
 class TestEventChannelsByCampaignsApi:
-
     def test_event_channels_by_campaigns_api(
         self, app, users, event_channels, campaigns
     ):
@@ -376,7 +381,7 @@ class TestEventChannelsByCampaignsApi:
             # GET list (filtered)
             ret = client.get(
                 EVENT_CHANNELS_BY_CAMPAIGNS_URL,
-                query_string={"event_channel_id": ec_1_id}
+                query_string={"event_channel_id": ec_1_id},
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -386,7 +391,7 @@ class TestEventChannelsByCampaignsApi:
             assert ret_val[0]["campaign_id"] == campaign_1_id
             ret = client.get(
                 EVENT_CHANNELS_BY_CAMPAIGNS_URL,
-                query_string={"campaign_id": campaign_2_id}
+                query_string={"campaign_id": campaign_2_id},
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -399,7 +404,7 @@ class TestEventChannelsByCampaignsApi:
                 query_string={
                     "event_channel_id": ec_1_id,
                     "campaign_id": campaign_2_id,
-                }
+                },
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -407,34 +412,29 @@ class TestEventChannelsByCampaignsApi:
 
             # GET channels list filtered by campaign
             ret = client.get(
-                EVENT_CHANNELS_URL,
-                query_string={"campaign_id": campaign_1_id}
+                EVENT_CHANNELS_URL, query_string={"campaign_id": campaign_1_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]['id'] == ec_1_id
+            assert ret_val[0]["id"] == ec_1_id
 
             # DELETE wrong ID -> 404
-            ret = client.delete(
-                f"{EVENTS_URL}channels_by_campaigns/{DUMMY_ID}")
+            ret = client.delete(f"{EVENTS_URL}channels_by_campaigns/{DUMMY_ID}")
             assert ret.status_code == 404
 
             # DELETE channel violating fkey constraint
             ret = client.get(f"{EVENT_CHANNELS_URL}{ec_1_id}")
-            ec_1_etag = ret.headers['ETag']
+            ec_1_etag = ret.headers["ETag"]
             ret = client.delete(
-                f"{EVENT_CHANNELS_URL}{ec_1_id}",
-                headers={'If-Match': ec_1_etag}
+                f"{EVENT_CHANNELS_URL}{ec_1_id}", headers={"If-Match": ec_1_etag}
             )
             assert ret.status_code == 409
 
             # DELETE
-            ret = client.delete(
-                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
+            ret = client.delete(f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
             assert ret.status_code == 204
-            ret = client.delete(
-                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_2_id}")
+            ret = client.delete(f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_2_id}")
             assert ret.status_code == 204
 
             # GET list
@@ -450,8 +450,7 @@ class TestEventChannelsByCampaignsApi:
     @pytest.mark.parametrize("user", ("user", "anonym"))
     @pytest.mark.usefixtures("users_by_campaigns")
     def test_event_channel_by_campaigns_as_user_or_anonym_api(
-        self, app, user, users,
-        event_channels, campaigns, event_channels_by_campaigns
+        self, app, user, users, event_channels, campaigns, event_channels_by_campaigns
     ):
         ec_1_id = event_channels[0]
         ecbc_1_id = event_channels_by_campaigns[0]
@@ -491,16 +490,13 @@ class TestEventChannelsByCampaignsApi:
                 assert ret.status_code == status_code
 
             # DELETE
-            ret = client.delete(
-                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
+            ret = client.delete(f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
             assert ret.status_code == status_code
 
             # GET by id
-            ret = client.get(
-                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_2_id}")
+            ret = client.get(f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_2_id}")
             assert ret.status_code == status_code
 
             # DELETE
-            ret = client.delete(
-                f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
+            ret = client.delete(f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
             assert ret.status_code == status_code

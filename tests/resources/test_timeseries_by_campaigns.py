@@ -8,21 +8,16 @@ from tests.common import AuthHeader
 
 DUMMY_ID = "69"
 
-TIMESERIES_URL = '/timeseries/'
+TIMESERIES_URL = "/timeseries/"
 TIMESERIES_BY_CAMPAIGNS_URL = "/timeseriesbycampaigns/"
-CAMPAIGNS_URL = '/campaigns/'
+CAMPAIGNS_URL = "/campaigns/"
 
 
 class TestTimeseriesByCampaignsApi:
-
     @pytest.mark.parametrize(
-            'timeseries_data',
-            ({"nb_ts": 2, "nb_tsd": 0}, ),
-            indirect=True
+        "timeseries_data", ({"nb_ts": 2, "nb_tsd": 0},), indirect=True
     )
-    def test_timeseries_by_campaigns_api(
-        self, app, users, timeseries_data, campaigns
-    ):
+    def test_timeseries_by_campaigns_api(self, app, users, timeseries_data, campaigns):
 
         ts_1_id, _, _, _ = timeseries_data[0]
         ts_2_id, _, _, _ = timeseries_data[1]
@@ -72,8 +67,7 @@ class TestTimeseriesByCampaignsApi:
 
             # GET list (filtered)
             ret = client.get(
-                TIMESERIES_BY_CAMPAIGNS_URL,
-                query_string={"timeseries_id": ts_1_id}
+                TIMESERIES_BY_CAMPAIGNS_URL, query_string={"timeseries_id": ts_1_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -82,8 +76,7 @@ class TestTimeseriesByCampaignsApi:
             assert ret_val[0]["timeseries_id"] == ts_1_id
             assert ret_val[0]["campaign_id"] == ts_1_id
             ret = client.get(
-                TIMESERIES_BY_CAMPAIGNS_URL,
-                query_string={"campaign_id": campaign_2_id}
+                TIMESERIES_BY_CAMPAIGNS_URL, query_string={"campaign_id": campaign_2_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -96,7 +89,7 @@ class TestTimeseriesByCampaignsApi:
                 query_string={
                     "timeseries_id": ts_1_id,
                     "campaign_id": campaign_2_id,
-                }
+                },
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -104,13 +97,12 @@ class TestTimeseriesByCampaignsApi:
 
             # GET TS list filtered by campaign
             ret = client.get(
-                TIMESERIES_URL,
-                query_string={"campaign_id": campaign_1_id}
+                TIMESERIES_URL, query_string={"campaign_id": campaign_1_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]['id'] == ts_1_id
+            assert ret_val[0]["id"] == ts_1_id
 
             # DELETE wrong ID -> 404
             ret = client.delete(f"{TIMESERIES_BY_CAMPAIGNS_URL}{DUMMY_ID}")
@@ -118,10 +110,9 @@ class TestTimeseriesByCampaignsApi:
 
             # DELETE TS violating fkey constraint
             ret = client.get(f"{TIMESERIES_URL}{ts_1_id}")
-            ts_1_etag = ret.headers['ETag']
+            ts_1_etag = ret.headers["ETag"]
             ret = client.delete(
-                f"{TIMESERIES_URL}{ts_1_id}",
-                headers={'If-Match': ts_1_etag}
+                f"{TIMESERIES_URL}{ts_1_id}", headers={"If-Match": ts_1_etag}
             )
             assert ret.status_code == 409
 
@@ -143,8 +134,7 @@ class TestTimeseriesByCampaignsApi:
 
     @pytest.mark.parametrize("user", ("user", "anonym"))
     def test_timeseries_by_campains_as_user_or_anonym_api(
-        self, app, user, users,
-        timeseries_data, campaigns, timeseries_by_campaigns
+        self, app, user, users, timeseries_data, campaigns, timeseries_by_campaigns
     ):
 
         ts_1_id, _, _, _ = timeseries_data[0]

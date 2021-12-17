@@ -14,20 +14,20 @@ class TimeseriesDataQueryArgsSchema(ma.Schema):
         required=True,
         metadata={
             "description": "Initial datetime",
-        }
+        },
     )
     end_time = ma.fields.AwareDateTime(
         required=True,
         metadata={
             "description": "End datetime (excluded from the interval)",
-        }
+        },
     )
     timeseries = ma.fields.List(
         ma.fields.Int(),
         required=True,
         metadata={
             "description": "List of timeseries ID",
-        }
+        },
     )
 
 
@@ -39,13 +39,13 @@ class TimeseriesDataAggregateQueryArgsSchema(TimeseriesDataQueryArgsSchema):
         required=True,
         metadata={
             "description": "Bucket width (ISO 8601 duration or PostgreSQL)",
-        }
+        },
     )
     timezone = Timezone(
         load_default="UTC",
         metadata={
             "description": "Timezone to use for the aggreagation",
-        }
+        },
     )
     aggregation = ma.fields.String(
         load_default="avg",

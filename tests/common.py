@@ -16,7 +16,7 @@ class AuthHeader(AbstractContextManager):
         self.creds = creds
 
     def __enter__(self):
-        self.token = AUTH_HEADER.set('Basic ' + self.creds)
+        self.token = AUTH_HEADER.set("Basic " + self.creds)
 
     def __exit__(self, *args, **kwargs):
         AUTH_HEADER.reset(self.token)

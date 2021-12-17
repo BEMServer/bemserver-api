@@ -18,9 +18,9 @@ from .schemas import (
 )
 
 
-@campaigns_blp.route('/<int:campaign_id>/timeseries_data/', methods=('GET', ))
+@campaigns_blp.route("/<int:campaign_id>/timeseries_data/", methods=("GET",))
 @campaigns_blp.login_required
-@campaigns_blp.arguments(TimeseriesDataQueryArgsSchema, location='query')
+@campaigns_blp.arguments(TimeseriesDataQueryArgsSchema, location="query")
 @campaigns_blp.response(200)
 def get_csv_for_campaign(args, campaign_id):
     """Get timeseries data as CSV file"""
@@ -29,25 +29,19 @@ def get_csv_for_campaign(args, campaign_id):
         abort(404)
     with CurrentCampaign(campaign):
         csv_str = tscsvio.export_csv(
-            args['start_time'],
-            args['end_time'],
-            args['timeseries'],
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
         )
 
-    response = Response(csv_str, mimetype='text/csv')
-    response.headers.set(
-        "Content-Disposition",
-        "attachment",
-        filename="timeseries.csv"
-    )
+    response = Response(csv_str, mimetype="text/csv")
+    response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
     return response
 
 
-@campaigns_blp.route(
-    '/<int:campaign_id>/timeseries_data/aggregate', methods=('GET', ))
+@campaigns_blp.route("/<int:campaign_id>/timeseries_data/aggregate", methods=("GET",))
 @campaigns_blp.login_required
-@campaigns_blp.arguments(
-    TimeseriesDataAggregateQueryArgsSchema, location='query')
+@campaigns_blp.arguments(TimeseriesDataAggregateQueryArgsSchema, location="query")
 @campaigns_blp.response(200)
 def get_aggregate_csv_for_campaign(args, campaign_id):
     """Get aggregated timeseries data as CSV file"""
@@ -56,35 +50,31 @@ def get_aggregate_csv_for_campaign(args, campaign_id):
         abort(404)
     with CurrentCampaign(campaign):
         csv_str = tscsvio.export_csv_bucket(
-            args['start_time'],
-            args['end_time'],
-            args['timeseries'],
-            args['bucket_width'],
-            args['timezone'],
-            args['aggregation'],
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
+            args["bucket_width"],
+            args["timezone"],
+            args["aggregation"],
         )
 
-    response = Response(csv_str, mimetype='text/csv')
-    response.headers.set(
-        "Content-Disposition",
-        "attachment",
-        filename="timeseries.csv"
-    )
+    response = Response(csv_str, mimetype="text/csv")
+    response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
     return response
 
 
 # TODO: document response
 # https://github.com/marshmallow-code/flask-smorest/issues/142
-@campaigns_blp.route('/<int:campaign_id>/timeseries_data/', methods=('POST', ))
+@campaigns_blp.route("/<int:campaign_id>/timeseries_data/", methods=("POST",))
 @campaigns_blp.login_required
-@campaigns_blp.arguments(TimeseriesCSVFileSchema, location='files')
+@campaigns_blp.arguments(TimeseriesCSVFileSchema, location="files")
 @campaigns_blp.response(201)
 def post_csv_for_campaign(files, campaign_id):
     """Post timeseries data as CSV file"""
     campaign = Campaign.get_by_id(campaign_id)
     if campaign is None:
         abort(404)
-    csv_file = files['csv_file']
+    csv_file = files["csv_file"]
     with CurrentCampaign(campaign):
         with io.TextIOWrapper(csv_file) as csv_file_txt:
             try:

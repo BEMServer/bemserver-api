@@ -12,7 +12,6 @@ CAMPAIGNS_URL = "/campaigns/"
 
 
 class TestCampaignsApi:
-
     def test_campaigns_api(self, app, users):
 
         creds = users["Chuck"]["creds"]
@@ -30,12 +29,10 @@ class TestCampaignsApi:
             campaign_1 = {
                 "name": "Campaign 1",
                 "start_time": (
-                    dt.datetime(
-                        2012, 9, 4, tzinfo=dt.timezone.utc).isoformat()
+                    dt.datetime(2012, 9, 4, tzinfo=dt.timezone.utc).isoformat()
                 ),
                 "end_time": (
-                    dt.datetime(
-                        2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
+                    dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
                 ),
             }
             ret = client.post(CAMPAIGNS_URL, json=campaign_1)
@@ -69,7 +66,7 @@ class TestCampaignsApi:
             ret = client.put(
                 f"{CAMPAIGNS_URL}{campaign_1_id}",
                 json=campaign_1,
-                headers={"If-Match": campaign_1_etag}
+                headers={"If-Match": campaign_1_etag},
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -81,7 +78,7 @@ class TestCampaignsApi:
             ret = client.put(
                 f"{CAMPAIGNS_URL}{DUMMY_ID}",
                 json=campaign_1,
-                headers={"If-Match": campaign_1_etag}
+                headers={"If-Match": campaign_1_etag},
             )
             assert ret.status_code == 404
 
@@ -89,12 +86,10 @@ class TestCampaignsApi:
             campaign_2 = {
                 "name": "Campaign 2",
                 "start_time": (
-                    dt.datetime(
-                        2016, 4, 8, tzinfo=dt.timezone.utc).isoformat()
+                    dt.datetime(2016, 4, 8, tzinfo=dt.timezone.utc).isoformat()
                 ),
                 "end_time": (
-                    dt.datetime(
-                        2019, 9, 20, tzinfo=dt.timezone.utc).isoformat()
+                    dt.datetime(2019, 9, 20, tzinfo=dt.timezone.utc).isoformat()
                 ),
             }
             ret = client.post(CAMPAIGNS_URL, json=campaign_2)
@@ -107,7 +102,7 @@ class TestCampaignsApi:
             ret = client.put(
                 f"{CAMPAIGNS_URL}{campaign_2_id}",
                 json=campaign_2,
-                headers={"If-Match": campaign_2_etag}
+                headers={"If-Match": campaign_2_etag},
             )
             assert ret.status_code == 409
 
@@ -118,8 +113,7 @@ class TestCampaignsApi:
             assert len(ret_val) == 2
 
             # GET list with filters
-            ret = client.get(
-                CAMPAIGNS_URL, query_string={"name": "Campaign 1"})
+            ret = client.get(CAMPAIGNS_URL, query_string={"name": "Campaign 1"})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
@@ -127,20 +121,17 @@ class TestCampaignsApi:
 
             # DELETE wrong ID -> 404
             ret = client.delete(
-                f"{CAMPAIGNS_URL}{DUMMY_ID}",
-                headers={"If-Match": campaign_1_etag}
+                f"{CAMPAIGNS_URL}{DUMMY_ID}", headers={"If-Match": campaign_1_etag}
             )
             assert ret.status_code == 404
 
             # DELETE
             ret = client.delete(
-                f"{CAMPAIGNS_URL}{campaign_1_id}",
-                headers={"If-Match": campaign_1_etag}
+                f"{CAMPAIGNS_URL}{campaign_1_id}", headers={"If-Match": campaign_1_etag}
             )
             assert ret.status_code == 204
             ret = client.delete(
-                f"{CAMPAIGNS_URL}{campaign_2_id}",
-                headers={"If-Match": campaign_2_etag}
+                f"{CAMPAIGNS_URL}{campaign_2_id}", headers={"If-Match": campaign_2_etag}
             )
             assert ret.status_code == 204
 
@@ -173,14 +164,12 @@ class TestCampaignsApi:
             assert campaign_1.pop("id") == campaign_1_id
 
             # GET list with filters
-            ret = client.get(
-                CAMPAIGNS_URL, query_string={"name": "Campaign 1"})
+            ret = client.get(CAMPAIGNS_URL, query_string={"name": "Campaign 1"})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == campaign_1_id
-            ret = client.get(
-                CAMPAIGNS_URL, query_string={"name": "Campaign 2"})
+            ret = client.get(CAMPAIGNS_URL, query_string={"name": "Campaign 2"})
             assert ret.status_code == 200
             assert not ret.json
 
@@ -191,8 +180,7 @@ class TestCampaignsApi:
                     dt.datetime(2012, 9, 4, tzinfo=dt.timezone.utc).isoformat()
                 ),
                 "end_time": (
-                    dt.datetime(
-                        2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
+                    dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
                 ),
             }
             ret = client.post(CAMPAIGNS_URL, json=campaign_3)
@@ -211,14 +199,13 @@ class TestCampaignsApi:
             ret = client.put(
                 f"{CAMPAIGNS_URL}{campaign_1_id}",
                 json=campaign_1,
-                headers={"If-Match": campaign_1_etag}
+                headers={"If-Match": campaign_1_etag},
             )
             assert ret.status_code == 403
 
             # DELETE
             ret = client.delete(
-                f"{CAMPAIGNS_URL}{campaign_1_id}",
-                headers={"If-Match": campaign_1_etag}
+                f"{CAMPAIGNS_URL}{campaign_1_id}", headers={"If-Match": campaign_1_etag}
             )
             assert ret.status_code == 403
 
@@ -235,12 +222,8 @@ class TestCampaignsApi:
         # POST
         campaign_3 = {
             "name": "Campaign 3",
-            "start_time": (
-                dt.datetime(2012, 9, 4, tzinfo=dt.timezone.utc).isoformat()
-            ),
-            "end_time": (
-                dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
-            ),
+            "start_time": (dt.datetime(2012, 9, 4, tzinfo=dt.timezone.utc).isoformat()),
+            "end_time": (dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()),
         }
         ret = client.post(CAMPAIGNS_URL, json=campaign_3)
         assert ret.status_code == 401
@@ -256,15 +239,14 @@ class TestCampaignsApi:
         ret = client.put(
             f"{CAMPAIGNS_URL}{campaign_1_id}",
             json=campaign_1,
-            headers={"If-Match": "Dummy-ETag"}
+            headers={"If-Match": "Dummy-ETag"},
         )
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401
 
         # DELETE
         ret = client.delete(
-            f"{CAMPAIGNS_URL}{campaign_1_id}",
-            headers={"If-Match": "Dummy-Etag"}
+            f"{CAMPAIGNS_URL}{campaign_1_id}", headers={"If-Match": "Dummy-Etag"}
         )
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401

@@ -11,17 +11,17 @@ from bemserver_api.database import db
 from bemserver_api.resources.campaigns import blp as campaigns_blp
 
 from .schemas import (
-    TimeseriesEventSchema, TimeseriesEventPutSchema,
+    TimeseriesEventSchema,
+    TimeseriesEventPutSchema,
     TimeseriesEventQueryArgsSchema,
 )
 
 
-@campaigns_blp.route('/<int:campaign_id>/events/timeseries/')
+@campaigns_blp.route("/<int:campaign_id>/events/timeseries/")
 class TimeseriesEventsViews(MethodView):
-
     @campaigns_blp.login_required
     @campaigns_blp.etag
-    @campaigns_blp.arguments(TimeseriesEventQueryArgsSchema, location='query')
+    @campaigns_blp.arguments(TimeseriesEventQueryArgsSchema, location="query")
     @campaigns_blp.response(200, TimeseriesEventSchema(many=True))
     @campaigns_blp.paginate(SQLCursorPage)
     # TODO: kwargs?
@@ -49,9 +49,8 @@ class TimeseriesEventsViews(MethodView):
             return item
 
 
-@campaigns_blp.route('/<int:campaign_id>/events/timeseries/<int:item_id>')
+@campaigns_blp.route("/<int:campaign_id>/events/timeseries/<int:item_id>")
 class TimeseriesEventsByIdViews(MethodView):
-
     @campaigns_blp.login_required
     @campaigns_blp.etag
     @campaigns_blp.response(200, TimeseriesEventSchema)
