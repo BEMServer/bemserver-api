@@ -1,0 +1,6 @@
+include LICENSE
+
+graft tests
+include tox.ini
+
+global-exclude *.py[co]
