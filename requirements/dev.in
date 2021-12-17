@@ -1,0 +1,6 @@
+# When modifying this file, run
+# pip-compile requirements/dev.in
+-r tests.in
+pip-tools
+pre-commit
+tox
