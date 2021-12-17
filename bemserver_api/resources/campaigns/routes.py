@@ -11,19 +11,15 @@ from .schemas import CampaignSchema, CampaignQueryArgsSchema
 
 
 blp = Blueprint(
-    'Campaign',
-    __name__,
-    url_prefix='/campaigns',
-    description="Operations on campaigns"
+    "Campaign", __name__, url_prefix="/campaigns", description="Operations on campaigns"
 )
 
 
-@blp.route('/')
+@blp.route("/")
 class CampaignViews(MethodView):
-
     @blp.login_required
     @blp.etag
-    @blp.arguments(CampaignQueryArgsSchema, location='query')
+    @blp.arguments(CampaignQueryArgsSchema, location="query")
     @blp.response(200, CampaignSchema(many=True))
     def get(self, args):
         """List campaigns"""
@@ -41,9 +37,8 @@ class CampaignViews(MethodView):
         return item
 
 
-@blp.route('/<int:item_id>')
+@blp.route("/<int:item_id>")
 class CampaignByIdViews(MethodView):
-
     @blp.login_required
     @blp.etag
     @blp.response(200, CampaignSchema)

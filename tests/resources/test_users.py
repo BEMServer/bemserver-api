@@ -8,7 +8,6 @@ USERS_URL = "/users/"
 
 
 class TestUsersApi:
-
     def test_users_api(self, app, users):
 
         creds = users["Chuck"]["creds"]
@@ -22,10 +21,8 @@ class TestUsersApi:
             assert ret.status_code == 200
             ret_val = ret.json
             nb_init_users = len(ret_val)
-            init_admin_users_ids = {
-                u["id"] for u in ret_val if u["is_admin"]}
-            init_inactive_users_ids = {
-                u["id"] for u in ret_val if not u["is_active"]}
+            init_admin_users_ids = {u["id"] for u in ret_val if u["is_admin"]}
+            init_inactive_users_ids = {u["id"] for u in ret_val if not u["is_active"]}
 
             # POST
             user_1 = {
@@ -70,7 +67,7 @@ class TestUsersApi:
             ret = client.put(
                 f"{USERS_URL}{user_1_id}",
                 json=user_1,
-                headers={"If-Match": user_1_etag}
+                headers={"If-Match": user_1_etag},
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -80,9 +77,7 @@ class TestUsersApi:
 
             # PUT wrong ID -> 404
             ret = client.put(
-                f"{USERS_URL}{DUMMY_ID}",
-                json=user_1,
-                headers={"If-Match": user_1_etag}
+                f"{USERS_URL}{DUMMY_ID}", json=user_1, headers={"If-Match": user_1_etag}
             )
             assert ret.status_code == 404
 
@@ -90,7 +85,7 @@ class TestUsersApi:
             ret = client.put(
                 f"{USERS_URL}{user_1_id}/set_admin",
                 json={"value": True},
-                headers={"If-Match": user_1_etag}
+                headers={"If-Match": user_1_etag},
             )
             assert ret.status_code == 204
             user_1_etag = ret.headers["ETag"]
@@ -99,7 +94,7 @@ class TestUsersApi:
             ret = client.put(
                 f"{USERS_URL}{DUMMY_ID}/set_admin",
                 json={"value": True},
-                headers={"If-Match": user_1_etag}
+                headers={"If-Match": user_1_etag},
             )
             assert ret.status_code == 404
 
@@ -120,7 +115,7 @@ class TestUsersApi:
             ret = client.put(
                 f"{USERS_URL}{user_2_id}",
                 json=user_2,
-                headers={"If-Match": user_2_etag}
+                headers={"If-Match": user_2_etag},
             )
             assert ret.status_code == 409
 
@@ -128,7 +123,7 @@ class TestUsersApi:
             ret = client.put(
                 f"{USERS_URL}{user_2_id}/set_active",
                 json={"value": False},
-                headers={"If-Match": user_2_etag}
+                headers={"If-Match": user_2_etag},
             )
             assert ret.status_code == 204
             user_2_etag = ret.headers["ETag"]
@@ -137,7 +132,7 @@ class TestUsersApi:
             ret = client.put(
                 f"{USERS_URL}{DUMMY_ID}/set_active",
                 json={"value": False},
-                headers={"If-Match": user_2_etag}
+                headers={"If-Match": user_2_etag},
             )
             assert ret.status_code == 404
 
@@ -152,30 +147,22 @@ class TestUsersApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == len(init_admin_users_ids) + 1
-            assert (
-                {u["id"] for u in ret_val} ==
-                init_admin_users_ids | {user_1_id}
-            )
+            assert {u["id"] for u in ret_val} == init_admin_users_ids | {user_1_id}
             ret = client.get(USERS_URL, query_string={"is_active": False})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == len(init_inactive_users_ids) + 1
-            assert (
-                {u["id"] for u in ret_val} ==
-                init_inactive_users_ids | {user_2_id}
-            )
+            assert {u["id"] for u in ret_val} == init_inactive_users_ids | {user_2_id}
 
             # DELETE wrong ID -> 404
             ret = client.delete(
-                f"{USERS_URL}{DUMMY_ID}",
-                headers={"If-Match": user_1_etag}
+                f"{USERS_URL}{DUMMY_ID}", headers={"If-Match": user_1_etag}
             )
             assert ret.status_code == 404
 
             # DELETE
             ret = client.delete(
-                f"{USERS_URL}{user_1_id}",
-                headers={"If-Match": user_1_etag}
+                f"{USERS_URL}{user_1_id}", headers={"If-Match": user_1_etag}
             )
             assert ret.status_code == 204
 
@@ -226,19 +213,19 @@ class TestUsersApi:
             user_1 = {
                 "name": "Superactive",
                 "password": "@ctive",
-                "email": "active@test.com"
+                "email": "active@test.com",
             }
             ret = client.put(
                 f"{USERS_URL}{user_1_id}",
                 json=user_1,
-                headers={"If-Match": user_1_etag}
+                headers={"If-Match": user_1_etag},
             )
             assert ret.status_code == 200
             user_1_etag = ret.headers["ETag"]
             ret = client.put(
                 f"{USERS_URL}{user_2_id}",
                 json=new_user,
-                headers={"If-Match": user_1_etag}
+                headers={"If-Match": user_1_etag},
             )
             # ETag is wrong but we get rejected before ETag check anyway
             assert ret.status_code == 403
@@ -247,7 +234,7 @@ class TestUsersApi:
             ret = client.put(
                 f"{USERS_URL}{user_1_id}/set_admin",
                 json={"value": True},
-                headers={"If-Match": user_1_etag}
+                headers={"If-Match": user_1_etag},
             )
             assert ret.status_code == 403
 
@@ -255,14 +242,13 @@ class TestUsersApi:
             ret = client.put(
                 f"{USERS_URL}{user_1_id}/set_active",
                 json={"value": False},
-                headers={"If-Match": user_1_etag}
+                headers={"If-Match": user_1_etag},
             )
             assert ret.status_code == 403
 
             # DELETE
             ret = client.delete(
-                f"{USERS_URL}{user_1_id}",
-                headers={"If-Match": user_1_etag}
+                f"{USERS_URL}{user_1_id}", headers={"If-Match": user_1_etag}
             )
             assert ret.status_code == 403
 
@@ -293,12 +279,10 @@ class TestUsersApi:
         user_1 = {
             "name": "Superactive",
             "password": "@ctive",
-            "email": "active@test.com"
+            "email": "active@test.com",
         }
         ret = client.put(
-            f"{USERS_URL}{user_1_id}",
-            json=user_1,
-            headers={"If-Match": "Dummy-ETag"}
+            f"{USERS_URL}{user_1_id}", json=user_1, headers={"If-Match": "Dummy-ETag"}
         )
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401
@@ -307,7 +291,7 @@ class TestUsersApi:
         ret = client.put(
             f"{USERS_URL}{user_1_id}/set_admin",
             json={"value": True},
-            headers={"If-Match": "Dummy-ETag"}
+            headers={"If-Match": "Dummy-ETag"},
         )
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401
@@ -316,15 +300,14 @@ class TestUsersApi:
         ret = client.put(
             f"{USERS_URL}{user_1_id}/set_active",
             json={"value": False},
-            headers={"If-Match": "Dummy-ETag"}
+            headers={"If-Match": "Dummy-ETag"},
         )
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401
 
         # DELETE
         ret = client.delete(
-            f"{USERS_URL}{user_1_id}",
-            headers={"If-Match": "Dummy-ETag"}
+            f"{USERS_URL}{user_1_id}", headers={"If-Match": "Dummy-ETag"}
         )
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401

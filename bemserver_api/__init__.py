@@ -4,7 +4,12 @@ import click
 
 from . import database
 from .extensions import (  # noqa
-    Api, Blueprint, Schema, AutoSchema, SQLCursorPage, authentication
+    Api,
+    Blueprint,
+    Schema,
+    AutoSchema,
+    SQLCursorPage,
+    authentication,
 )
 from .resources import register_blueprints
 
@@ -23,7 +28,7 @@ def create_app(config_override=None):
     """
     app = flask.Flask(__name__)
     app.config.from_object("bemserver_api.settings.Config")
-    app.config.from_envvar('FLASK_SETTINGS_FILE', silent=True)
+    app.config.from_envvar("FLASK_SETTINGS_FILE", silent=True)
     app.config.from_object(config_override)
 
     database.init_app(app)

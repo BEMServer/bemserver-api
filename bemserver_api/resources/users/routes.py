@@ -11,19 +11,15 @@ from .schemas import UserSchema, UserQueryArgsSchema, BooleanValueSchema
 
 
 blp = Blueprint(
-    'User',
-    __name__,
-    url_prefix='/users',
-    description="Operations on users"
+    "User", __name__, url_prefix="/users", description="Operations on users"
 )
 
 
-@blp.route('/')
+@blp.route("/")
 class UserViews(MethodView):
-
     @blp.login_required
     @blp.etag
-    @blp.arguments(UserQueryArgsSchema, location='query')
+    @blp.arguments(UserQueryArgsSchema, location="query")
     @blp.response(200, UserSchema(many=True))
     def get(self, args):
         """List users"""
@@ -45,9 +41,8 @@ class UserViews(MethodView):
         return item
 
 
-@blp.route('/<int:item_id>')
+@blp.route("/<int:item_id>")
 class UserByIdViews(MethodView):
-
     @blp.login_required
     @blp.etag
     @blp.response(200, UserSchema)
@@ -89,7 +84,7 @@ class UserByIdViews(MethodView):
         db.session.commit()
 
 
-@blp.route('/<int:item_id>/set_admin', methods=('PUT', ))
+@blp.route("/<int:item_id>/set_admin", methods=("PUT",))
 @blp.login_required
 @blp.etag
 @blp.arguments(BooleanValueSchema)
@@ -104,7 +99,7 @@ def set_admin(args, item_id):
     blp.set_etag(item, UserSchema)
 
 
-@blp.route('/<int:item_id>/set_active', methods=('PUT', ))
+@blp.route("/<int:item_id>/set_active", methods=("PUT",))
 @blp.login_required
 @blp.etag
 @blp.arguments(BooleanValueSchema)

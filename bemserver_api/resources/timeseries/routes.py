@@ -11,19 +11,18 @@ from .schemas import TimeseriesSchema, TimeseriesQueryArgsSchema
 
 
 blp = Blueprint(
-    'Timeseries',
+    "Timeseries",
     __name__,
-    url_prefix='/timeseries',
-    description="Operations on timeseries"
+    url_prefix="/timeseries",
+    description="Operations on timeseries",
 )
 
 
-@blp.route('/')
+@blp.route("/")
 class TimeseriesViews(MethodView):
-
     @blp.login_required
     @blp.etag
-    @blp.arguments(TimeseriesQueryArgsSchema, location='query')
+    @blp.arguments(TimeseriesQueryArgsSchema, location="query")
     @blp.response(200, TimeseriesSchema(many=True))
     @blp.paginate(SQLCursorPage)
     def get(self, args):
@@ -42,9 +41,8 @@ class TimeseriesViews(MethodView):
         return item
 
 
-@blp.route('/<int:item_id>')
+@blp.route("/<int:item_id>")
 class TimeseriesByIdViews(MethodView):
-
     @blp.login_required
     @blp.etag
     @blp.response(200, TimeseriesSchema)

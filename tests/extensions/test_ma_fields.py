@@ -6,7 +6,6 @@ from bemserver_api.extensions.ma_fields import Timezone
 
 
 class TestMaFields:
-
     def test_ma_fields_timezone(self):
         field = Timezone()
         assert field.deserialize("UTC") == "UTC"

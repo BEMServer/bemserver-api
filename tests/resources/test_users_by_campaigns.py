@@ -10,7 +10,6 @@ USERS_BY_CAMPAIGNS_URL = "/usersbycampaigns/"
 
 
 class TestUsersByCampaignsApi:
-
     def test_users_by_campaigns_api(self, app, users, campaigns):
 
         user_1_id = users["Active"]["id"]
@@ -66,8 +65,7 @@ class TestUsersByCampaignsApi:
 
             # GET list (filtered)
             ret = client.get(
-                USERS_BY_CAMPAIGNS_URL,
-                query_string={"user_id": user_1_id}
+                USERS_BY_CAMPAIGNS_URL, query_string={"user_id": user_1_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -76,8 +74,7 @@ class TestUsersByCampaignsApi:
             assert ret_val[0]["user_id"] == user_1_id
             assert ret_val[0]["campaign_id"] == campaign_1_id
             ret = client.get(
-                USERS_BY_CAMPAIGNS_URL,
-                query_string={"campaign_id": campaign_2_id}
+                USERS_BY_CAMPAIGNS_URL, query_string={"campaign_id": campaign_2_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -87,8 +84,7 @@ class TestUsersByCampaignsApi:
             assert ret_val[0]["campaign_id"] == campaign_2_id
             ret = client.get(
                 USERS_BY_CAMPAIGNS_URL,
-                query_string={
-                    "user_id": user_1_id, "campaign_id": campaign_2_id}
+                query_string={"user_id": user_1_id, "campaign_id": campaign_2_id},
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -100,19 +96,17 @@ class TestUsersByCampaignsApi:
 
             # DELETE user violating fkey constraint
             ret = client.get(f"{USERS_URL}{user_1_id}")
-            user_1_etag = ret.headers['ETag']
+            user_1_etag = ret.headers["ETag"]
             ret = client.delete(
-                f"{USERS_URL}{user_1_id}",
-                headers={'If-Match': user_1_etag}
+                f"{USERS_URL}{user_1_id}", headers={"If-Match": user_1_etag}
             )
             assert ret.status_code == 409
 
             # DELETE campaign violating fkey constraint
             ret = client.get(f"{CAMPAIGNS_URL}{campaign_1_id}")
-            campaign_1_etag = ret.headers['ETag']
+            campaign_1_etag = ret.headers["ETag"]
             ret = client.delete(
-                f"{CAMPAIGNS_URL}{campaign_1_id}",
-                headers={'If-Match': campaign_1_etag}
+                f"{CAMPAIGNS_URL}{campaign_1_id}", headers={"If-Match": campaign_1_etag}
             )
             assert ret.status_code == 409
 
@@ -167,8 +161,7 @@ class TestUsersByCampaignsApi:
 
             # GET list (filtered)
             ret = client.get(
-                USERS_BY_CAMPAIGNS_URL,
-                query_string={"user_id": user_1_id}
+                USERS_BY_CAMPAIGNS_URL, query_string={"user_id": user_1_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -177,15 +170,13 @@ class TestUsersByCampaignsApi:
             assert ret_val[0]["user_id"] == user_1_id
             assert ret_val[0]["campaign_id"] == campaign_1_id
             ret = client.get(
-                USERS_BY_CAMPAIGNS_URL,
-                query_string={"campaign_id": campaign_2_id}
+                USERS_BY_CAMPAIGNS_URL, query_string={"campaign_id": campaign_2_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 0
             ret = client.get(
-                USERS_BY_CAMPAIGNS_URL,
-                query_string={"user_id": user_2_id}
+                USERS_BY_CAMPAIGNS_URL, query_string={"user_id": user_2_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json

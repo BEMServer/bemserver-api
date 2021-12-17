@@ -14,6 +14,7 @@ class catch_integrity_error(contextlib.ContextDecorator):
 
     Can be used as context manager or decorator.
     """
+
     def __enter__(self):
         return self
 

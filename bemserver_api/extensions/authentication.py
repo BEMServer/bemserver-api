@@ -5,8 +5,7 @@ import sqlalchemy as sqla
 from flask_httpauth import HTTPBasicAuth
 from flask_smorest import abort
 from bemserver_core.model.users import User
-from bemserver_core.authorization import (
-    CurrentUser, BEMServerAuthorizationError)
+from bemserver_core.authorization import CurrentUser, BEMServerAuthorizationError
 
 from bemserver_api.database import db
 
@@ -21,8 +20,8 @@ class Auth(HTTPBasicAuth):
         Sets CurrentUser context variable to authenticated user for the request
         Catches Authorization error and aborts accordingly
         """
-        def decorator(func):
 
+        def decorator(func):
             @wraps(func)
             def wrapper(*args, **func_kwargs):
                 with CurrentUser(self.current_user()):

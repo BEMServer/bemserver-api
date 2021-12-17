@@ -14,29 +14,23 @@ uve = sqla.exc.IntegrityError(None, None, None)
 
 
 class TestIntegrityError:
-
     @pytest.mark.parametrize("error", (uve, fkve, uve))
     def test_blp_integrity_error(self, error):
 
         app = flask.Flask("Test")
         api = Api(
-            app,
-            spec_kwargs={
-                "title": "Test",
-                "version": "1",
-                "openapi_version": "3"
-            }
+            app, spec_kwargs={"title": "Test", "version": "1", "openapi_version": "3"}
         )
 
-        blp = Blueprint('Test', __name__, url_prefix='/test')
+        blp = Blueprint("Test", __name__, url_prefix="/test")
 
-        @blp.route('/decorator')
+        @blp.route("/decorator")
         @blp.response(200)
         @blp.catch_integrity_error()
         def decorator():
             raise error
 
-        @blp.route('/decorator_factory')
+        @blp.route("/decorator_factory")
         @blp.response(200)
         @blp.catch_integrity_error
         def decorator_factory():

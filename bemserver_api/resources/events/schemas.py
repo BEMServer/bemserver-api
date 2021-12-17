@@ -4,8 +4,11 @@ import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import (
-    EventState, EventCategory, EventLevel,
-    EventChannel, EventChannelByCampaign,
+    EventState,
+    EventCategory,
+    EventLevel,
+    EventChannel,
+    EventChannelByCampaign,
 )
 
 from bemserver_api import AutoSchema
