@@ -117,9 +117,9 @@ class TestTimeseriesApi:
             assert ret.status_code == 404
 
     @pytest.mark.parametrize("user", ("user", "anonym"))
-    def test_timeseries_as_user_or_anonym_api(self, app, user, users, timeseries_data):
+    def test_timeseries_as_user_or_anonym_api(self, app, user, users, timeseries):
 
-        timeseries_1_id = timeseries_data[0][0]
+        timeseries_1_id = timeseries[0]
 
         if user == "user":
             creds = users["Active"]["creds"]

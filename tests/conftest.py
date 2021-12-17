@@ -109,47 +109,44 @@ def users_by_campaigns(campaigns, users):
     return user_by_campaign_1.id, user_by_campaign_2.id
 
 
-@pytest.fixture(params=[{}])
-def timeseries_data(request, database):
-
-    param = request.param
-
-    nb_ts = param.get("nb_ts", 2)
-    nb_tsd = param.get("nb_tsd", 24 * 100)
-
+@pytest.fixture(params=[2])
+def timeseries(request, database):
     ts_l = []
+    for i in range(request.param):
+        ts_i = model.Timeseries(
+            name=f"Timeseries {i}",
+            description=f"Test timeseries #{i}",
+        )
+        ts_l.append(ts_i)
+    db.session.add_all(ts_l)
+    db.session.commit()
+    return [ts.id for ts in ts_l]
 
+
+@pytest.fixture(params=[4])
+def timeseries_data(request, database, timeseries):
+    nb_tsd = request.param
     with AdminUser:
-
-        for i in range(nb_ts):
-            ts_i = model.Timeseries.new(
-                name=f"Timeseries {i}",
-                description=f"Test timeseries #{i}",
-            )
-
+        for ts_id in timeseries:
             start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
             for i in range(nb_tsd):
                 timestamp = start_dt + dt.timedelta(hours=i)
-                model.TimeseriesData.new(timestamp=timestamp, timeseries=ts_i, value=i)
-
-            ts_l.append(ts_i)
-
+                model.TimeseriesData.new(
+                    timestamp=timestamp, timeseries_id=ts_id, value=i
+                )
         db.session.commit()
-
-    return [
-        (ts.id, nb_tsd, start_dt, start_dt + dt.timedelta(hours=nb_tsd)) for ts in ts_l
-    ]
+    return (start_dt, start_dt + dt.timedelta(hours=nb_tsd))
 
 
 @pytest.fixture
-def timeseries_by_campaigns(timeseries_data, campaigns):
+def timeseries_by_campaigns(timeseries, campaigns):
     with AdminUser:
         ts_by_campaign_1 = model.TimeseriesByCampaign.new(
-            timeseries_id=timeseries_data[0][0],
+            timeseries_id=timeseries[0],
             campaign_id=campaigns[0],
         )
         ts_by_campaign_2 = model.TimeseriesByCampaign.new(
-            timeseries_id=timeseries_data[1][0],
+            timeseries_id=timeseries[1],
             campaign_id=campaigns[1],
         )
         db.session.commit()

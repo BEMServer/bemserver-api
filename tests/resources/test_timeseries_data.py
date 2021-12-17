@@ -12,9 +12,6 @@ CAMPAIGNS_URL = "/campaigns/"
 
 
 class TestTimeseriesDataForCampaignApi:
-    @pytest.mark.parametrize(
-        "timeseries_data", ({"nb_ts": 2, "nb_tsd": 4},), indirect=True
-    )
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_campaigns")
     @pytest.mark.usefixtures("timeseries_by_campaigns")
@@ -24,11 +21,12 @@ class TestTimeseriesDataForCampaignApi:
         user,
         users,
         campaigns,
+        timeseries,
         timeseries_data,
     ):
-
-        ts_0_id, _, start_time, end_time = timeseries_data[0]
-        ts_1_id, _, _, _ = timeseries_data[1]
+        start_time, end_time = timeseries_data
+        ts_1_id = timeseries[0]
+        ts_2_id = timeseries[1]
         campaign_1_id, campaign_2_id = campaigns
 
         if user == "admin":
@@ -50,7 +48,7 @@ class TestTimeseriesDataForCampaignApi:
                     "start_time": start_time.isoformat(),
                     "end_time": end_time.isoformat(),
                     "timeseries": [
-                        ts_0_id,
+                        ts_1_id,
                     ],
                 },
             )
@@ -60,22 +58,6 @@ class TestTimeseriesDataForCampaignApi:
                 assert ret.status_code == 200
 
             # Timeseries not in Campaign
-            ret = client.get(
-                f"{CAMPAIGNS_URL}{campaign_2_id}/timeseries_data/",
-                query_string={
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat(),
-                    "timeseries": [
-                        ts_0_id,
-                    ],
-                },
-            )
-            if user == "anonym":
-                assert ret.status_code == 401
-            else:
-                assert ret.status_code == 403
-
-            # User not in Campaign
             ret = client.get(
                 f"{CAMPAIGNS_URL}{campaign_2_id}/timeseries_data/",
                 query_string={
@@ -88,6 +70,22 @@ class TestTimeseriesDataForCampaignApi:
             )
             if user == "anonym":
                 assert ret.status_code == 401
+            else:
+                assert ret.status_code == 403
+
+            # User not in Campaign
+            ret = client.get(
+                f"{CAMPAIGNS_URL}{campaign_2_id}/timeseries_data/",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": [
+                        ts_2_id,
+                    ],
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
             elif user == "user":
                 assert ret.status_code == 403
             else:
@@ -100,7 +98,7 @@ class TestTimeseriesDataForCampaignApi:
                     "start_time": (start_time - dt.timedelta(days=1)).isoformat(),
                     "end_time": end_time.isoformat(),
                     "timeseries": [
-                        ts_0_id,
+                        ts_1_id,
                     ],
                 },
             )
@@ -109,9 +107,6 @@ class TestTimeseriesDataForCampaignApi:
             else:
                 assert ret.status_code == 403
 
-    @pytest.mark.parametrize(
-        "timeseries_data", ({"nb_ts": 2, "nb_tsd": 4},), indirect=True
-    )
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_campaigns")
     @pytest.mark.usefixtures("timeseries_by_campaigns")
@@ -121,11 +116,12 @@ class TestTimeseriesDataForCampaignApi:
         user,
         users,
         campaigns,
+        timeseries,
         timeseries_data,
     ):
-
-        ts_0_id, _, start_time, end_time = timeseries_data[0]
-        ts_1_id, _, _, _ = timeseries_data[1]
+        start_time, end_time = timeseries_data
+        ts_1_id = timeseries[0]
+        ts_2_id = timeseries[1]
         campaign_1_id, campaign_2_id = campaigns
 
         if user == "admin":
@@ -146,7 +142,7 @@ class TestTimeseriesDataForCampaignApi:
                 query_string={
                     "start_time": start_time.isoformat(),
                     "end_time": end_time.isoformat(),
-                    "timeseries": [ts_0_id],
+                    "timeseries": [ts_1_id],
                     "bucket_width": "1 day",
                     "timezone": "UTC",
                 },
@@ -162,7 +158,7 @@ class TestTimeseriesDataForCampaignApi:
                 query_string={
                     "start_time": start_time.isoformat(),
                     "end_time": end_time.isoformat(),
-                    "timeseries": [ts_0_id],
+                    "timeseries": [ts_1_id],
                     "bucket_width": "1 day",
                     "timezone": "UTC",
                 },
@@ -178,7 +174,7 @@ class TestTimeseriesDataForCampaignApi:
                 query_string={
                     "start_time": start_time.isoformat(),
                     "end_time": end_time.isoformat(),
-                    "timeseries": [ts_1_id],
+                    "timeseries": [ts_2_id],
                     "bucket_width": "1 day",
                     "timezone": "UTC",
                 },
@@ -196,7 +192,7 @@ class TestTimeseriesDataForCampaignApi:
                 query_string={
                     "start_time": (start_time - dt.timedelta(days=1)).isoformat(),
                     "end_time": end_time.isoformat(),
-                    "timeseries": [ts_0_id],
+                    "timeseries": [ts_1_id],
                     "bucket_width": "1 day",
                     "timezone": "UTC",
                 },
@@ -206,18 +202,15 @@ class TestTimeseriesDataForCampaignApi:
             else:
                 assert ret.status_code == 403
 
-    @pytest.mark.parametrize(
-        "timeseries_data", ({"nb_ts": 2, "nb_tsd": 0},), indirect=True
-    )
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_campaigns")
     @pytest.mark.usefixtures("timeseries_by_campaigns")
     def test_timeseries_data_for_campaign_post(
-        self, app, user, users, campaigns, timeseries_data
+        self, app, user, users, campaigns, timeseries
     ):
 
-        ts_0_id, _, _, _ = timeseries_data[0]
-        ts_1_id, _, _, _ = timeseries_data[1]
+        ts_1_id = timeseries[0]
+        ts_2_id = timeseries[1]
         campaign_1_id, campaign_2_id = campaigns
 
         if user == "admin":
@@ -234,7 +227,7 @@ class TestTimeseriesDataForCampaignApi:
         with auth_context:
 
             csv_str = (
-                f"Datetime,{ts_0_id}\n"
+                f"Datetime,{ts_1_id}\n"
                 "2020-01-01T00:00:00+00:00,0\n"
                 "2020-01-01T01:00:00+00:00,1\n"
                 "2020-01-01T02:00:00+00:00,2\n"
@@ -251,7 +244,7 @@ class TestTimeseriesDataForCampaignApi:
 
             # Timeseries not in Campaign
             csv_str = (
-                f"Datetime,{ts_1_id}\n"
+                f"Datetime,{ts_2_id}\n"
                 "2020-01-01T00:00:00+00:00,0\n"
                 "2020-01-01T01:00:00+00:00,1\n"
                 "2020-01-01T02:00:00+00:00,2\n"
@@ -268,7 +261,7 @@ class TestTimeseriesDataForCampaignApi:
 
             # User not in Campaign
             csv_str = (
-                f"Datetime,{ts_1_id}\n"
+                f"Datetime,{ts_2_id}\n"
                 "2020-01-01T00:00:00+00:00,0\n"
                 "2020-01-01T01:00:00+00:00,1\n"
                 "2020-01-01T02:00:00+00:00,2\n"
@@ -287,7 +280,7 @@ class TestTimeseriesDataForCampaignApi:
 
             # Time range exceeds Campaign
             csv_str = (
-                f"Datetime,{ts_0_id}\n"
+                f"Datetime,{ts_1_id}\n"
                 "2019-01-01T00:00:00+00:00,0\n"
                 "2020-01-01T01:00:00+00:00,1\n"
                 "2020-01-01T02:00:00+00:00,2\n"
