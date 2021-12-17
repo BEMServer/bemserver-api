@@ -1,3 +1,6 @@
+# When modifying this file, run
+# pip-compile requirements/tests.in
+# pip-compile requirements/dev.in
 pytest
 pytest-postgresql<4
 pytest-cov
