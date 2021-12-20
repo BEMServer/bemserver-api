@@ -19,3 +19,18 @@ repos:
   hooks:
   - id: blacken-docs
     additional_dependencies: [black==21.12b0]
+- repo: https://github.com/jazzband/pip-tools
+  rev: 6.4.0
+  hooks:
+    - id: pip-compile
+      name: pip-compile setup.py
+      args: [setup.py, --output-file=requirements/install.txt]
+      files: ^(setup\.py|requirements\/install\.txt)$
+    - id: pip-compile
+      name: pip-compile requirements/dev.in
+      args: [requirements/dev.in]
+      files: ^requirements\/(tests|dev)\.(in|txt)$
+    - id: pip-compile
+      name: pip-compile requirements/tests.in
+      args: [requirements/tests.in]
+      files: ^requirements\/tests\.(in|txt)$
