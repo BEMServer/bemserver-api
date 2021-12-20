@@ -29,8 +29,6 @@ setup(
         "Programming Language :: Python :: 3.9",
     ],
     python_requires=">=3.7",
-    # When modifying this list, run
-    # pip-compile setup.py --output-file=requirements/install.txt
     install_requires=[
         "flask>=2.0.0",
         "python-dotenv>=0.9.0",
