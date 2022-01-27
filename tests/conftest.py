@@ -18,7 +18,10 @@ from tests.common import TestConfig, AUTH_HEADER
 
 
 postgresql_proc = ppf.postgresql_proc(
-    postgres_options="-c shared_preload_libraries='timescaledb'"
+    postgres_options=(
+        "-c shared_preload_libraries='timescaledb' "
+        "-c timescaledb.telemetry_level=off"
+    )
 )
 postgresql = ppf.postgresql("postgresql_proc")
 
