@@ -112,13 +112,46 @@ def users_by_campaigns(campaigns, users):
     return user_by_campaign_1.id, user_by_campaign_2.id
 
 
+@pytest.fixture
+def timeseries_groups(database):
+    with OpenBar():
+        ts_group_1 = model.TimeseriesGroup(
+            name="TS Group 1",
+        )
+        db.session.add(ts_group_1)
+        ts_group_2 = model.TimeseriesGroup(
+            name="TS Group 2",
+        )
+        db.session.add(ts_group_2)
+        db.session.commit()
+    return ts_group_1.id, ts_group_2.id
+
+
+@pytest.fixture
+def timeseries_groups_by_users(database, timeseries_groups, users):
+    with OpenBar():
+        tgbu_1 = model.TimeseriesGroupByUser(
+            timeseries_group_id=timeseries_groups[0],
+            user_id=users["Active"]["id"],
+        )
+        db.session.add(tgbu_1)
+        tgbu_2 = model.TimeseriesGroupByUser(
+            timeseries_group_id=timeseries_groups[1],
+            user_id=users["Inactive"]["id"],
+        )
+        db.session.add(tgbu_2)
+        db.session.commit()
+    return tgbu_1.id, tgbu_2.id
+
+
 @pytest.fixture(params=[2])
-def timeseries(request, database):
+def timeseries(request, database, timeseries_groups):
     ts_l = []
     for i in range(request.param):
         ts_i = model.Timeseries(
             name=f"Timeseries {i}",
             description=f"Test timeseries #{i}",
+            group_id=timeseries_groups[i % len(timeseries_groups)],
         )
         ts_l.append(ts_i)
     db.session.add_all(ts_l)
@@ -142,14 +175,14 @@ def timeseries_data(request, database, timeseries):
 
 
 @pytest.fixture
-def timeseries_by_campaigns(timeseries, campaigns):
+def timeseries_groups_by_campaigns(timeseries_groups, campaigns):
     with AdminUser:
-        ts_by_campaign_1 = model.TimeseriesByCampaign.new(
-            timeseries_id=timeseries[0],
+        ts_by_campaign_1 = model.TimeseriesGroupByCampaign.new(
+            timeseries_group_id=timeseries_groups[0],
             campaign_id=campaigns[0],
         )
-        ts_by_campaign_2 = model.TimeseriesByCampaign.new(
-            timeseries_id=timeseries[1],
+        ts_by_campaign_2 = model.TimeseriesGroupByCampaign.new(
+            timeseries_group_id=timeseries_groups[1],
             campaign_id=campaigns[1],
         )
         db.session.commit()
@@ -187,7 +220,24 @@ def event_channels_by_campaigns(database, campaigns, event_channels):
 
 
 @pytest.fixture
-def timeseries_events_by_campaigns(database, campaigns, event_channels):
+def event_channels_by_users(database, event_channels, users):
+    with OpenBar():
+        ecbu_1 = model.EventChannelByUser(
+            event_channel_id=event_channels[0],
+            user_id=users["Active"]["id"],
+        )
+        db.session.add(ecbu_1)
+        ecbu_2 = model.EventChannelByUser(
+            event_channel_id=event_channels[1],
+            user_id=users["Inactive"]["id"],
+        )
+        db.session.add(ecbu_2)
+        db.session.commit()
+    return ecbu_1.id, ecbu_2.id
+
+
+@pytest.fixture
+def timeseries_events(database, campaigns, event_channels):
     with OpenBar():
         tse_1 = model.TimeseriesEvent(
             channel_id=event_channels[0],

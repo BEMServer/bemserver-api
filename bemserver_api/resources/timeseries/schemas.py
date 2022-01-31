@@ -10,6 +10,7 @@ from bemserver_api import AutoSchema
 class TimeseriesSchema(AutoSchema):
     class Meta:
         table = Timeseries.__table__
+        include_fk = True
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
@@ -21,3 +22,4 @@ class TimeseriesQueryArgsSchema(ma.Schema):
     name = ma.fields.Str()
     unit = ma.fields.Str()
     campaign_id = ma.fields.Int()
+    user_id = ma.fields.Int()
