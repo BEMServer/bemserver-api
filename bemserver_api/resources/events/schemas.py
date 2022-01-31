@@ -8,6 +8,7 @@ from bemserver_core.model import (
     EventCategory,
     EventLevel,
     EventChannel,
+    EventChannelByUser,
     EventChannelByCampaign,
 )
 
@@ -50,6 +51,19 @@ class EventChannelSchema(AutoSchema):
 class EventChannelQueryArgsSchema(ma.Schema):
     name = ma.fields.Str()
     campaign_id = ma.fields.Int()
+
+
+class EventChannelByUserSchema(AutoSchema):
+    class Meta:
+        table = EventChannelByUser.__table__
+        include_fk = True
+
+    id = msa.auto_field(dump_only=True)
+
+
+class EventChannelByUserQueryArgsSchema(ma.Schema):
+    user_id = ma.fields.Int()
+    event_channel_id = ma.fields.Int()
 
 
 class EventChannelByCampaignSchema(AutoSchema):
