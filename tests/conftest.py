@@ -237,9 +237,9 @@ def event_channels_by_users(database, event_channels, users):
 
 
 @pytest.fixture
-def timeseries_events(database, campaigns, event_channels):
+def events(database, campaigns, event_channels):
     with OpenBar():
-        tse_1 = model.TimeseriesEvent(
+        tse_1 = model.Event(
             channel_id=event_channels[0],
             timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
             source="Event source",
@@ -248,7 +248,7 @@ def timeseries_events(database, campaigns, event_channels):
             state="NEW",
         )
         db.session.add(tse_1)
-        tse_2 = model.TimeseriesEvent(
+        tse_2 = model.Event(
             channel_id=event_channels[1],
             timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
             source="Another event source",

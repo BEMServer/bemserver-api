@@ -3,77 +3,31 @@
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 
-from bemserver_core.model import (
-    EventState,
-    EventCategory,
-    EventLevel,
-    EventChannel,
-    EventChannelByUser,
-    EventChannelByCampaign,
-)
+from bemserver_core.model import Event
 
 from bemserver_api import AutoSchema
 
 
-class EventStateSchema(AutoSchema):
+class EventSchema(AutoSchema):
     class Meta:
-        table = EventState.__table__
-
-    id = msa.auto_field(dump_only=True)
-    description = msa.auto_field(validate=ma.validate.Length(1, 250))
-
-
-class EventCategorySchema(AutoSchema):
-    class Meta:
-        table = EventCategory.__table__
-
-    id = msa.auto_field(dump_only=True)
-    description = msa.auto_field(validate=ma.validate.Length(1, 250))
-    parent = msa.auto_field()
-
-
-class EventLevelSchema(AutoSchema):
-    class Meta:
-        table = EventLevel.__table__
-
-    id = msa.auto_field(dump_only=True)
-    description = msa.auto_field(validate=ma.validate.Length(1, 250))
-
-
-class EventChannelSchema(AutoSchema):
-    class Meta:
-        table = EventChannel.__table__
-
-    id = msa.auto_field(dump_only=True)
-    name = msa.auto_field(validate=ma.validate.Length(1, 80))
-
-
-class EventChannelQueryArgsSchema(ma.Schema):
-    name = ma.fields.Str()
-    campaign_id = ma.fields.Int()
-
-
-class EventChannelByUserSchema(AutoSchema):
-    class Meta:
-        table = EventChannelByUser.__table__
+        table = Event.__table__
+        exclude = ("_channel_id", "_timestamp")
         include_fk = True
 
     id = msa.auto_field(dump_only=True)
+    channel_id = ma.fields.Integer()
+    timestamp = ma.fields.AwareDateTime()
 
 
-class EventChannelByUserQueryArgsSchema(ma.Schema):
-    user_id = ma.fields.Int()
-    event_channel_id = ma.fields.Int()
-
-
-class EventChannelByCampaignSchema(AutoSchema):
+class EventPutSchema(EventSchema):
     class Meta:
-        table = EventChannelByCampaign.__table__
-        include_fk = True
-
-    id = msa.auto_field(dump_only=True)
+        exclude = ("channel_id", "timestamp")
 
 
-class EventChannelByCampaignQueryArgsSchema(ma.Schema):
-    campaign_id = ma.fields.Int()
-    event_channel_id = ma.fields.Int()
+class EventQueryArgsSchema(ma.Schema):
+    channel_id = ma.fields.Integer()
+    source = ma.fields.Str()
+    category = ma.fields.Str()
+    level = ma.fields.Str()
+    state = ma.fields.Str()
+    # TODO: timestamp min/max
