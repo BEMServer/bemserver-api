@@ -90,6 +90,7 @@ class UserByIdViews(MethodView):
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)
 def set_admin(args, item_id):
+    """Set / unset admin"""
     item = User.get_by_id(item_id)
     if item is None:
         abort(404)
@@ -105,6 +106,7 @@ def set_admin(args, item_id):
 @blp.arguments(BooleanValueSchema)
 @blp.response(204)
 def set_active(args, item_id):
+    """Set / unset active"""
     item = User.get_by_id(item_id)
     if item is None:
         abort(404)
