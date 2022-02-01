@@ -16,7 +16,7 @@ from .schemas import (
 blp = Blueprint(
     "TimeseriesGroupByCampaign",
     __name__,
-    url_prefix="/timeseriesgroupsbycampaigns",
+    url_prefix="/timeseries_groups_by_campaigns",
     description="Operations on timeseries groups x campaigns associations",
 )
 
