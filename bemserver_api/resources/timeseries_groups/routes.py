@@ -13,7 +13,7 @@ from .schemas import TimeseriesGroupSchema, TimeseriesGroupQueryArgsSchema
 blp = Blueprint(
     "TimeseriesGroup",
     __name__,
-    url_prefix="/timeseriesgroups",
+    url_prefix="/timeseries_groups",
     description="Operations on timeseries groups x campaigns",
 )
 

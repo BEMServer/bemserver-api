@@ -5,8 +5,8 @@ from tests.common import AuthHeader
 DUMMY_ID = "69"
 
 TIMESERIES_URL = "/timeseries/"
-TIMESERIES_GROUPS_URL = "/timeseriesgroups/"
-TIMESERIES_GROUPS_BY_USERS_URL = "/timeseriesgroupsbyusers/"
+TIMESERIES_GROUPS_URL = "/timeseries_groups/"
+TIMESERIES_GROUPS_BY_USERS_URL = "/timeseries_groups_by_users/"
 
 
 class TestTimeseriesGroupByUsersApi:

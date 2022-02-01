@@ -7,8 +7,8 @@ from tests.common import AuthHeader
 DUMMY_ID = "69"
 
 TIMESERIES_URL = "/timeseries/"
-TIMESERIES_GROUPS_URL = "/timeseriesgroups/"
-TIMESERIES_GROUPS_BY_CAMPAIGNS_URL = "/timeseriesgroupsbycampaigns/"
+TIMESERIES_GROUPS_URL = "/timeseries_groups/"
+TIMESERIES_GROUPS_BY_CAMPAIGNS_URL = "/timeseries_groups_by_campaigns/"
 
 
 class TestTimeseriesGroupByCampaignsApi:
