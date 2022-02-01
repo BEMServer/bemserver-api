@@ -13,13 +13,10 @@ setup(
     version="0.1",
     description="BEMServer API",
     long_description=long_description,
-    # url="",
+    url="https://github.com/BEMServer/bemserver-api",
     author="Nobatek/INEF4",
     author_email="jlafrechoux@nobatek.inef4.com",
-    # license="",
-    # keywords=[
-    # ],
-    # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
+    license="AGPLv3+",
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -27,6 +24,10 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        (
+            "License :: OSI Approved :: "
+            "GNU Affero General Public License v3 or later (AGPLv3+)"
+        ),
     ],
     python_requires=">=3.7",
     install_requires=[
