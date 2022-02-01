@@ -5,7 +5,7 @@ import datetime as dt
 import flask.testing
 
 from bemserver_core.database import db
-from bemserver_core.authorization import CurrentUser, OpenBar
+from bemserver_core.authorization import OpenBar
 from bemserver_core import model
 from bemserver_core.testutils import setup_db
 
@@ -49,12 +49,6 @@ def app(request, database):
     yield application
 
 
-with OpenBar():
-    AdminUser = CurrentUser(
-        model.User(name="Chuck", email="chuck@test.com", is_admin=True, is_active=True)
-    )
-
-
 USERS = (
     ("Chuck", "N0rris", "chuck@test.com", True, True),
     ("Active", "@ctive", "active@test.com", False, True),
@@ -83,7 +77,7 @@ def users(database, request):
 
 @pytest.fixture
 def campaigns(database):
-    with AdminUser:
+    with OpenBar():
         campaign_1 = model.Campaign.new(
             name="Campaign 1",
             start_time=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
@@ -99,7 +93,7 @@ def campaigns(database):
 
 @pytest.fixture
 def users_by_campaigns(campaigns, users):
-    with AdminUser:
+    with OpenBar():
         user_by_campaign_1 = model.UserByCampaign.new(
             user_id=users["Active"]["id"],
             campaign_id=campaigns[0],
@@ -115,14 +109,12 @@ def users_by_campaigns(campaigns, users):
 @pytest.fixture
 def timeseries_groups(database):
     with OpenBar():
-        ts_group_1 = model.TimeseriesGroup(
+        ts_group_1 = model.TimeseriesGroup.new(
             name="TS Group 1",
         )
-        db.session.add(ts_group_1)
-        ts_group_2 = model.TimeseriesGroup(
+        ts_group_2 = model.TimeseriesGroup.new(
             name="TS Group 2",
         )
-        db.session.add(ts_group_2)
         db.session.commit()
     return ts_group_1.id, ts_group_2.id
 
@@ -130,39 +122,37 @@ def timeseries_groups(database):
 @pytest.fixture
 def timeseries_groups_by_users(database, timeseries_groups, users):
     with OpenBar():
-        tgbu_1 = model.TimeseriesGroupByUser(
+        tgbu_1 = model.TimeseriesGroupByUser.new(
             timeseries_group_id=timeseries_groups[0],
             user_id=users["Active"]["id"],
         )
-        db.session.add(tgbu_1)
-        tgbu_2 = model.TimeseriesGroupByUser(
+        tgbu_2 = model.TimeseriesGroupByUser.new(
             timeseries_group_id=timeseries_groups[1],
             user_id=users["Inactive"]["id"],
         )
-        db.session.add(tgbu_2)
         db.session.commit()
     return tgbu_1.id, tgbu_2.id
 
 
 @pytest.fixture(params=[2])
 def timeseries(request, database, timeseries_groups):
-    ts_l = []
-    for i in range(request.param):
-        ts_i = model.Timeseries(
-            name=f"Timeseries {i}",
-            description=f"Test timeseries #{i}",
-            group_id=timeseries_groups[i % len(timeseries_groups)],
-        )
-        ts_l.append(ts_i)
-    db.session.add_all(ts_l)
-    db.session.commit()
-    return [ts.id for ts in ts_l]
+    with OpenBar():
+        ts_l = []
+        for i in range(request.param):
+            ts_i = model.Timeseries.new(
+                name=f"Timeseries {i}",
+                description=f"Test timeseries #{i}",
+                group_id=timeseries_groups[i % len(timeseries_groups)],
+            )
+            ts_l.append(ts_i)
+        db.session.commit()
+        return [ts.id for ts in ts_l]
 
 
 @pytest.fixture(params=[4])
 def timeseries_data(request, database, timeseries):
-    nb_tsd = request.param
-    with AdminUser:
+    with OpenBar():
+        nb_tsd = request.param
         for ts_id in timeseries:
             start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
             for i in range(nb_tsd):
@@ -176,7 +166,7 @@ def timeseries_data(request, database, timeseries):
 
 @pytest.fixture
 def timeseries_groups_by_campaigns(timeseries_groups, campaigns):
-    with AdminUser:
+    with OpenBar():
         ts_by_campaign_1 = model.TimeseriesGroupByCampaign.new(
             timeseries_group_id=timeseries_groups[0],
             campaign_id=campaigns[0],
@@ -191,7 +181,7 @@ def timeseries_groups_by_campaigns(timeseries_groups, campaigns):
 
 @pytest.fixture
 def event_channels(database):
-    with AdminUser:
+    with OpenBar():
         event_channel_1 = model.EventChannel.new(
             name="Event channel 1",
         )
@@ -205,16 +195,14 @@ def event_channels(database):
 @pytest.fixture
 def event_channels_by_campaigns(database, campaigns, event_channels):
     with OpenBar():
-        ecc_1 = model.EventChannelByCampaign(
+        ecc_1 = model.EventChannelByCampaign.new(
             event_channel_id=event_channels[0],
             campaign_id=campaigns[0],
         )
-        db.session.add(ecc_1)
-        ecc_2 = model.EventChannelByCampaign(
+        ecc_2 = model.EventChannelByCampaign.new(
             event_channel_id=event_channels[1],
             campaign_id=campaigns[1],
         )
-        db.session.add(ecc_2)
         db.session.commit()
     return (ecc_1.id, ecc_2.id)
 
@@ -222,16 +210,14 @@ def event_channels_by_campaigns(database, campaigns, event_channels):
 @pytest.fixture
 def event_channels_by_users(database, event_channels, users):
     with OpenBar():
-        ecbu_1 = model.EventChannelByUser(
+        ecbu_1 = model.EventChannelByUser.new(
             event_channel_id=event_channels[0],
             user_id=users["Active"]["id"],
         )
-        db.session.add(ecbu_1)
-        ecbu_2 = model.EventChannelByUser(
+        ecbu_2 = model.EventChannelByUser.new(
             event_channel_id=event_channels[1],
             user_id=users["Inactive"]["id"],
         )
-        db.session.add(ecbu_2)
         db.session.commit()
     return ecbu_1.id, ecbu_2.id
 
@@ -239,7 +225,7 @@ def event_channels_by_users(database, event_channels, users):
 @pytest.fixture
 def events(database, campaigns, event_channels):
     with OpenBar():
-        tse_1 = model.Event(
+        tse_1 = model.Event.new(
             channel_id=event_channels[0],
             timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
             source="Event source",
@@ -247,8 +233,7 @@ def events(database, campaigns, event_channels):
             level="INFO",
             state="NEW",
         )
-        db.session.add(tse_1)
-        tse_2 = model.Event(
+        tse_2 = model.Event.new(
             channel_id=event_channels[1],
             timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
             source="Another event source",
@@ -256,6 +241,5 @@ def events(database, campaigns, event_channels):
             level="WARNING",
             state="ONGOING",
         )
-        db.session.add(tse_2)
         db.session.commit()
     return (tse_1.id, tse_2.id)
