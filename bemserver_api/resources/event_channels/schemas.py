@@ -19,3 +19,4 @@ class EventChannelSchema(AutoSchema):
 class EventChannelQueryArgsSchema(ma.Schema):
     name = ma.fields.Str()
     campaign_id = ma.fields.Int()
+    user_id = ma.fields.Int()
