@@ -230,13 +230,201 @@ class TestEventChannelsApi:
         assert ret.status_code == 401
 
 
+class TestEventChannelsByUsersApi:
+    def test_event_channels_by_users_api(self, app, users, event_channels):
+        ec_1_id = event_channels[0]
+        ec_2_id = event_channels[1]
+        user_1_id = users["Active"]["id"]
+        user_2_id = users["Inactive"]["id"]
+
+        creds = users["Chuck"]["creds"]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_BY_USERS_URL)
+            assert ret.status_code == 200
+            assert ret.json == []
+
+            # POST
+            ecbu_1 = {
+                "user_id": user_1_id,
+                "event_channel_id": ec_1_id,
+            }
+            ret = client.post(EVENT_CHANNELS_BY_USERS_URL, json=ecbu_1)
+            assert ret.status_code == 201
+            ret_val = ret.json
+            ecbu_1_id = ret_val.pop("id")
+            ecbu_1_etag = ret.headers["ETag"]
+
+            # POST violating unique constraint
+            ret = client.post(EVENT_CHANNELS_BY_USERS_URL, json=ecbu_1)
+            assert ret.status_code == 409
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_BY_USERS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == ecbu_1_id
+
+            # GET by id
+            ret = client.get(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
+            assert ret.status_code == 200
+            assert ret.headers["ETag"] == ecbu_1_etag
+
+            # POST
+            ecbu_2 = {
+                "user_id": user_2_id,
+                "event_channel_id": ec_2_id,
+            }
+            ret = client.post(EVENT_CHANNELS_BY_USERS_URL, json=ecbu_2)
+            assert ret.status_code == 201
+            ret_val = ret.json
+            ecbu_2_id = ret_val.pop("id")
+
+            # GET list (filtered)
+            ret = client.get(
+                EVENT_CHANNELS_BY_USERS_URL,
+                query_string={"event_channel_id": ec_1_id},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == ecbu_1_id
+            assert ret_val[0]["event_channel_id"] == ec_1_id
+            assert ret_val[0]["user_id"] == user_1_id
+            ret = client.get(
+                EVENT_CHANNELS_BY_USERS_URL,
+                query_string={"user_id": user_2_id},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == ecbu_2_id
+            assert ret_val[0]["event_channel_id"] == ec_2_id
+            assert ret_val[0]["user_id"] == user_2_id
+            ret = client.get(
+                EVENT_CHANNELS_BY_USERS_URL,
+                query_string={
+                    "event_channel_id": ec_1_id,
+                    "user_id": user_2_id,
+                },
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+
+            # GET channels list filtered by user
+            ret = client.get(EVENT_CHANNELS_URL, query_string={"user_id": user_1_id})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == ec_1_id
+
+            # DELETE wrong ID -> 404
+            ret = client.delete(f"{EVENT_CHANNELS_BY_USERS_URL}{DUMMY_ID}")
+            assert ret.status_code == 404
+
+            # DELETE channel violating fkey constraint
+            ret = client.get(f"{EVENT_CHANNELS_URL}{ec_1_id}")
+            ec_1_etag = ret.headers["ETag"]
+            ret = client.delete(
+                f"{EVENT_CHANNELS_URL}{ec_1_id}", headers={"If-Match": ec_1_etag}
+            )
+            assert ret.status_code == 409
+
+            # DELETE
+            ret = client.delete(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
+            assert ret.status_code == 204
+            ret = client.delete(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_2_id}")
+            assert ret.status_code == 204
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_BY_USERS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+
+            # GET by id -> 404
+            ret = client.get(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
+            assert ret.status_code == 404
+
+    @pytest.mark.usefixtures("users_by_campaigns")
+    def test_event_channel_by_users_as_user_api(
+        self, app, users, event_channels, event_channels_by_users
+    ):
+        ec_1_id = event_channels[0]
+        ecbu_1_id = event_channels_by_users[0]
+        ecbu_2_id = event_channels_by_users[1]
+        user_1_id = users["Active"]["id"]
+
+        creds = users["Active"]["creds"]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+
+            # GET list
+            ret = client.get(EVENT_CHANNELS_BY_USERS_URL)
+            assert ret.status_code == 200
+            assert len(ret.json) == 1
+
+            # POST
+            ecbu = {"user_id": user_1_id, "event_channel_id": ec_1_id}
+            ret = client.post(EVENT_CHANNELS_BY_USERS_URL, json=ecbu)
+            assert ret.status_code == 403
+
+            # GET by id
+            ret = client.get(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
+            assert ret.status_code == 200
+
+            # GET by id
+            ret = client.get(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_2_id}")
+            assert ret.status_code == 403
+
+            # DELETE
+            ret = client.delete(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
+            assert ret.status_code == 403
+
+    @pytest.mark.usefixtures("users_by_campaigns")
+    def test_event_channel_by_users_as_anonym_api(
+        self, app, users, event_channels, event_channels_by_users
+    ):
+        ec_1_id = event_channels[0]
+        ecbu_1_id = event_channels_by_users[0]
+        user_1_id = users["Active"]["id"]
+
+        client = app.test_client()
+
+        # GET list
+        ret = client.get(EVENT_CHANNELS_BY_USERS_URL)
+        assert ret.status_code == 401
+
+        # POST
+        ecbu = {"user_id": user_1_id, "event_channel_id": ec_1_id}
+        ret = client.post(EVENT_CHANNELS_BY_USERS_URL, json=ecbu)
+        assert ret.status_code == 401
+
+        # GET by id
+        ret = client.get(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
+        assert ret.status_code == 401
+
+        # DELETE
+        ret = client.delete(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
+        assert ret.status_code == 401
+
+
 class TestEventChannelsByCampaignsApi:
     def test_event_channels_by_campaigns_api(
         self, app, users, event_channels, campaigns
     ):
         ec_1_id = event_channels[0]
         ec_2_id = event_channels[1]
-        campaign_1_id, campaign_2_id = campaigns
+        campaign_1_id = campaigns[0]
+        campaign_2_id = campaigns[1]
 
         creds = users["Chuck"]["creds"]
 
@@ -306,7 +494,7 @@ class TestEventChannelsByCampaignsApi:
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == ecbc_2_id
             assert ret_val[0]["event_channel_id"] == ec_2_id
-            assert ret_val[0]["campaign_id"] == ec_2_id
+            assert ret_val[0]["campaign_id"] == campaign_2_id
             ret = client.get(
                 EVENT_CHANNELS_BY_CAMPAIGNS_URL,
                 query_string={
@@ -354,70 +542,6 @@ class TestEventChannelsByCampaignsApi:
             # GET by id -> 404
             ret = client.get(f"{EVENT_CHANNELS_BY_CAMPAIGNS_URL}{ecbc_1_id}")
             assert ret.status_code == 404
-
-    @pytest.mark.usefixtures("users_by_campaigns")
-    def test_event_channel_by_users_as_user_api(
-        self, app, users, event_channels, event_channels_by_users
-    ):
-        ec_1_id = event_channels[0]
-        ecbu_1_id = event_channels_by_users[0]
-        ecbu_2_id = event_channels_by_users[1]
-        user_1_id = users["Active"]["id"]
-
-        creds = users["Active"]["creds"]
-
-        client = app.test_client()
-
-        with AuthHeader(creds):
-
-            # GET list
-            ret = client.get(EVENT_CHANNELS_BY_USERS_URL)
-            assert ret.status_code == 200
-            assert len(ret.json) == 1
-
-            # POST
-            ecbu = {"user_id": user_1_id, "event_channel_id": ec_1_id}
-            ret = client.post(EVENT_CHANNELS_BY_USERS_URL, json=ecbu)
-            assert ret.status_code == 403
-
-            # GET by id
-            ret = client.get(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
-            assert ret.status_code == 200
-
-            # GET by id
-            ret = client.get(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_2_id}")
-            assert ret.status_code == 403
-
-            # DELETE
-            ret = client.delete(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
-            assert ret.status_code == 403
-
-    @pytest.mark.usefixtures("users_by_campaigns")
-    def test_event_channel_by_users_as_anonym_api(
-        self, app, users, event_channels, event_channels_by_users
-    ):
-        ec_1_id = event_channels[0]
-        ecbu_1_id = event_channels_by_users[0]
-        user_1_id = users["Active"]["id"]
-
-        client = app.test_client()
-
-        # GET list
-        ret = client.get(EVENT_CHANNELS_BY_USERS_URL)
-        assert ret.status_code == 401
-
-        # POST
-        ecbu = {"user_id": user_1_id, "event_channel_id": ec_1_id}
-        ret = client.post(EVENT_CHANNELS_BY_USERS_URL, json=ecbu)
-        assert ret.status_code == 401
-
-        # GET by id
-        ret = client.get(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
-        assert ret.status_code == 401
-
-        # DELETE
-        ret = client.delete(f"{EVENT_CHANNELS_BY_USERS_URL}{ecbu_1_id}")
-        assert ret.status_code == 401
 
     @pytest.mark.usefixtures("users_by_campaigns")
     def test_event_channel_by_campaigns_as_user_api(
