@@ -54,7 +54,7 @@ py==1.11.0
     #   tox
 pyparsing==3.0.6
     # via packaging
-pytest==6.2.5
+pytest==7.0.0
     # via
     #   -r requirements/tests.in
     #   pytest-cov
@@ -72,12 +72,12 @@ six==1.16.0
 toml==0.10.2
     # via
     #   pre-commit
-    #   pytest
     #   tox
 tomli==2.0.0
     # via
     #   coverage
     #   pep517
+    #   pytest
 tox==3.24.5
     # via -r requirements/dev.in
 virtualenv==20.10.0

@@ -24,7 +24,7 @@ py==1.11.0
     # via pytest
 pyparsing==3.0.6
     # via packaging
-pytest==6.2.5
+pytest==7.0.0
     # via
     #   -r requirements/tests.in
     #   pytest-cov
@@ -33,7 +33,7 @@ pytest-cov==3.0.0
     # via -r requirements/tests.in
 pytest-postgresql==3.1.2
     # via -r requirements/tests.in
-toml==0.10.2
-    # via pytest
 tomli==2.0.0
-    # via coverage
+    # via
+    #   coverage
+    #   pytest
