@@ -11,7 +11,7 @@ TIMESERIES_DATA_URL = "/timeseries-data/"
 
 class TestTimeseriesDataApi:
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
-    @pytest.mark.usefixtures("timeseries_groups_by_users")
+    @pytest.mark.usefixtures("timeseries_cluster_groups_by_users")
     def test_timeseries_data_get(
         self,
         app,
@@ -73,7 +73,7 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 200
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
-    @pytest.mark.usefixtures("timeseries_groups_by_users")
+    @pytest.mark.usefixtures("timeseries_cluster_groups_by_users")
     def test_timeseries_data_get_aggregate(
         self,
         app,
@@ -135,7 +135,7 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 200
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
-    @pytest.mark.usefixtures("timeseries_groups_by_users")
+    @pytest.mark.usefixtures("timeseries_cluster_groups_by_users")
     def test_timeseries_data_post(self, app, user, users, campaigns, timeseries):
 
         ts_1_id = timeseries[0]
