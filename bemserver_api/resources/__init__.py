@@ -3,6 +3,7 @@
 from . import users
 from . import campaigns
 from . import users_by_campaigns
+from . import timeseries_properties
 from . import timeseries_data_states
 from . import timeseries_clusters
 from . import timeseries_cluster_groups
@@ -23,6 +24,7 @@ MODULES = (
     users,
     campaigns,
     users_by_campaigns,
+    timeseries_properties,
     timeseries_data_states,
     timeseries_clusters,
     timeseries_cluster_groups,

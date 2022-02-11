@@ -107,6 +107,19 @@ def users_by_campaigns(campaigns, users):
 
 
 @pytest.fixture
+def timeseries_properties(database):
+    with OpenBar():
+        ts_p_1 = model.TimeseriesProperty.new(
+            name="Min",
+        )
+        ts_p_2 = model.TimeseriesProperty.new(
+            name="Max",
+        )
+        db.session.commit()
+    return ts_p_1.id, ts_p_2.id
+
+
+@pytest.fixture
 def timeseries_cluster_groups(database):
     with OpenBar():
         ts_group_1 = model.TimeseriesClusterGroup.new(
