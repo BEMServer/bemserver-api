@@ -3,11 +3,13 @@
 from . import users
 from . import campaigns
 from . import users_by_campaigns
+from . import timeseries_properties
 from . import timeseries_data_states
 from . import timeseries_clusters
 from . import timeseries_cluster_groups
 from . import timeseries_cluster_groups_by_users
 from . import timeseries_cluster_groups_by_campaigns
+from . import timeseries_cluster_property_data
 from . import timeseries
 from . import timeseries_data
 from . import event_states
@@ -23,11 +25,13 @@ MODULES = (
     users,
     campaigns,
     users_by_campaigns,
+    timeseries_properties,
     timeseries_data_states,
     timeseries_clusters,
     timeseries_cluster_groups,
     timeseries_cluster_groups_by_users,
     timeseries_cluster_groups_by_campaigns,
+    timeseries_cluster_property_data,
     timeseries,
     timeseries_data,
     event_states,
