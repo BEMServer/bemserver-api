@@ -1,4 +1,4 @@
-"""Timeseries groups tests"""
+"""Timeseries cluster groups tests"""
 import pytest
 
 from tests.common import AuthHeader
@@ -74,7 +74,7 @@ class TestTimeseriesClusterGroupsApi:
             )
             assert ret.status_code == 404
 
-            # POST TS 2
+            # POST TSCG 2
             tscg_2 = {
                 "name": "Timeseries cluster group 2",
             }
@@ -114,12 +114,11 @@ class TestTimeseriesClusterGroupsApi:
 
     @pytest.mark.usefixtures("timeseries_cluster_groups_by_users")
     def test_timeseries_cluster_groups_as_user_api(
-        self, app, users, timeseries, timeseries_cluster_groups
+        self, app, users, timeseries_cluster_groups
     ):
 
-        tscg_1 = timeseries_cluster_groups[0]
-        tscg_1_id = timeseries[0]
-        tscg_2_id = timeseries[1]
+        tscg_1_id = timeseries_cluster_groups[0]
+        tscg_2_id = timeseries_cluster_groups[1]
 
         creds = users["Active"]["creds"]
 
@@ -169,11 +168,10 @@ class TestTimeseriesClusterGroupsApi:
             assert ret.status_code == 403
 
     def test_timeseries_cluster_groups_as_anonym_api(
-        self, app, users, timeseries, timeseries_cluster_groups
+        self, app, users, timeseries_cluster_groups
     ):
 
-        tscg_1 = timeseries_cluster_groups[0]
-        tscg_1_id = timeseries[0]
+        tscg_1_id = timeseries_cluster_groups[0]
 
         client = app.test_client()
 

@@ -74,7 +74,7 @@ class TestTimeseriesDataStatesApi:
             )
             assert ret.status_code == 404
 
-            # POST TS 2
+            # POST TSDS 2
             tds_2 = {
                 "name": "Accuracy",
             }

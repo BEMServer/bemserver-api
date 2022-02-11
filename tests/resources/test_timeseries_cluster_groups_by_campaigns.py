@@ -1,4 +1,4 @@
-"""Timeseries by campaign routes tests"""
+"""Timeseries cluster group by campaign routes tests"""
 import pytest
 
 from tests.common import AuthHeader

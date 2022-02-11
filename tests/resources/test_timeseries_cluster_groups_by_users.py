@@ -1,4 +1,4 @@
-"""Timeseries by user routes tests"""
+"""Timeseries cluter group by user routes tests"""
 from tests.common import AuthHeader
 
 
