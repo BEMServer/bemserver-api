@@ -163,6 +163,32 @@ def timeseries_clusters(request, database, timeseries_cluster_groups):
         return [tsc.id for tsc in tsc_l]
 
 
+@pytest.fixture
+def timeseries_cluster_property_data(
+    request, database, timeseries_properties, timeseries_clusters
+):
+    with OpenBar():
+        tscpd_l = []
+        for tsc in timeseries_clusters:
+            tscpd_l.append(
+                model.TimeseriesClusterPropertyData(
+                    cluster_id=tsc,
+                    property_id=timeseries_properties[0],
+                    value=12,
+                )
+            )
+            tscpd_l.append(
+                model.TimeseriesClusterPropertyData(
+                    cluster_id=tsc,
+                    property_id=timeseries_properties[1],
+                    value=42,
+                )
+            )
+        db.session.add_all(tscpd_l)
+        db.session.commit()
+        return [tscpd.id for tscpd in tscpd_l]
+
+
 @pytest.fixture(params=[2])
 def timeseries(request, database, timeseries_clusters):
     with OpenBar():
