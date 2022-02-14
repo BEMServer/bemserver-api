@@ -40,7 +40,7 @@ py==1.11.0
     # via pytest
 pyparsing==3.0.6
     # via packaging
-pytest==6.2.5
+pytest==7.0.1
     # via
     #   -r requirements/tests.in
     #   pytest-cov
@@ -54,10 +54,10 @@ pyyaml==6.0
 six==1.16.0
     # via virtualenv
 toml==0.10.2
-    # via
-    #   pre-commit
-    #   pytest
+    # via pre-commit
 tomli==2.0.0
-    # via coverage
+    # via
+    #   coverage
+    #   pytest
 virtualenv==20.10.0
     # via pre-commit
