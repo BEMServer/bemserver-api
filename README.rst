@@ -26,3 +26,15 @@ BEMServer API
 BEMServer is a free Building Energy Management software platform.
 
 Its purpose it to store data collected in buildings and produce useful information such as performance indicators or alerts.
+
+
+The purpose of this branch is to publish the API docs in GitHub pages.
+
+To update::
+
+    git checkout gh-pages
+    git rebase master
+    flask openapi write api-docs.json
+    git add .
+    git commit --amend
+    git push -f
