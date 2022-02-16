@@ -36,7 +36,7 @@ setup(
         "python-dotenv>=0.9.0",
         "marshmallow>=3.14.0,<4.0",
         "marshmallow-sqlalchemy>=0.24.0",
-        "flask_smorest>=0.35.0,<0.36",
+        "flask_smorest>=0.37.0,<0.38",
         "flask-httpauth>=0.5.0",
         (
             # https://github.com/jazzband/pip-tools/issues/1359
