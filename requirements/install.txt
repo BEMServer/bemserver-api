@@ -10,7 +10,7 @@ argon2-cffi==21.3.0
     # via bemserver-core
 argon2-cffi-bindings==21.2.0
     # via argon2-cffi
-bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/111779d.tar.gz
+bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/20b8d52.tar.gz
     # via bemserver-api (setup.py)
 cffi==1.15.0
     # via
@@ -25,7 +25,7 @@ flask==2.0.2
     #   flask-smorest
 flask-httpauth==4.5.0
     # via bemserver-api (setup.py)
-flask-smorest==0.35.0
+flask-smorest==0.37.0
     # via bemserver-api (setup.py)
 greenlet==1.1.2
     # via sqlalchemy
