@@ -47,8 +47,9 @@ blp = Blueprint(
 def get_csv(args):
     """Get timeseries data as CSV file
 
-    Returns a CSV file where the first column is the timestamp as aware datetime
-    and each other column is a timeseries data. Column headers are timeseries ID.
+    Returns a CSV file where the first column is the timestamp as timezone aware
+    datetime and each other column is a timeseries data. Column headers are
+    timeseries IDs.
 
     ```
     Datetime,1,2,3
@@ -79,8 +80,9 @@ def get_csv(args):
 def get_aggregate_csv(args):
     """Get aggregated timeseries data as CSV file
 
-    Returns a CSV file where the first column is the timestamp as aware datetime
-    and each other column is a timeseries data. Column headers are timeseries ID.
+    Returns a CSV file where the first column is the timestamp as timezone aware
+    datetime and each other column is a timeseries data. Column headers are
+    timeseries IDs.
 
     ```
     Datetime,1,2,3
@@ -109,8 +111,9 @@ def get_aggregate_csv(args):
 def post_csv(files):
     """Post timeseries data as CSV file
 
-    Loads a CSV file where the first column is the timestamp as aware datetime
-    and each other column is a timeseries data. Column headers are timeseries ID.
+    Loads a CSV file where the first column is the timestamp as timezone aware
+    datetime and each other column is a timeseries data. Column headers are
+    timeseries ID.
 
     ```
     Datetime,1,2,3
