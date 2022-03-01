@@ -1,4 +1,4 @@
-"""Timeseries resources"""
+"""Timeseries data resources"""
 import io
 import textwrap
 
@@ -11,9 +11,10 @@ from bemserver_core.exceptions import TimeseriesCSVIOError
 from bemserver_api import Blueprint
 
 from .schemas import (
-    TimeseriesDataQueryArgsSchema,
-    TimeseriesDataAggregateQueryArgsSchema,
-    TimeseriesCSVFileSchema,
+    TimeseriesDataGetQueryArgsSchema,
+    TimeseriesDataGetAggregateQueryArgsSchema,
+    TimeseriesDataPostQueryArgsSchema,
+    TimeseriesDataPostFileSchema,
 )
 
 
@@ -37,7 +38,7 @@ blp = Blueprint(
 
 @blp.route("/", methods=("GET",))
 @blp.login_required
-@blp.arguments(TimeseriesDataQueryArgsSchema, location="query")
+@blp.arguments(TimeseriesDataGetQueryArgsSchema, location="query")
 @blp.response(
     200,
     {"format": "binary", "type": "string"},
@@ -58,10 +59,12 @@ def get_csv(args):
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
+
     csv_str = tscsvio.export_csv(
         args["start_time"],
         args["end_time"],
         args["timeseries"],
+        args["data_state"],
     )
     response = Response(csv_str, mimetype="text/csv")
     response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
@@ -70,7 +73,7 @@ def get_csv(args):
 
 @blp.route("/aggregate", methods=("GET",))
 @blp.login_required
-@blp.arguments(TimeseriesDataAggregateQueryArgsSchema, location="query")
+@blp.arguments(TimeseriesDataGetAggregateQueryArgsSchema, location="query")
 @blp.response(
     200,
     {"format": "binary", "type": "string"},
@@ -95,6 +98,7 @@ def get_aggregate_csv(args):
         args["start_time"],
         args["end_time"],
         args["timeseries"],
+        args["data_state"],
         args["bucket_width"],
         args["timezone"],
         args["aggregation"],
@@ -106,9 +110,10 @@ def get_aggregate_csv(args):
 
 @blp.route("/", methods=("POST",))
 @blp.login_required
-@blp.arguments(TimeseriesCSVFileSchema, location="files")
+@blp.arguments(TimeseriesDataPostFileSchema, location="files")
+@blp.arguments(TimeseriesDataPostQueryArgsSchema, location="query")
 @blp.response(201)
-def post_csv(files):
+def post_csv(files, args):
     """Post timeseries data as CSV file
 
     Loads a CSV file where the first column is the timestamp as timezone aware
@@ -125,6 +130,6 @@ def post_csv(files):
     csv_file = files["csv_file"]
     with io.TextIOWrapper(csv_file) as csv_file_txt:
         try:
-            tscsvio.import_csv(csv_file_txt)
+            tscsvio.import_csv(csv_file_txt, args["data_state"])
         except TimeseriesCSVIOError:
             abort(422, "Invalid csv file content")
