@@ -11,7 +11,7 @@ TIMESERIES_DATA_URL = "/timeseries-data/"
 
 class TestTimeseriesDataApi:
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
-    @pytest.mark.usefixtures("timeseries_cluster_groups_by_users")
+    @pytest.mark.usefixtures("timeseries_groups_by_users")
     def test_timeseries_data_get(
         self,
         app,
@@ -25,6 +25,7 @@ class TestTimeseriesDataApi:
         ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
         campaign_1_id, campaign_2_id = campaigns
+        ds_id = 1
 
         if user == "admin":
             creds = users["Chuck"]["creds"]
@@ -47,6 +48,7 @@ class TestTimeseriesDataApi:
                     "timeseries": [
                         ts_1_id,
                     ],
+                    "data_state": ds_id,
                 },
             )
             if user == "anonym":
@@ -63,6 +65,7 @@ class TestTimeseriesDataApi:
                     "timeseries": [
                         ts_2_id,
                     ],
+                    "data_state": ds_id,
                 },
             )
             if user == "anonym":
@@ -73,7 +76,7 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 200
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
-    @pytest.mark.usefixtures("timeseries_cluster_groups_by_users")
+    @pytest.mark.usefixtures("timeseries_groups_by_users")
     def test_timeseries_data_get_aggregate(
         self,
         app,
@@ -87,6 +90,7 @@ class TestTimeseriesDataApi:
         ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
         campaign_1_id, campaign_2_id = campaigns
+        ds_id = 1
 
         if user == "admin":
             creds = users["Chuck"]["creds"]
@@ -107,6 +111,7 @@ class TestTimeseriesDataApi:
                     "start_time": start_time.isoformat(),
                     "end_time": end_time.isoformat(),
                     "timeseries": [ts_1_id],
+                    "data_state": ds_id,
                     "bucket_width": "1 day",
                     "timezone": "UTC",
                 },
@@ -123,6 +128,7 @@ class TestTimeseriesDataApi:
                     "start_time": start_time.isoformat(),
                     "end_time": end_time.isoformat(),
                     "timeseries": [ts_2_id],
+                    "data_state": ds_id,
                     "bucket_width": "1 day",
                     "timezone": "UTC",
                 },
@@ -135,12 +141,13 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 200
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
-    @pytest.mark.usefixtures("timeseries_cluster_groups_by_users")
+    @pytest.mark.usefixtures("timeseries_groups_by_users")
     def test_timeseries_data_post(self, app, user, users, campaigns, timeseries):
 
         ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
         campaign_1_id, campaign_2_id = campaigns
+        ds_id = 1
 
         if user == "admin":
             creds = users["Chuck"]["creds"]
@@ -164,6 +171,9 @@ class TestTimeseriesDataApi:
             )
             ret = client.post(
                 TIMESERIES_DATA_URL,
+                query_string={
+                    "data_state": ds_id,
+                },
                 data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
             )
             if user == "anonym":
@@ -181,6 +191,9 @@ class TestTimeseriesDataApi:
             )
             ret = client.post(
                 TIMESERIES_DATA_URL,
+                query_string={
+                    "data_state": ds_id,
+                },
                 data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
             )
             if user == "anonym":

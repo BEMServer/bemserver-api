@@ -7,7 +7,7 @@ from bemserver_core.csv_io import AGGREGATION_FUNCTIONS
 from bemserver_api.extensions.ma_fields import Timezone
 
 
-class TimeseriesDataQueryArgsSchema(ma.Schema):
+class TimeseriesDataGetQueryArgsSchema(ma.Schema):
     """Timeseries values GET query parameters schema"""
 
     start_time = ma.fields.AwareDateTime(
@@ -29,9 +29,15 @@ class TimeseriesDataQueryArgsSchema(ma.Schema):
             "description": "List of timeseries ID",
         },
     )
+    data_state = ma.fields.Int(
+        required=True,
+        metadata={
+            "description": "Data state ID",
+        },
+    )
 
 
-class TimeseriesDataAggregateQueryArgsSchema(TimeseriesDataQueryArgsSchema):
+class TimeseriesDataGetAggregateQueryArgsSchema(TimeseriesDataGetQueryArgsSchema):
     """Timeseries values aggregate GET query parameters schema"""
 
     # TODO: Create custom field for bucket width
@@ -53,5 +59,16 @@ class TimeseriesDataAggregateQueryArgsSchema(TimeseriesDataQueryArgsSchema):
     )
 
 
-class TimeseriesCSVFileSchema(ma.Schema):
+class TimeseriesDataPostQueryArgsSchema(ma.Schema):
+    """Timeseries values POST query parameters schema"""
+
+    data_state = ma.fields.Int(
+        required=True,
+        metadata={
+            "description": "Data state ID",
+        },
+    )
+
+
+class TimeseriesDataPostFileSchema(ma.Schema):
     csv_file = Upload()

@@ -120,12 +120,12 @@ def timeseries_properties(database):
 
 
 @pytest.fixture
-def timeseries_cluster_groups(database):
+def timeseries_groups(database):
     with OpenBar():
-        ts_group_1 = model.TimeseriesClusterGroup.new(
+        ts_group_1 = model.TimeseriesGroup.new(
             name="TS Group 1",
         )
-        ts_group_2 = model.TimeseriesClusterGroup.new(
+        ts_group_2 = model.TimeseriesGroup.new(
             name="TS Group 2",
         )
         db.session.commit()
@@ -133,14 +133,14 @@ def timeseries_cluster_groups(database):
 
 
 @pytest.fixture
-def timeseries_cluster_groups_by_users(database, timeseries_cluster_groups, users):
+def timeseries_groups_by_users(database, timeseries_groups, users):
     with OpenBar():
-        tgbu_1 = model.TimeseriesClusterGroupByUser.new(
-            timeseries_cluster_group_id=timeseries_cluster_groups[0],
+        tgbu_1 = model.TimeseriesGroupByUser.new(
+            timeseries_group_id=timeseries_groups[0],
             user_id=users["Active"]["id"],
         )
-        tgbu_2 = model.TimeseriesClusterGroupByUser.new(
-            timeseries_cluster_group_id=timeseries_cluster_groups[1],
+        tgbu_2 = model.TimeseriesGroupByUser.new(
+            timeseries_group_id=timeseries_groups[1],
             user_id=users["Inactive"]["id"],
         )
         db.session.commit()
@@ -148,54 +148,52 @@ def timeseries_cluster_groups_by_users(database, timeseries_cluster_groups, user
 
 
 @pytest.fixture(params=[2])
-def timeseries_clusters(request, database, timeseries_cluster_groups):
-    with OpenBar():
-        tsc_l = []
-        for i in range(request.param):
-            tsc_i = model.TimeseriesCluster(
-                name=f"Timeseries cluster {i}",
-                description=f"Test timeseries cluster #{i}",
-                group_id=timeseries_cluster_groups[i % len(timeseries_cluster_groups)],
-            )
-            tsc_l.append(tsc_i)
-        db.session.add_all(tsc_l)
-        db.session.commit()
-        return [tsc.id for tsc in tsc_l]
-
-
-@pytest.fixture
-def timeseries_cluster_property_data(
-    request, database, timeseries_properties, timeseries_clusters
-):
-    with OpenBar():
-        tscpd_l = []
-        for tsc in timeseries_clusters:
-            tscpd_l.append(
-                model.TimeseriesClusterPropertyData(
-                    cluster_id=tsc,
-                    property_id=timeseries_properties[0],
-                    value=12,
-                )
-            )
-            tscpd_l.append(
-                model.TimeseriesClusterPropertyData(
-                    cluster_id=tsc,
-                    property_id=timeseries_properties[1],
-                    value=42,
-                )
-            )
-        db.session.add_all(tscpd_l)
-        db.session.commit()
-        return [tscpd.id for tscpd in tscpd_l]
-
-
-@pytest.fixture(params=[2])
-def timeseries(request, database, timeseries_clusters):
+def timeseries(request, database, timeseries_groups):
     with OpenBar():
         ts_l = []
         for i in range(request.param):
             ts_i = model.Timeseries(
-                cluster_id=timeseries_clusters[i % len(timeseries_clusters)],
+                name=f"Timeseries {i}",
+                description=f"Test timeseries #{i}",
+                group_id=timeseries_groups[i % len(timeseries_groups)],
+            )
+            ts_l.append(ts_i)
+        db.session.add_all(ts_l)
+        db.session.commit()
+        return [ts.id for ts in ts_l]
+
+
+@pytest.fixture
+def timeseries_property_data(request, database, timeseries_properties, timeseries):
+    with OpenBar():
+        tspd_l = []
+        for ts in timeseries:
+            tspd_l.append(
+                model.TimeseriesPropertyData(
+                    timeseries_id=ts,
+                    property_id=timeseries_properties[0],
+                    value=12,
+                )
+            )
+            tspd_l.append(
+                model.TimeseriesPropertyData(
+                    timeseries_id=ts,
+                    property_id=timeseries_properties[1],
+                    value=42,
+                )
+            )
+        db.session.add_all(tspd_l)
+        db.session.commit()
+        return [tspd.id for tspd in tspd_l]
+
+
+@pytest.fixture(params=[2])
+def timeseries_by_data_states(request, database, timeseries):
+    with OpenBar():
+        ts_l = []
+        for i in range(request.param):
+            ts_i = model.TimeseriesByDataState(
+                timeseries_id=timeseries[i % len(timeseries)],
                 data_state_id=1,
             )
             ts_l.append(ts_i)
@@ -205,29 +203,29 @@ def timeseries(request, database, timeseries_clusters):
 
 
 @pytest.fixture(params=[4])
-def timeseries_data(request, database, timeseries):
+def timeseries_data(request, database, timeseries_by_data_states):
     with OpenBar():
         nb_tsd = request.param
-        for ts_id in timeseries:
+        for tsbds_id in timeseries_by_data_states:
             start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
             for i in range(nb_tsd):
                 timestamp = start_dt + dt.timedelta(hours=i)
                 model.TimeseriesData.new(
-                    timestamp=timestamp, timeseries_id=ts_id, value=i
+                    timestamp=timestamp, timeseries_by_data_state_id=tsbds_id, value=i
                 )
         db.session.commit()
     return (start_dt, start_dt + dt.timedelta(hours=nb_tsd))
 
 
 @pytest.fixture
-def timeseries_cluster_groups_by_campaigns(timeseries_cluster_groups, campaigns):
+def timeseries_groups_by_campaigns(timeseries_groups, campaigns):
     with OpenBar():
-        ts_by_campaign_1 = model.TimeseriesClusterGroupByCampaign.new(
-            timeseries_cluster_group_id=timeseries_cluster_groups[0],
+        ts_by_campaign_1 = model.TimeseriesGroupByCampaign.new(
+            timeseries_group_id=timeseries_groups[0],
             campaign_id=campaigns[0],
         )
-        ts_by_campaign_2 = model.TimeseriesClusterGroupByCampaign.new(
-            timeseries_cluster_group_id=timeseries_cluster_groups[1],
+        ts_by_campaign_2 = model.TimeseriesGroupByCampaign.new(
+            timeseries_group_id=timeseries_groups[1],
             campaign_id=campaigns[1],
         )
         db.session.commit()
