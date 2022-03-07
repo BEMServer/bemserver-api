@@ -10,6 +10,7 @@ class TestAuthentication:
     def test_auth_login_required(self, app, users):
 
         active_user_creds = users["Active"]["creds"]
+        active_user_invalid_creds = users["Active"]["invalid_creds"]
         inactive_user_creds = users["Inactive"]["creds"]
         api = app.extensions["flask-smorest"]["ext_obj"]
         blp = Blueprint("AuthTest", __name__, url_prefix="/auth_test")
@@ -39,6 +40,13 @@ class TestAuthentication:
         headers = {"Authorization": "Basic " + inactive_user_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 403
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
+
+        # Active user with invalid creds (bad password)
+        headers = {"Authorization": "Basic " + active_user_invalid_creds}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 401
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 

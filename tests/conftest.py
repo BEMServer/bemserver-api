@@ -67,7 +67,8 @@ def users(database, request):
             )
             user.set_password(password)
             creds = base64.b64encode(f"{email}:{password}".encode()).decode()
-            ret[name] = {"user": user, "creds": creds}
+            invalid_creds = base64.b64encode(f"{email}:bad_pwd".encode()).decode()
+            ret[name] = {"user": user, "creds": creds, "invalid_creds": invalid_creds}
         db.session.commit()
         # Set id after commit
         for user in ret.values():
