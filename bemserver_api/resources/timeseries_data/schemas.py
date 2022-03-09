@@ -71,4 +71,6 @@ class TimeseriesDataPostQueryArgsSchema(ma.Schema):
 
 
 class TimeseriesDataPostFileSchema(ma.Schema):
-    csv_file = Upload()
+    csv_file = Upload(
+        required=True,
+    )
