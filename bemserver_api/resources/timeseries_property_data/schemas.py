@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import TimeseriesPropertyData
 
-from bemserver_api import AutoSchema
+from bemserver_api import AutoSchema, Schema
 
 
 class TimeseriesPropertyDataSchema(AutoSchema):
@@ -15,6 +15,6 @@ class TimeseriesPropertyDataSchema(AutoSchema):
     id = msa.auto_field(dump_only=True)
 
 
-class TimeseriesPropertyDataQueryArgsSchema(ma.Schema):
+class TimeseriesPropertyDataQueryArgsSchema(Schema):
     timeseries_id = ma.fields.Int()
     property_id = ma.fields.Int()

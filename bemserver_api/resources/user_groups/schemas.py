@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import UserGroup
 
-from bemserver_api import AutoSchema
+from bemserver_api import AutoSchema, Schema
 
 
 class UserGroupSchema(AutoSchema):
@@ -15,5 +15,5 @@ class UserGroupSchema(AutoSchema):
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
 
 
-class UserGroupQueryArgsSchema(ma.Schema):
+class UserGroupQueryArgsSchema(Schema):
     name = ma.fields.Str()

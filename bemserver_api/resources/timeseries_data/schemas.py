@@ -4,10 +4,11 @@ from flask_smorest.fields import Upload
 
 from bemserver_core.csv_io import AGGREGATION_FUNCTIONS
 
+from bemserver_api import Schema
 from bemserver_api.extensions.ma_fields import Timezone
 
 
-class TimeseriesDataGetQueryArgsSchema(ma.Schema):
+class TimeseriesDataGetQueryArgsSchema(Schema):
     """Timeseries values GET query parameters schema"""
 
     start_time = ma.fields.AwareDateTime(
@@ -59,7 +60,7 @@ class TimeseriesDataGetAggregateQueryArgsSchema(TimeseriesDataGetQueryArgsSchema
     )
 
 
-class TimeseriesDataPostQueryArgsSchema(ma.Schema):
+class TimeseriesDataPostQueryArgsSchema(Schema):
     """Timeseries values POST query parameters schema"""
 
     data_state = ma.fields.Int(
@@ -70,7 +71,7 @@ class TimeseriesDataPostQueryArgsSchema(ma.Schema):
     )
 
 
-class TimeseriesDataPostFileSchema(ma.Schema):
+class TimeseriesDataPostFileSchema(Schema):
     csv_file = Upload(
         required=True,
     )
