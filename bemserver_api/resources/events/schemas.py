@@ -11,21 +11,21 @@ from bemserver_api import AutoSchema
 class EventSchema(AutoSchema):
     class Meta:
         table = Event.__table__
-        exclude = ("_channel_id", "_timestamp")
+        exclude = ("_campaign_scope_id", "_timestamp")
         include_fk = True
 
     id = msa.auto_field(dump_only=True)
-    channel_id = ma.fields.Integer()
     timestamp = ma.fields.AwareDateTime()
+    campaign_scope_id = ma.fields.Int(required=True)
 
 
 class EventPutSchema(EventSchema):
     class Meta:
-        exclude = ("channel_id", "timestamp")
+        exclude = ("campaign_scope_id", "timestamp")
 
 
 class EventQueryArgsSchema(ma.Schema):
-    channel_id = ma.fields.Integer()
+    campaign_scope_id = ma.fields.Integer()
     source = ma.fields.Str()
     category = ma.fields.Str()
     level = ma.fields.Str()

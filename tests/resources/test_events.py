@@ -11,7 +11,6 @@ DUMMY_ID = "69"
 EVENT_STATES_URL = "/event_states/"
 EVENT_LEVELS_URL = "/event_levels/"
 EVENT_CATEGORIES_URL = "/event_categories/"
-EVENT_CHANNELS_URL = "/event_channels/"
 EVENTS_URL = "/events/"
 
 
@@ -105,11 +104,11 @@ class TestEventCategoriesApi:
 
 
 class TestEventsApi:
-    def test_events_api(self, app, users, event_channels):
-        ec_1_id = event_channels[0]
-        ec_2_id = event_channels[1]
-        event_channel_1_id = event_channels[0]
-        event_channel_2_id = event_channels[1]
+    def test_events_api(self, app, users, campaign_scopes):
+        ec_1_id = campaign_scopes[0]
+        ec_2_id = campaign_scopes[1]
+        campaign_scope_1_id = campaign_scopes[0]
+        campaign_scope_2_id = campaign_scopes[1]
         c1_st = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
         c2_et = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
 
@@ -126,7 +125,7 @@ class TestEventsApi:
 
             # POST
             tse_1 = {
-                "channel_id": event_channel_1_id,
+                "campaign_scope_id": campaign_scope_1_id,
                 "timestamp": c1_st,
                 "source": "Event source",
                 "category": "observation_missing",
@@ -158,7 +157,7 @@ class TestEventsApi:
 
             # POST
             tse_2 = {
-                "channel_id": event_channel_2_id,
+                "campaign_scope_id": campaign_scope_2_id,
                 "timestamp": c2_et,
                 "source": "Another event source",
                 "category": "observation_missing",
@@ -172,7 +171,7 @@ class TestEventsApi:
             tse_2_etag = ret.headers["ETag"]
 
             # GET list (filtered)
-            ret = client.get(EVENTS_URL, query_string={"channel_id": ec_1_id})
+            ret = client.get(EVENTS_URL, query_string={"campaign_scope_id": ec_1_id})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
@@ -185,7 +184,7 @@ class TestEventsApi:
             ret = client.get(
                 EVENTS_URL,
                 query_string={
-                    "channel_id": ec_2_id,
+                    "campaign_scope_id": ec_2_id,
                     "level": "INFO",
                 },
             )
@@ -200,15 +199,6 @@ class TestEventsApi:
                 headers={"If-Match": "Dummy-ETag"},
             )
             assert ret.status_code == 404
-
-            # DELETE channel violating fkey constraint
-            ret = client.get(f"{EVENT_CHANNELS_URL}{ec_1_id}")
-            ec_1_etag = ret.headers["ETag"]
-            ret = client.delete(
-                f"{EVENT_CHANNELS_URL}{ec_1_id}",
-                headers={"If-Match": ec_1_etag},
-            )
-            assert ret.status_code == 409
 
             # DELETE
             ret = client.delete(
@@ -232,10 +222,11 @@ class TestEventsApi:
             ret = client.get(f"{EVENTS_URL}{tse_1_id}")
             assert ret.status_code == 404
 
-    @pytest.mark.usefixtures("event_channels_by_users")
-    def test_events_as_user_api(self, app, users, event_channels, campaigns, events):
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    def test_events_as_user_api(self, app, users, campaign_scopes, campaigns, events):
         tse_1_id = events[0]
-        event_channel_1_id = event_channels[0]
+        campaign_scope_1_id = campaign_scopes[0]
         c1_st = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
 
         creds = users["Active"]["creds"]
@@ -251,7 +242,7 @@ class TestEventsApi:
 
             # POST
             tse = {
-                "channel_id": event_channel_1_id,
+                "campaign_scope_id": campaign_scope_1_id,
                 "timestamp": c1_st,
                 "source": "Event source",
                 "category": "observation_missing",
@@ -273,9 +264,9 @@ class TestEventsApi:
             )
             assert ret.status_code == 204
 
-    def test_events_as_anonym_api(self, app, event_channels, events):
+    def test_events_as_anonym_api(self, app, campaign_scopes, events):
         tse_1_id = events[0]
-        event_channel_1_id = event_channels[0]
+        campaign_scope_1_id = campaign_scopes[0]
         c1_st = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
 
         client = app.test_client()
@@ -286,7 +277,7 @@ class TestEventsApi:
 
         # POST
         tse = {
-            "channel_id": event_channel_1_id,
+            "campaign_scope_id": campaign_scope_1_id,
             "timestamp": c1_st,
             "source": "Event source",
             "category": "observation_missing",

@@ -122,7 +122,8 @@ class TestTimeseriesPropertyDataApi:
             ret = client.get(f"{TIMESERIES_PROPERTY_DATA_URL}{tsg_1_id}")
             assert ret.status_code == 404
 
-    @pytest.mark.usefixtures("timeseries_groups_by_users")
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
     def test_timeseries_property_data_as_user_api(
         self,
         app,

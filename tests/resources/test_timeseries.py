@@ -6,22 +6,23 @@ from tests.common import AuthHeader
 
 DUMMY_ID = "69"
 
-TIMESERIESS_URL = "/timeseries/"
+TIMESERIES_URL = "/timeseries/"
 
 
 class TestTimeseriesApi:
-    def test_timeseries_api(self, app, users, timeseries_groups):
+    def test_timeseries_api(self, app, users, campaigns, campaign_scopes):
 
         creds = users["Chuck"]["creds"]
-        tsg_1 = timeseries_groups[0]
-        tsg_2 = timeseries_groups[1]
+        campaign_1 = campaigns[0]
+        cs_1 = campaign_scopes[0]
+        cs_2 = campaign_scopes[1]
 
         client = app.test_client()
 
         with AuthHeader(creds):
 
             # GET list
-            ret = client.get(TIMESERIESS_URL)
+            ret = client.get(TIMESERIES_URL)
             assert ret.status_code == 200
             assert ret.json == []
 
@@ -29,9 +30,10 @@ class TestTimeseriesApi:
             timeseries_1 = {
                 "name": "Timeseries 1",
                 "description": "Timeseries example 1",
-                "group_id": tsg_1,
+                "campaign_id": campaign_1,
+                "campaign_scope_id": cs_1,
             }
-            ret = client.post(TIMESERIESS_URL, json=timeseries_1)
+            ret = client.post(TIMESERIES_URL, json=timeseries_1)
             assert ret.status_code == 201
             ret_val = ret.json
             timeseries_1_id = ret_val.pop("id")
@@ -39,18 +41,18 @@ class TestTimeseriesApi:
             assert ret_val == timeseries_1
 
             # POST violating unique constraint
-            ret = client.post(TIMESERIESS_URL, json=timeseries_1)
+            ret = client.post(TIMESERIES_URL, json=timeseries_1)
             assert ret.status_code == 409
 
             # GET list
-            ret = client.get(TIMESERIESS_URL)
+            ret = client.get(TIMESERIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == timeseries_1_id
 
             # GET by id
-            ret = client.get(f"{TIMESERIESS_URL}{timeseries_1_id}")
+            ret = client.get(f"{TIMESERIES_URL}{timeseries_1_id}")
             assert ret.status_code == 200
             assert ret.headers["ETag"] == timeseries_1_etag
             ret_val = ret.json
@@ -59,9 +61,12 @@ class TestTimeseriesApi:
 
             # PUT
             del timeseries_1["description"]
+            timeseries_1_put = timeseries_1.copy()
+            del timeseries_1_put["campaign_id"]
+            del timeseries_1_put["campaign_scope_id"]
             ret = client.put(
-                f"{TIMESERIESS_URL}{timeseries_1_id}",
-                json=timeseries_1,
+                f"{TIMESERIES_URL}{timeseries_1_id}",
+                json=timeseries_1_put,
                 headers={"If-Match": timeseries_1_etag},
             )
             assert ret.status_code == 200
@@ -72,8 +77,8 @@ class TestTimeseriesApi:
 
             # PUT wrong ID -> 404
             ret = client.put(
-                f"{TIMESERIESS_URL}{DUMMY_ID}",
-                json=timeseries_1,
+                f"{TIMESERIES_URL}{DUMMY_ID}",
+                json=timeseries_1_put,
                 headers={"If-Match": timeseries_1_etag},
             )
             assert ret.status_code == 404
@@ -81,46 +86,51 @@ class TestTimeseriesApi:
             # POST TS 2
             timeseries_2 = {
                 "name": "Timeseries 2",
-                "group_id": tsg_2,
+                "campaign_id": campaign_1,
+                "campaign_scope_id": cs_2,
             }
-            ret = client.post(TIMESERIESS_URL, json=timeseries_2)
+            ret = client.post(TIMESERIES_URL, json=timeseries_2)
             ret_val = ret.json
             timeseries_2_id = ret_val.pop("id")
             timeseries_2_etag = ret.headers["ETag"]
 
             # PUT violating unique constraint
-            timeseries_2["name"] = timeseries_1["name"]
+            timeseries_1_put["name"] = timeseries_2["name"]
             ret = client.put(
-                f"{TIMESERIESS_URL}{timeseries_2_id}",
-                json=timeseries_2,
-                headers={"If-Match": timeseries_2_etag},
+                f"{TIMESERIES_URL}{timeseries_1_id}",
+                json=timeseries_1_put,
+                headers={"If-Match": timeseries_1_etag},
             )
             assert ret.status_code == 409
 
             # DELETE
             ret = client.delete(
-                f"{TIMESERIESS_URL}{timeseries_1_id}",
+                f"{TIMESERIES_URL}{timeseries_1_id}",
                 headers={"If-Match": timeseries_1_etag},
             )
             assert ret.status_code == 204
             ret = client.delete(
-                f"{TIMESERIESS_URL}{timeseries_2_id}",
+                f"{TIMESERIES_URL}{timeseries_2_id}",
                 headers={"If-Match": timeseries_2_etag},
             )
 
             # GET list
-            ret = client.get(TIMESERIESS_URL)
+            ret = client.get(TIMESERIES_URL)
             assert ret.status_code == 200
             assert ret.json == []
 
             # GET by id -> 404
-            ret = client.get(f"{TIMESERIESS_URL}{timeseries_1_id}")
+            ret = client.get(f"{TIMESERIES_URL}{timeseries_1_id}")
             assert ret.status_code == 404
 
-    @pytest.mark.usefixtures("timeseries_groups_by_users")
-    def test_timeseries_as_user_api(self, app, users, timeseries, timeseries_groups):
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    def test_timeseries_as_user_api(
+        self, app, users, timeseries, campaigns, campaign_scopes
+    ):
 
-        tsg_1 = timeseries_groups[0]
+        campaign_1 = campaigns[0]
+        cs_1 = campaign_scopes[0]
         timeseries_1_id = timeseries[0]
         timeseries_2_id = timeseries[1]
 
@@ -131,34 +141,38 @@ class TestTimeseriesApi:
         with AuthHeader(creds):
 
             # GET list
-            ret = client.get(TIMESERIESS_URL)
+            ret = client.get(TIMESERIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]["group_id"] == tsg_1
+            assert ret_val[0]["campaign_id"] == campaign_1
+            assert ret_val[0]["campaign_scope_id"] == cs_1
 
             # POST
             timeseries_1 = {
                 "name": "Timeseries 1",
                 "description": "Timeseries example 1",
-                "group_id": tsg_1,
+                "campaign_id": campaign_1,
+                "campaign_scope_id": cs_1,
             }
-            ret = client.post(TIMESERIESS_URL, json=timeseries_1)
+            ret = client.post(TIMESERIES_URL, json=timeseries_1)
             assert ret.status_code == 403
 
             # GET by id
-            ret = client.get(f"{TIMESERIESS_URL}{timeseries_1_id}")
+            ret = client.get(f"{TIMESERIES_URL}{timeseries_1_id}")
             assert ret.status_code == 200
             ts_1_etag = ret.headers["ETag"]
 
             # GET by id, user not in group
-            ret = client.get(f"{TIMESERIESS_URL}{timeseries_2_id}")
+            ret = client.get(f"{TIMESERIES_URL}{timeseries_2_id}")
             assert ret.status_code == 403
 
             # PUT
             del timeseries_1["description"]
+            del timeseries_1["campaign_id"]
+            del timeseries_1["campaign_scope_id"]
             ret = client.put(
-                f"{TIMESERIESS_URL}{timeseries_1_id}",
+                f"{TIMESERIES_URL}{timeseries_1_id}",
                 json=timeseries_1,
                 headers={"If-Match": ts_1_etag},
             )
@@ -167,40 +181,46 @@ class TestTimeseriesApi:
 
             # DELETE
             ret = client.delete(
-                f"{TIMESERIESS_URL}{timeseries_1_id}",
+                f"{TIMESERIES_URL}{timeseries_1_id}",
                 headers={"If-Match": ts_1_etag},
             )
             # ETag is wrong but we get rejected before ETag check anyway
             assert ret.status_code == 403
 
-    def test_timeseries_as_anonym_api(self, app, users, timeseries, timeseries_groups):
+    def test_timeseries_as_anonym_api(
+        self, app, users, timeseries, campaigns, campaign_scopes
+    ):
 
-        tsg_1 = timeseries_groups[0]
+        campaign_1 = campaigns[0]
+        cs_1 = campaign_scopes[0]
         timeseries_1_id = timeseries[0]
 
         client = app.test_client()
 
         # GET list
-        ret = client.get(TIMESERIESS_URL)
+        ret = client.get(TIMESERIES_URL)
         assert ret.status_code == 401
 
         # POST
         timeseries_1 = {
             "name": "Timeseries 1",
             "description": "Timeseries example 1",
-            "group_id": tsg_1,
+            "campaign_id": campaign_1,
+            "campaign_scope_id": cs_1,
         }
-        ret = client.post(TIMESERIESS_URL, json=timeseries_1)
+        ret = client.post(TIMESERIES_URL, json=timeseries_1)
         assert ret.status_code == 401
 
         # GET by id
-        ret = client.get(f"{TIMESERIESS_URL}{timeseries_1_id}")
+        ret = client.get(f"{TIMESERIES_URL}{timeseries_1_id}")
         assert ret.status_code == 401
 
         # PUT
         del timeseries_1["description"]
+        del timeseries_1["campaign_id"]
+        del timeseries_1["campaign_scope_id"]
         ret = client.put(
-            f"{TIMESERIESS_URL}{timeseries_1_id}",
+            f"{TIMESERIES_URL}{timeseries_1_id}",
             json=timeseries_1,
             headers={"If-Match": "Dummy-ETag"},
         )
@@ -209,7 +229,7 @@ class TestTimeseriesApi:
 
         # DELETE
         ret = client.delete(
-            f"{TIMESERIESS_URL}{timeseries_1_id}",
+            f"{TIMESERIES_URL}{timeseries_1_id}",
             headers={"If-Match": "Dummy-ETag"},
         )
         # ETag is wrong but we get rejected before ETag check anyway

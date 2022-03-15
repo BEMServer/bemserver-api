@@ -1,4 +1,4 @@
-from .routes import blp
+from .routes import blp  # noqa
 
 
 def register_blueprints(api):

@@ -145,7 +145,8 @@ class TestCampaignsApi:
             ret = client.get(f"{CAMPAIGNS_URL}{campaign_1_id}")
             assert ret.status_code == 404
 
-    @pytest.mark.usefixtures("users_by_campaigns")
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaigns")
     def test_campaigns_as_user_api(self, app, users, campaigns):
 
         user_creds = users["Active"]["creds"]
