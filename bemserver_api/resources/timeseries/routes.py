@@ -7,7 +7,7 @@ from bemserver_core.model import Timeseries
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
-from .schemas import TimeseriesSchema, TimeseriesQueryArgsSchema
+from .schemas import TimeseriesSchema, TimeseriesPutSchema, TimeseriesQueryArgsSchema
 
 
 blp = Blueprint(
@@ -55,7 +55,7 @@ class TimeseriesByIdViews(MethodView):
 
     @blp.login_required
     @blp.etag
-    @blp.arguments(TimeseriesSchema)
+    @blp.arguments(TimeseriesPutSchema)
     @blp.response(200, TimeseriesSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):

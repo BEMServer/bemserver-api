@@ -10,7 +10,7 @@ argon2-cffi==21.3.0
     # via bemserver-core
 argon2-cffi-bindings==21.2.0
     # via argon2-cffi
-bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/cdbe4c0.tar.gz
+bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/074fa26.tar.gz
     # via bemserver-api (setup.py)
 cffi==1.15.0
     # via

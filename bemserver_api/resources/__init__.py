@@ -1,43 +1,39 @@
 """Resources initialization"""
 
 from . import users
+from . import user_groups
+from . import users_by_user_groups
 from . import campaigns
-from . import users_by_campaigns
+from . import user_groups_by_campaigns
+from . import campaign_scopes
+from . import user_groups_by_campaign_scopes
 from . import timeseries_properties
 from . import timeseries_data_states
 from . import timeseries
-from . import timeseries_groups
-from . import timeseries_groups_by_users
-from . import timeseries_groups_by_campaigns
 from . import timeseries_property_data
 from . import timeseries_data
 from . import event_states
 from . import event_levels
 from . import event_categories
-from . import event_channels
-from . import event_channels_by_users
-from . import event_channels_by_campaigns
 from . import events
 
 
 MODULES = (
     users,
+    user_groups,
+    users_by_user_groups,
     campaigns,
-    users_by_campaigns,
+    user_groups_by_campaigns,
+    campaign_scopes,
+    user_groups_by_campaign_scopes,
     timeseries_properties,
     timeseries_data_states,
     timeseries,
-    timeseries_groups,
-    timeseries_groups_by_users,
-    timeseries_groups_by_campaigns,
     timeseries_property_data,
     timeseries_data,
     event_states,
     event_levels,
     event_categories,
-    event_channels,
-    event_channels_by_users,
-    event_channels_by_campaigns,
     events,
 )
 
