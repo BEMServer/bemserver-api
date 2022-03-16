@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import User
 
-from bemserver_api import AutoSchema
+from bemserver_api import AutoSchema, Schema
 
 
 class UserSchema(AutoSchema):
@@ -20,12 +20,12 @@ class UserSchema(AutoSchema):
     is_active = ma.fields.Boolean(dump_only=True)
 
 
-class UserQueryArgsSchema(ma.Schema):
+class UserQueryArgsSchema(Schema):
     name = ma.fields.Str()
     email = ma.fields.Str()
     is_admin = ma.fields.Boolean()
     is_active = ma.fields.Boolean()
 
 
-class BooleanValueSchema(ma.Schema):
+class BooleanValueSchema(Schema):
     value = ma.fields.Boolean()

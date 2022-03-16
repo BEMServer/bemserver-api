@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import UserGroupByCampaign
 
-from bemserver_api import AutoSchema
+from bemserver_api import AutoSchema, Schema
 
 
 class UserGroupByCampaignSchema(AutoSchema):
@@ -15,6 +15,6 @@ class UserGroupByCampaignSchema(AutoSchema):
     id = msa.auto_field(dump_only=True)
 
 
-class UserGroupByCampaignQueryArgsSchema(ma.Schema):
+class UserGroupByCampaignQueryArgsSchema(Schema):
     user_group_id = ma.fields.Int()
     campaign_id = ma.fields.Int()

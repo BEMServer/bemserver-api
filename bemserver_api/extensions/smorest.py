@@ -77,14 +77,18 @@ class Blueprint(flask_smorest.Blueprint):
 
 
 class Schema(ma.Schema):
-    """Schema class used to load/dump SQLAlchemy objects
+    """Base Schema class to use in the API"""
+
+    # Ensures the fields are ordered
+    set_class = ma.orderedset.OrderedSet
+
+
+class SQLAlchemySchema(Schema):
+    """Base Schema class used to load/dump SQLAlchemy objects
 
     The API assumes missing = None/null, so we treat missing fields as None
     unless they are read-only.
     """
-
-    # Ensures the fields are ordered
-    set_class = ma.orderedset.OrderedSet
 
     @ma.post_load
     def set_missing_expected_values_to_none(self, data, **kwargs):
@@ -98,7 +102,7 @@ class Schema(ma.Schema):
         return {key: value for key, value in data.items() if value is not None}
 
 
-class AutoSchema(msa.SQLAlchemyAutoSchema, Schema):
+class AutoSchema(msa.SQLAlchemyAutoSchema, SQLAlchemySchema):
     """Auto-schema class"""
 
 

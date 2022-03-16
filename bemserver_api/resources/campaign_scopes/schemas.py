@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import CampaignScope
 
-from bemserver_api import AutoSchema
+from bemserver_api import AutoSchema, Schema
 
 
 class CampaignScopeSchema(AutoSchema):
@@ -22,5 +22,5 @@ class CampaignScopePutSchema(CampaignScopeSchema):
         exclude = ("campaign_id",)
 
 
-class CampaignScopeQueryArgsSchema(ma.Schema):
+class CampaignScopeQueryArgsSchema(Schema):
     name = ma.fields.Str()

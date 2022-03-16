@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Timeseries
 
-from bemserver_api import AutoSchema
+from bemserver_api import AutoSchema, Schema
 
 
 class TimeseriesSchema(AutoSchema):
@@ -26,7 +26,7 @@ class TimeseriesPutSchema(TimeseriesSchema):
         exclude = ("campaign_id", "campaign_scope_id")
 
 
-class TimeseriesQueryArgsSchema(ma.Schema):
+class TimeseriesQueryArgsSchema(Schema):
     name = ma.fields.Str()
     unit_symbol = ma.fields.Str()
     campaign_id = ma.fields.Int()

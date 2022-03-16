@@ -5,7 +5,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Event
 
-from bemserver_api import AutoSchema
+from bemserver_api import AutoSchema, Schema
 
 
 class EventSchema(AutoSchema):
@@ -24,7 +24,7 @@ class EventPutSchema(EventSchema):
         exclude = ("campaign_scope_id", "timestamp")
 
 
-class EventQueryArgsSchema(ma.Schema):
+class EventQueryArgsSchema(Schema):
     campaign_scope_id = ma.fields.Integer()
     source = ma.fields.Str()
     category = ma.fields.Str()
