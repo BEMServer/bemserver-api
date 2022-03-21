@@ -131,5 +131,5 @@ def post_csv(files, args):
     with io.TextIOWrapper(csv_file) as csv_file_txt:
         try:
             tscsvio.import_csv(csv_file_txt, args["data_state"])
-        except TimeseriesCSVIOError:
-            abort(422, "Invalid csv file content")
+        except TimeseriesCSVIOError as exc:
+            abort(422, message=f"Invalid csv file content: {exc}")
