@@ -270,3 +270,18 @@ def events(database, campaigns, campaign_scopes):
         )
         db.session.commit()
     return (tse_1.id, tse_2.id)
+
+
+@pytest.fixture
+def sites(database, campaigns):
+    with OpenBar():
+        site_1 = model.Site.new(
+            name="Site 1",
+            campaign_id=campaigns[0],
+        )
+        site_2 = model.Site.new(
+            name="Site 2",
+            campaign_id=campaigns[1],
+        )
+        db.session.commit()
+    return (site_1.id, site_2.id)
