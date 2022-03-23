@@ -330,3 +330,16 @@ def spaces(database, storeys):
         )
         db.session.commit()
     return (space_1.id, space_2.id)
+
+
+@pytest.fixture
+def structural_element_properties(database):
+    with OpenBar():
+        sep_1 = model.StructuralElementProperty.new(
+            name="Surface",
+        )
+        sep_2 = model.StructuralElementProperty.new(
+            name="Volume",
+        )
+        db.session.commit()
+    return (sep_1.id, sep_2.id)
