@@ -17,6 +17,7 @@ from . import event_levels
 from . import event_categories
 from . import events
 from . import sites
+from . import buildings
 
 
 MODULES = (
@@ -37,6 +38,7 @@ MODULES = (
     event_categories,
     events,
     sites,
+    buildings,
 )
 
 

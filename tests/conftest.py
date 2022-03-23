@@ -285,3 +285,18 @@ def sites(database, campaigns):
         )
         db.session.commit()
     return (site_1.id, site_2.id)
+
+
+@pytest.fixture
+def buildings(database, sites):
+    with OpenBar():
+        building_1 = model.Building.new(
+            name="Building 1",
+            site_id=sites[0],
+        )
+        building_2 = model.Building.new(
+            name="Building 2",
+            site_id=sites[1],
+        )
+        db.session.commit()
+    return (building_1.id, building_2.id)
