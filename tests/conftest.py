@@ -300,3 +300,18 @@ def buildings(database, sites):
         )
         db.session.commit()
     return (building_1.id, building_2.id)
+
+
+@pytest.fixture
+def storeys(database, buildings):
+    with OpenBar():
+        storey_1 = model.Storey.new(
+            name="Storey 1",
+            building_id=buildings[0],
+        )
+        storey_2 = model.Storey.new(
+            name="Storey 2",
+            building_id=buildings[1],
+        )
+        db.session.commit()
+    return (storey_1.id, storey_2.id)

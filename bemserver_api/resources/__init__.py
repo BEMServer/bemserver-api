@@ -18,6 +18,7 @@ from . import event_categories
 from . import events
 from . import sites
 from . import buildings
+from . import storeys
 
 
 MODULES = (
@@ -39,6 +40,7 @@ MODULES = (
     events,
     sites,
     buildings,
+    storeys,
 )
 
 
