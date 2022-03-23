@@ -315,3 +315,18 @@ def storeys(database, buildings):
         )
         db.session.commit()
     return (storey_1.id, storey_2.id)
+
+
+@pytest.fixture
+def spaces(database, storeys):
+    with OpenBar():
+        space_1 = model.Space.new(
+            name="Space 1",
+            storey_id=storeys[0],
+        )
+        space_2 = model.Space.new(
+            name="Space 2",
+            storey_id=storeys[1],
+        )
+        db.session.commit()
+    return (space_1.id, space_2.id)
