@@ -333,6 +333,21 @@ def spaces(database, storeys):
 
 
 @pytest.fixture
+def zones(database, campaigns):
+    with OpenBar():
+        zone_1 = model.Zone.new(
+            name="Zone 1",
+            campaign_id=campaigns[0],
+        )
+        zone_2 = model.Zone.new(
+            name="Zone 2",
+            campaign_id=campaigns[1],
+        )
+        db.session.commit()
+    return (zone_1.id, zone_2.id)
+
+
+@pytest.fixture
 def structural_element_properties(database):
     with OpenBar():
         sep_1 = model.StructuralElementProperty.new(

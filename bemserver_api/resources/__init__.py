@@ -20,6 +20,7 @@ from . import sites
 from . import buildings
 from . import storeys
 from . import spaces
+from . import zones
 from . import structural_element_properties
 from . import site_properties
 from . import building_properties
@@ -48,6 +49,7 @@ MODULES = (
     buildings,
     storeys,
     spaces,
+    zones,
     structural_element_properties,
     site_properties,
     building_properties,
