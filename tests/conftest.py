@@ -410,3 +410,16 @@ def space_properties(database, structural_element_properties):
         )
         db.session.commit()
     return (space_p_1.id, space_p_2.id)
+
+
+@pytest.fixture
+def zone_properties(database, structural_element_properties):
+    with OpenBar():
+        zone_p_1 = model.ZoneProperty.new(
+            structural_element_property_id=structural_element_properties[0],
+        )
+        zone_p_2 = model.ZoneProperty.new(
+            structural_element_property_id=structural_element_properties[1],
+        )
+        db.session.commit()
+    return (zone_p_1.id, zone_p_2.id)
