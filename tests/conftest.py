@@ -343,3 +343,16 @@ def structural_element_properties(database):
         )
         db.session.commit()
     return (sep_1.id, sep_2.id)
+
+
+@pytest.fixture
+def site_properties(database, structural_element_properties):
+    with OpenBar():
+        site_p_1 = model.SiteProperty.new(
+            structural_element_property_id=structural_element_properties[0],
+        )
+        site_p_2 = model.SiteProperty.new(
+            structural_element_property_id=structural_element_properties[1],
+        )
+        db.session.commit()
+    return (site_p_1.id, site_p_2.id)

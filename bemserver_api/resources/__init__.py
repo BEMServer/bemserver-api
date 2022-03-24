@@ -21,6 +21,7 @@ from . import buildings
 from . import storeys
 from . import spaces
 from . import structural_element_properties
+from . import site_properties
 
 
 MODULES = (
@@ -45,6 +46,7 @@ MODULES = (
     storeys,
     spaces,
     structural_element_properties,
+    site_properties,
 )
 
 
