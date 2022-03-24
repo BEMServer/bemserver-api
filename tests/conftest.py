@@ -369,3 +369,16 @@ def building_properties(database, structural_element_properties):
         )
         db.session.commit()
     return (building_p_1.id, building_p_2.id)
+
+
+@pytest.fixture
+def storey_properties(database, structural_element_properties):
+    with OpenBar():
+        storey_p_1 = model.StoreyProperty.new(
+            structural_element_property_id=structural_element_properties[0],
+        )
+        storey_p_2 = model.StoreyProperty.new(
+            structural_element_property_id=structural_element_properties[1],
+        )
+        db.session.commit()
+    return (storey_p_1.id, storey_p_2.id)
