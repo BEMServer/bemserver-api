@@ -474,3 +474,20 @@ def storey_property_data(database, storeys, storey_properties):
         )
         db.session.commit()
     return (spd_1.id, spd_2.id)
+
+
+@pytest.fixture
+def space_property_data(database, spaces, space_properties):
+    with OpenBar():
+        spd_1 = model.SpacePropertyData.new(
+            space_id=spaces[0],
+            space_property_id=space_properties[0],
+            value="12",
+        )
+        spd_2 = model.SpacePropertyData.new(
+            space_id=spaces[1],
+            space_property_id=space_properties[1],
+            value="42",
+        )
+        db.session.commit()
+    return (spd_1.id, spd_2.id)
