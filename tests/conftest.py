@@ -440,3 +440,20 @@ def site_property_data(database, sites, site_properties):
         )
         db.session.commit()
     return (spd_1.id, spd_2.id)
+
+
+@pytest.fixture
+def building_property_data(database, sites, site_properties):
+    with OpenBar():
+        bpd_1 = model.BuildingPropertyData.new(
+            building_id=sites[0],
+            building_property_id=site_properties[0],
+            value="12",
+        )
+        bpd_2 = model.BuildingPropertyData.new(
+            building_id=sites[1],
+            building_property_id=site_properties[1],
+            value="42",
+        )
+        db.session.commit()
+    return (bpd_1.id, bpd_2.id)
