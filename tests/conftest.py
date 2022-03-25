@@ -538,3 +538,18 @@ def timeseries_by_buildings(database, buildings, timeseries):
         )
         db.session.commit()
     return (tbb_1.id, tbb_2.id)
+
+
+@pytest.fixture
+def timeseries_by_storeys(database, storeys, timeseries):
+    with OpenBar():
+        tbs_1 = model.TimeseriesByStorey.new(
+            storey_id=storeys[0],
+            timeseries_id=timeseries[0],
+        )
+        tbs_2 = model.TimeseriesByStorey.new(
+            storey_id=storeys[1],
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (tbs_1.id, tbs_2.id)
