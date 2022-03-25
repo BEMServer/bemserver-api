@@ -491,3 +491,20 @@ def space_property_data(database, spaces, space_properties):
         )
         db.session.commit()
     return (spd_1.id, spd_2.id)
+
+
+@pytest.fixture
+def zone_property_data(database, zones, zone_properties):
+    with OpenBar():
+        zpd_1 = model.ZonePropertyData.new(
+            zone_id=zones[0],
+            zone_property_id=zone_properties[0],
+            value="12",
+        )
+        zpd_2 = model.ZonePropertyData.new(
+            zone_id=zones[1],
+            zone_property_id=zone_properties[1],
+            value="42",
+        )
+        db.session.commit()
+    return (zpd_1.id, zpd_2.id)

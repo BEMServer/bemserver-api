@@ -31,6 +31,7 @@ from . import site_property_data
 from . import building_property_data
 from . import storey_property_data
 from . import space_property_data
+from . import zone_property_data
 
 
 MODULES = (
@@ -65,6 +66,7 @@ MODULES = (
     building_property_data,
     storey_property_data,
     space_property_data,
+    zone_property_data,
 )
 
 
