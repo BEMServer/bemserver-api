@@ -36,6 +36,7 @@ from . import timeseries_by_sites
 from . import timeseries_by_buildings
 from . import timeseries_by_storeys
 from . import timeseries_by_spaces
+from . import timeseries_by_zones
 
 
 MODULES = (
@@ -75,6 +76,7 @@ MODULES = (
     timeseries_by_buildings,
     timeseries_by_storeys,
     timeseries_by_spaces,
+    timeseries_by_zones,
 )
 
 
