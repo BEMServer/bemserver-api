@@ -508,3 +508,18 @@ def zone_property_data(database, zones, zone_properties):
         )
         db.session.commit()
     return (zpd_1.id, zpd_2.id)
+
+
+@pytest.fixture
+def timeseries_by_sites(database, sites, timeseries):
+    with OpenBar():
+        tbs_1 = model.TimeseriesBySite.new(
+            site_id=sites[0],
+            timeseries_id=timeseries[0],
+        )
+        tbs_2 = model.TimeseriesBySite.new(
+            site_id=sites[1],
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (tbs_1.id, tbs_2.id)
