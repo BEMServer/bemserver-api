@@ -423,3 +423,20 @@ def zone_properties(database, structural_element_properties):
         )
         db.session.commit()
     return (zone_p_1.id, zone_p_2.id)
+
+
+@pytest.fixture
+def site_property_data(database, sites, site_properties):
+    with OpenBar():
+        spd_1 = model.SitePropertyData.new(
+            site_id=sites[0],
+            site_property_id=site_properties[0],
+            value="12",
+        )
+        spd_2 = model.SitePropertyData.new(
+            site_id=sites[1],
+            site_property_id=site_properties[1],
+            value="42",
+        )
+        db.session.commit()
+    return (spd_1.id, spd_2.id)
