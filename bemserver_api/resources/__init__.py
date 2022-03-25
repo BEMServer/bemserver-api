@@ -33,6 +33,7 @@ from . import storey_property_data
 from . import space_property_data
 from . import zone_property_data
 from . import timeseries_by_sites
+from . import timeseries_by_buildings
 
 
 MODULES = (
@@ -69,6 +70,7 @@ MODULES = (
     space_property_data,
     zone_property_data,
     timeseries_by_sites,
+    timeseries_by_buildings,
 )
 
 
