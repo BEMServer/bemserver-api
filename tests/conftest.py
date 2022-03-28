@@ -270,3 +270,316 @@ def events(database, campaigns, campaign_scopes):
         )
         db.session.commit()
     return (tse_1.id, tse_2.id)
+
+
+@pytest.fixture
+def sites(database, campaigns):
+    with OpenBar():
+        site_1 = model.Site.new(
+            name="Site 1",
+            campaign_id=campaigns[0],
+        )
+        site_2 = model.Site.new(
+            name="Site 2",
+            campaign_id=campaigns[1],
+        )
+        db.session.commit()
+    return (site_1.id, site_2.id)
+
+
+@pytest.fixture
+def buildings(database, sites):
+    with OpenBar():
+        building_1 = model.Building.new(
+            name="Building 1",
+            site_id=sites[0],
+        )
+        building_2 = model.Building.new(
+            name="Building 2",
+            site_id=sites[1],
+        )
+        db.session.commit()
+    return (building_1.id, building_2.id)
+
+
+@pytest.fixture
+def storeys(database, buildings):
+    with OpenBar():
+        storey_1 = model.Storey.new(
+            name="Storey 1",
+            building_id=buildings[0],
+        )
+        storey_2 = model.Storey.new(
+            name="Storey 2",
+            building_id=buildings[1],
+        )
+        db.session.commit()
+    return (storey_1.id, storey_2.id)
+
+
+@pytest.fixture
+def spaces(database, storeys):
+    with OpenBar():
+        space_1 = model.Space.new(
+            name="Space 1",
+            storey_id=storeys[0],
+        )
+        space_2 = model.Space.new(
+            name="Space 2",
+            storey_id=storeys[1],
+        )
+        db.session.commit()
+    return (space_1.id, space_2.id)
+
+
+@pytest.fixture
+def zones(database, campaigns):
+    with OpenBar():
+        zone_1 = model.Zone.new(
+            name="Zone 1",
+            campaign_id=campaigns[0],
+        )
+        zone_2 = model.Zone.new(
+            name="Zone 2",
+            campaign_id=campaigns[1],
+        )
+        db.session.commit()
+    return (zone_1.id, zone_2.id)
+
+
+@pytest.fixture
+def structural_element_properties(database):
+    with OpenBar():
+        sep_1 = model.StructuralElementProperty.new(
+            name="Surface",
+        )
+        sep_2 = model.StructuralElementProperty.new(
+            name="Volume",
+        )
+        db.session.commit()
+    return (sep_1.id, sep_2.id)
+
+
+@pytest.fixture
+def site_properties(database, structural_element_properties):
+    with OpenBar():
+        site_p_1 = model.SiteProperty.new(
+            structural_element_property_id=structural_element_properties[0],
+        )
+        site_p_2 = model.SiteProperty.new(
+            structural_element_property_id=structural_element_properties[1],
+        )
+        db.session.commit()
+    return (site_p_1.id, site_p_2.id)
+
+
+@pytest.fixture
+def building_properties(database, structural_element_properties):
+    with OpenBar():
+        building_p_1 = model.BuildingProperty.new(
+            structural_element_property_id=structural_element_properties[0],
+        )
+        building_p_2 = model.BuildingProperty.new(
+            structural_element_property_id=structural_element_properties[1],
+        )
+        db.session.commit()
+    return (building_p_1.id, building_p_2.id)
+
+
+@pytest.fixture
+def storey_properties(database, structural_element_properties):
+    with OpenBar():
+        storey_p_1 = model.StoreyProperty.new(
+            structural_element_property_id=structural_element_properties[0],
+        )
+        storey_p_2 = model.StoreyProperty.new(
+            structural_element_property_id=structural_element_properties[1],
+        )
+        db.session.commit()
+    return (storey_p_1.id, storey_p_2.id)
+
+
+@pytest.fixture
+def space_properties(database, structural_element_properties):
+    with OpenBar():
+        space_p_1 = model.SpaceProperty.new(
+            structural_element_property_id=structural_element_properties[0],
+        )
+        space_p_2 = model.SpaceProperty.new(
+            structural_element_property_id=structural_element_properties[1],
+        )
+        db.session.commit()
+    return (space_p_1.id, space_p_2.id)
+
+
+@pytest.fixture
+def zone_properties(database, structural_element_properties):
+    with OpenBar():
+        zone_p_1 = model.ZoneProperty.new(
+            structural_element_property_id=structural_element_properties[0],
+        )
+        zone_p_2 = model.ZoneProperty.new(
+            structural_element_property_id=structural_element_properties[1],
+        )
+        db.session.commit()
+    return (zone_p_1.id, zone_p_2.id)
+
+
+@pytest.fixture
+def site_property_data(database, sites, site_properties):
+    with OpenBar():
+        spd_1 = model.SitePropertyData.new(
+            site_id=sites[0],
+            site_property_id=site_properties[0],
+            value="12",
+        )
+        spd_2 = model.SitePropertyData.new(
+            site_id=sites[1],
+            site_property_id=site_properties[1],
+            value="42",
+        )
+        db.session.commit()
+    return (spd_1.id, spd_2.id)
+
+
+@pytest.fixture
+def building_property_data(database, sites, site_properties):
+    with OpenBar():
+        bpd_1 = model.BuildingPropertyData.new(
+            building_id=sites[0],
+            building_property_id=site_properties[0],
+            value="12",
+        )
+        bpd_2 = model.BuildingPropertyData.new(
+            building_id=sites[1],
+            building_property_id=site_properties[1],
+            value="42",
+        )
+        db.session.commit()
+    return (bpd_1.id, bpd_2.id)
+
+
+@pytest.fixture
+def storey_property_data(database, storeys, storey_properties):
+    with OpenBar():
+        spd_1 = model.StoreyPropertyData.new(
+            storey_id=storeys[0],
+            storey_property_id=storey_properties[0],
+            value="12",
+        )
+        spd_2 = model.StoreyPropertyData.new(
+            storey_id=storeys[1],
+            storey_property_id=storey_properties[1],
+            value="42",
+        )
+        db.session.commit()
+    return (spd_1.id, spd_2.id)
+
+
+@pytest.fixture
+def space_property_data(database, spaces, space_properties):
+    with OpenBar():
+        spd_1 = model.SpacePropertyData.new(
+            space_id=spaces[0],
+            space_property_id=space_properties[0],
+            value="12",
+        )
+        spd_2 = model.SpacePropertyData.new(
+            space_id=spaces[1],
+            space_property_id=space_properties[1],
+            value="42",
+        )
+        db.session.commit()
+    return (spd_1.id, spd_2.id)
+
+
+@pytest.fixture
+def zone_property_data(database, zones, zone_properties):
+    with OpenBar():
+        zpd_1 = model.ZonePropertyData.new(
+            zone_id=zones[0],
+            zone_property_id=zone_properties[0],
+            value="12",
+        )
+        zpd_2 = model.ZonePropertyData.new(
+            zone_id=zones[1],
+            zone_property_id=zone_properties[1],
+            value="42",
+        )
+        db.session.commit()
+    return (zpd_1.id, zpd_2.id)
+
+
+@pytest.fixture
+def timeseries_by_sites(database, sites, timeseries):
+    with OpenBar():
+        tbs_1 = model.TimeseriesBySite.new(
+            site_id=sites[0],
+            timeseries_id=timeseries[0],
+        )
+        tbs_2 = model.TimeseriesBySite.new(
+            site_id=sites[1],
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (tbs_1.id, tbs_2.id)
+
+
+@pytest.fixture
+def timeseries_by_buildings(database, buildings, timeseries):
+    with OpenBar():
+        tbb_1 = model.TimeseriesByBuilding.new(
+            building_id=buildings[0],
+            timeseries_id=timeseries[0],
+        )
+        tbb_2 = model.TimeseriesByBuilding.new(
+            building_id=buildings[1],
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (tbb_1.id, tbb_2.id)
+
+
+@pytest.fixture
+def timeseries_by_storeys(database, storeys, timeseries):
+    with OpenBar():
+        tbs_1 = model.TimeseriesByStorey.new(
+            storey_id=storeys[0],
+            timeseries_id=timeseries[0],
+        )
+        tbs_2 = model.TimeseriesByStorey.new(
+            storey_id=storeys[1],
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (tbs_1.id, tbs_2.id)
+
+
+@pytest.fixture
+def timeseries_by_spaces(database, spaces, timeseries):
+    with OpenBar():
+        tbs_1 = model.TimeseriesBySpace.new(
+            space_id=spaces[0],
+            timeseries_id=timeseries[0],
+        )
+        tbs_2 = model.TimeseriesBySpace.new(
+            space_id=spaces[1],
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (tbs_1.id, tbs_2.id)
+
+
+@pytest.fixture
+def timeseries_by_zones(database, spaces, timeseries):
+    with OpenBar():
+        tbz_1 = model.TimeseriesByZone.new(
+            zone_id=spaces[0],
+            timeseries_id=timeseries[0],
+        )
+        tbz_2 = model.TimeseriesByZone.new(
+            zone_id=spaces[1],
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (tbz_1.id, tbz_2.id)
