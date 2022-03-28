@@ -10,7 +10,7 @@ from .schemas import EventStateSchema
 
 
 blp = Blueprint(
-    "Events states",
+    "EventState",
     __name__,
     url_prefix="/event_states",
     description="Operations on event states",

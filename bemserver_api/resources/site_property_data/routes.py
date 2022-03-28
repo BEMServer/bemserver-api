@@ -14,7 +14,7 @@ from .schemas import (
 
 
 blp = Blueprint(
-    "Site property data",
+    "SitePropertyData",
     __name__,
     url_prefix="/site_property_data",
     description="Operations on site property data",

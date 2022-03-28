@@ -10,7 +10,7 @@ from .schemas import EventLevelSchema
 
 
 blp = Blueprint(
-    "Event levels",
+    "EventLevel",
     __name__,
     url_prefix="/event_levels",
     description="Operations on event levels",
