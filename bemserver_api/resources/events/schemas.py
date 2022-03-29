@@ -9,10 +9,9 @@ from bemserver_api import AutoSchema, Schema
 
 
 class EventSchema(AutoSchema):
-    class Meta:
+    class Meta(AutoSchema.Meta):
         table = Event.__table__
         exclude = ("_campaign_scope_id", "_timestamp")
-        include_fk = True
 
     id = msa.auto_field(dump_only=True)
     timestamp = ma.fields.AwareDateTime()
@@ -20,8 +19,8 @@ class EventSchema(AutoSchema):
 
 
 class EventPutSchema(EventSchema):
-    class Meta:
-        exclude = ("campaign_scope_id", "timestamp")
+    class Meta(EventSchema.Meta):
+        exclude = EventSchema.Meta.exclude + ("campaign_scope_id", "timestamp")
 
 
 class EventQueryArgsSchema(Schema):

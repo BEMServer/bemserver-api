@@ -6,7 +6,7 @@ import pytest
 
 from tests.common import AuthHeader
 
-TIMESERIES_DATA_URL = "/timeseries-data/"
+TIMESERIES_DATA_URL = "/timeseries_data/"
 
 
 class TestTimeseriesDataApi:

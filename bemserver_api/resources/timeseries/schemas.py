@@ -8,10 +8,9 @@ from bemserver_api import AutoSchema, Schema
 
 
 class TimeseriesSchema(AutoSchema):
-    class Meta:
+    class Meta(AutoSchema.Meta):
         table = Timeseries.__table__
         exclude = ("_campaign_id", "_campaign_scope_id")
-        include_fk = True
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
@@ -22,8 +21,8 @@ class TimeseriesSchema(AutoSchema):
 
 
 class TimeseriesPutSchema(TimeseriesSchema):
-    class Meta:
-        exclude = ("campaign_id", "campaign_scope_id")
+    class Meta(TimeseriesSchema.Meta):
+        exclude = TimeseriesSchema.Meta.exclude + ("campaign_id", "campaign_scope_id")
 
 
 class TimeseriesQueryArgsSchema(Schema):

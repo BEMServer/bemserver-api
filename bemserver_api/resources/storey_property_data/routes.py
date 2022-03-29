@@ -14,7 +14,7 @@ from .schemas import (
 
 
 blp = Blueprint(
-    "Storey property data",
+    "StoreyPropertyData",
     __name__,
     url_prefix="/storey_property_data",
     description="Operations on storey property data",
@@ -73,7 +73,6 @@ class StoreyPropertyDataByIdViews(MethodView):
     @blp.login_required
     @blp.etag
     @blp.response(204)
-    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a storey property data"""
         item = StoreyPropertyData.get_by_id(item_id)

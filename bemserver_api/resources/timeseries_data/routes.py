@@ -29,9 +29,9 @@ EXAMPLE_CSV_IN_OUT_FILE = textwrap.dedent(
 
 
 blp = Blueprint(
-    "Timeseries data",
+    "TimeseriesData",
     __name__,
-    url_prefix="/timeseries-data",
+    url_prefix="/timeseries_data",
     description="Operations on timeseries data",
 )
 

@@ -9,7 +9,7 @@ from bemserver_api import AutoSchema
 
 
 class TimeseriesDataStateSchema(AutoSchema):
-    class Meta:
+    class Meta(AutoSchema.Meta):
         table = TimeseriesDataState.__table__
 
     id = msa.auto_field(dump_only=True)

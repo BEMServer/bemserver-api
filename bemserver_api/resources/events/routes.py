@@ -16,7 +16,7 @@ from .schemas import (
 
 
 blp = Blueprint(
-    "Events", __name__, url_prefix="/events", description="Operations on events"
+    "Event", __name__, url_prefix="/events", description="Operations on events"
 )
 
 
@@ -27,7 +27,6 @@ class EventsViews(MethodView):
     @blp.arguments(EventQueryArgsSchema, location="query")
     @blp.response(200, EventSchema(many=True))
     @blp.paginate(SQLCursorPage)
-    # TODO: kwargs?
     def get(self, args):
         """List events"""
         return Event.get(**args)

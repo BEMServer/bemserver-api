@@ -14,7 +14,7 @@ from .schemas import (
 
 
 blp = Blueprint(
-    "Zone property data",
+    "ZonePropertyData",
     __name__,
     url_prefix="/zone_property_data",
     description="Operations on zone property data",
@@ -73,7 +73,6 @@ class ZonePropertyDataByIdViews(MethodView):
     @blp.login_required
     @blp.etag
     @blp.response(204)
-    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a zone property data"""
         item = ZonePropertyData.get_by_id(item_id)

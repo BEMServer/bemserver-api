@@ -60,7 +60,6 @@ class TestCampaignsApi:
             ret = client.post(BUILDING_PROPERTIES_URL, json=building_p_2)
             ret_val = ret.json
             building_p_2_id = ret_val.pop("id")
-            building_p_2_etag = ret.headers["ETag"]
 
             # GET list
             ret = client.get(BUILDING_PROPERTIES_URL)
@@ -79,22 +78,13 @@ class TestCampaignsApi:
             assert ret_val[0]["id"] == building_p_1_id
 
             # DELETE wrong ID -> 404
-            ret = client.delete(
-                f"{BUILDING_PROPERTIES_URL}{DUMMY_ID}",
-                headers={"If-Match": building_p_1_etag},
-            )
+            ret = client.delete(f"{BUILDING_PROPERTIES_URL}{DUMMY_ID}")
             assert ret.status_code == 404
 
             # DELETE
-            ret = client.delete(
-                f"{BUILDING_PROPERTIES_URL}{building_p_1_id}",
-                headers={"If-Match": building_p_1_etag},
-            )
+            ret = client.delete(f"{BUILDING_PROPERTIES_URL}{building_p_1_id}")
             assert ret.status_code == 204
-            ret = client.delete(
-                f"{BUILDING_PROPERTIES_URL}{building_p_2_id}",
-                headers={"If-Match": building_p_2_etag},
-            )
+            ret = client.delete(f"{BUILDING_PROPERTIES_URL}{building_p_2_id}")
             assert ret.status_code == 204
 
             # GET list
@@ -137,13 +127,9 @@ class TestCampaignsApi:
             # GET by id
             ret = client.get(f"{BUILDING_PROPERTIES_URL}{building_p_1_id}")
             assert ret.status_code == 200
-            building_p_1_etag = ret.headers["ETag"]
 
             # DELETE
-            ret = client.delete(
-                f"{BUILDING_PROPERTIES_URL}{building_p_1_id}",
-                headers={"If-Match": building_p_1_etag},
-            )
+            ret = client.delete(f"{BUILDING_PROPERTIES_URL}{building_p_1_id}")
             assert ret.status_code == 403
 
     def test_building_properties_as_anonym_api(
@@ -171,9 +157,5 @@ class TestCampaignsApi:
         assert ret.status_code == 401
 
         # DELETE
-        ret = client.delete(
-            f"{BUILDING_PROPERTIES_URL}{building_p_1_id}",
-            headers={"If-Match": "Dummy-Etag"},
-        )
-        # ETag is wrong but we get rejected before ETag check anyway
+        ret = client.delete(f"{BUILDING_PROPERTIES_URL}{building_p_1_id}")
         assert ret.status_code == 401

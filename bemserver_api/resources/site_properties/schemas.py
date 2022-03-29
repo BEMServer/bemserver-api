@@ -9,9 +9,8 @@ from bemserver_api import AutoSchema, Schema
 
 
 class SitePropertySchema(AutoSchema):
-    class Meta:
+    class Meta(AutoSchema.Meta):
         table = SiteProperty.__table__
-        include_fk = True
 
     id = msa.auto_field(dump_only=True)
 

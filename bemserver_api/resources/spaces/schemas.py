@@ -8,10 +8,9 @@ from bemserver_api import AutoSchema, Schema
 
 
 class SpaceSchema(AutoSchema):
-    class Meta:
+    class Meta(AutoSchema.Meta):
         table = Space.__table__
         exclude = ("_storey_id",)
-        include_fk = True
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
@@ -20,8 +19,8 @@ class SpaceSchema(AutoSchema):
 
 
 class SpacePutSchema(SpaceSchema):
-    class Meta:
-        exclude = ("storey_id",)
+    class Meta(SpaceSchema.Meta):
+        exclude = SpaceSchema.Meta.exclude + ("storey_id",)
 
 
 class SpaceQueryArgsSchema(Schema):

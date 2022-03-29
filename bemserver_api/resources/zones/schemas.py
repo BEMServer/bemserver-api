@@ -8,10 +8,9 @@ from bemserver_api import AutoSchema, Schema
 
 
 class ZoneSchema(AutoSchema):
-    class Meta:
+    class Meta(AutoSchema.Meta):
         table = Zone.__table__
         exclude = ("_campaign_id",)
-        include_fk = True
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
@@ -20,8 +19,8 @@ class ZoneSchema(AutoSchema):
 
 
 class ZonePutSchema(ZoneSchema):
-    class Meta:
-        exclude = ("campaign_id",)
+    class Meta(ZoneSchema.Meta):
+        exclude = ZoneSchema.Meta.exclude + ("campaign_id",)
 
 
 class ZoneQueryArgsSchema(Schema):

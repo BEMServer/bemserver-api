@@ -8,10 +8,9 @@ from bemserver_api import AutoSchema, Schema
 
 
 class BuildingSchema(AutoSchema):
-    class Meta:
+    class Meta(AutoSchema.Meta):
         table = Building.__table__
         exclude = ("_site_id",)
-        include_fk = True
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
@@ -20,8 +19,8 @@ class BuildingSchema(AutoSchema):
 
 
 class BuildingPutSchema(BuildingSchema):
-    class Meta:
-        exclude = ("site_id",)
+    class Meta(BuildingSchema.Meta):
+        exclude = BuildingSchema.Meta.exclude + ("site_id",)
 
 
 class BuildingQueryArgsSchema(Schema):

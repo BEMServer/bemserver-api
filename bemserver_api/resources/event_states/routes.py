@@ -10,7 +10,7 @@ from .schemas import EventStateSchema
 
 
 blp = Blueprint(
-    "Events states",
+    "EventState",
     __name__,
     url_prefix="/event_states",
     description="Operations on event states",
@@ -20,6 +20,7 @@ blp = Blueprint(
 @blp.route("/")
 class EventStatesViews(MethodView):
     @blp.login_required
+    @blp.etag
     @blp.response(200, EventStateSchema(many=True))
     def get(self):
         """List event states"""

@@ -10,7 +10,7 @@ from .schemas import EventLevelSchema
 
 
 blp = Blueprint(
-    "Event levels",
+    "EventLevel",
     __name__,
     url_prefix="/event_levels",
     description="Operations on event levels",
@@ -20,6 +20,7 @@ blp = Blueprint(
 @blp.route("/")
 class EventLevelsViews(MethodView):
     @blp.login_required
+    @blp.etag
     @blp.response(200, EventLevelSchema(many=True))
     def get(self):
         """List event levels"""

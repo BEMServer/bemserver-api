@@ -14,7 +14,7 @@ from .schemas import (
 
 
 blp = Blueprint(
-    "Building properties",
+    "BuildingProperty",
     __name__,
     url_prefix="/building_properties",
     description="Operations on building properties",
@@ -56,7 +56,6 @@ class BuildingPropertyByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
@@ -64,6 +63,5 @@ class BuildingPropertyByIdViews(MethodView):
         item = BuildingProperty.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, BuildingPropertySchema)
         item.delete()
         db.session.commit()

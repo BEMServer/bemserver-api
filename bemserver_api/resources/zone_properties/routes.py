@@ -14,7 +14,7 @@ from .schemas import (
 
 
 blp = Blueprint(
-    "Zone properties",
+    "ZoneProperty",
     __name__,
     url_prefix="/zone_properties",
     description="Operations on zone properties",
@@ -56,7 +56,6 @@ class ZonePropertyByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
@@ -64,6 +63,5 @@ class ZonePropertyByIdViews(MethodView):
         item = ZoneProperty.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, ZonePropertySchema)
         item.delete()
         db.session.commit()

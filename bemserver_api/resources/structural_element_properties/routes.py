@@ -14,7 +14,7 @@ from .schemas import (
 
 
 blp = Blueprint(
-    "Structural element properties",
+    "StructuralElementProperty",
     __name__,
     url_prefix="/structural_element_properties",
     description="Operations on structural element properties",

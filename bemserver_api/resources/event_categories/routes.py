@@ -10,7 +10,7 @@ from .schemas import EventCategorySchema
 
 
 blp = Blueprint(
-    "Event categories",
+    "EventCategory",
     __name__,
     url_prefix="/event_categories",
     description="Operations on event categories",
@@ -20,6 +20,7 @@ blp = Blueprint(
 @blp.route("/")
 class EventCategoriesViews(MethodView):
     @blp.login_required
+    @blp.etag
     @blp.response(200, EventCategorySchema(many=True))
     def get(self):
         """List event categories"""

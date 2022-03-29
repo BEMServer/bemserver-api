@@ -8,7 +8,7 @@ from bemserver_api import AutoSchema, Schema
 
 
 class CampaignSchema(AutoSchema):
-    class Meta:
+    class Meta(AutoSchema.Meta):
         table = Campaign.__table__
 
     id = msa.auto_field(dump_only=True)
