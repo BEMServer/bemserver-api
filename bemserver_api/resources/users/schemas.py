@@ -8,7 +8,7 @@ from bemserver_api import AutoSchema, Schema
 
 
 class UserSchema(AutoSchema):
-    class Meta:
+    class Meta(AutoSchema.Meta):
         table = User.__table__
         exclude = ("_is_active", "_is_admin")
 

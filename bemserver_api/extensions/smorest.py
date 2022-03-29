@@ -83,12 +83,15 @@ class Schema(ma.Schema):
     set_class = ma.orderedset.OrderedSet
 
 
-class SQLAlchemySchema(Schema):
-    """Base Schema class used to load/dump SQLAlchemy objects
+class AutoSchema(msa.SQLAlchemyAutoSchema, Schema):
+    """Auto Schema class used to load/dump SQLAlchemy objects
 
     The API assumes missing = None/null, so we treat missing fields as None
     unless they are read-only.
     """
+
+    class Meta:
+        include_fk = True
 
     @ma.post_load
     def set_missing_expected_values_to_none(self, data, **kwargs):
@@ -100,10 +103,6 @@ class SQLAlchemySchema(Schema):
     @ma.post_dump
     def remove_none_values(self, data, **kwargs):
         return {key: value for key, value in data.items() if value is not None}
-
-
-class AutoSchema(msa.SQLAlchemyAutoSchema, SQLAlchemySchema):
-    """Auto-schema class"""
 
 
 class SQLCursorPage(flask_smorest.Page):
