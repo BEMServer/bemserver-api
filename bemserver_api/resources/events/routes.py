@@ -27,7 +27,6 @@ class EventsViews(MethodView):
     @blp.arguments(EventQueryArgsSchema, location="query")
     @blp.response(200, EventSchema(many=True))
     @blp.paginate(SQLCursorPage)
-    # TODO: kwargs?
     def get(self, args):
         """List events"""
         return Event.get(**args)
