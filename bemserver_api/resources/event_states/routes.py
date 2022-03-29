@@ -20,6 +20,7 @@ blp = Blueprint(
 @blp.route("/")
 class EventStatesViews(MethodView):
     @blp.login_required
+    @blp.etag
     @blp.response(200, EventStateSchema(many=True))
     def get(self):
         """List event states"""

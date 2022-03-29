@@ -56,7 +56,6 @@ class SpacePropertyByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
@@ -64,6 +63,5 @@ class SpacePropertyByIdViews(MethodView):
         item = SpaceProperty.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, SpacePropertySchema)
         item.delete()
         db.session.commit()

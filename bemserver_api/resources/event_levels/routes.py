@@ -20,6 +20,7 @@ blp = Blueprint(
 @blp.route("/")
 class EventLevelsViews(MethodView):
     @blp.login_required
+    @blp.etag
     @blp.response(200, EventLevelSchema(many=True))
     def get(self):
         """List event levels"""

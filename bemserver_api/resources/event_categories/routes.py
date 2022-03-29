@@ -20,6 +20,7 @@ blp = Blueprint(
 @blp.route("/")
 class EventCategoriesViews(MethodView):
     @blp.login_required
+    @blp.etag
     @blp.response(200, EventCategorySchema(many=True))
     def get(self):
         """List event categories"""

@@ -56,7 +56,6 @@ class StoreyPropertyByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
@@ -64,6 +63,5 @@ class StoreyPropertyByIdViews(MethodView):
         item = StoreyProperty.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, StoreyPropertySchema)
         item.delete()
         db.session.commit()

@@ -56,7 +56,6 @@ class SitePropertyByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
     @blp.response(204)
     @blp.catch_integrity_error
     def delete(self, item_id):
@@ -64,6 +63,5 @@ class SitePropertyByIdViews(MethodView):
         item = SiteProperty.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, SitePropertySchema)
         item.delete()
         db.session.commit()
