@@ -29,15 +29,15 @@ class TestUsersByCampaignsApi:
             assert ret.json == []
 
             # POST
-            ubc_1 = {"user_group_id": ug_1_id, "user_id": user_1_id}
-            ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubc_1)
+            ubug_1 = {"user_group_id": ug_1_id, "user_id": user_1_id}
+            ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubug_1)
             assert ret.status_code == 201
             ret_val = ret.json
-            ubc_1_id = ret_val.pop("id")
-            ubc_1_etag = ret.headers["ETag"]
+            ubug_1_id = ret_val.pop("id")
+            ubug_1_etag = ret.headers["ETag"]
 
             # POST violating unique constraint
-            ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubc_1)
+            ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubug_1)
             assert ret.status_code == 409
 
             # GET list
@@ -45,19 +45,19 @@ class TestUsersByCampaignsApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]["id"] == ubc_1_id
+            assert ret_val[0]["id"] == ubug_1_id
 
             # GET by id
-            ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubc_1_id}")
+            ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubug_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == ubc_1_etag
+            assert ret.headers["ETag"] == ubug_1_etag
 
             # POST
-            ubc_2 = {"user_group_id": ug_2_id, "user_id": user_2_id}
-            ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubc_2)
+            ubug_2 = {"user_group_id": ug_2_id, "user_id": user_2_id}
+            ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubug_2)
             assert ret.status_code == 201
             ret_val = ret.json
-            ubc_2_id = ret_val.pop("id")
+            ubug_2_id = ret_val.pop("id")
 
             # GET list (filtered)
             ret = client.get(
@@ -66,7 +66,7 @@ class TestUsersByCampaignsApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]["id"] == ubc_1_id
+            assert ret_val[0]["id"] == ubug_1_id
             assert ret_val[0]["user_id"] == user_1_id
             assert ret_val[0]["user_group_id"] == ug_1_id
             ret = client.get(
@@ -75,7 +75,7 @@ class TestUsersByCampaignsApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]["id"] == ubc_2_id
+            assert ret_val[0]["id"] == ubug_2_id
             assert ret_val[0]["user_id"] == user_2_id
             assert ret_val[0]["user_group_id"] == ug_2_id
             ret = client.get(
@@ -90,26 +90,29 @@ class TestUsersByCampaignsApi:
             ret = client.delete(f"{USERS_BY_USER_GROUPS_URL}{DUMMY_ID}")
             assert ret.status_code == 404
 
-            # DELETE user violating fkey constraint
+            # DELETE
+            ubug_3 = {"user_group_id": ug_1_id, "user_id": user_2_id}
+            ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubug_3)
+            ret_val = ret.json
+            ubug_3_id = ret_val.pop("id")
+            assert ret.status_code == 201
+            ret = client.delete(f"{USERS_BY_USER_GROUPS_URL}{ubug_3_id}")
+            assert ret.status_code == 204
+
+            # DELETE user cascade
             ret = client.get(f"{USERS_URL}{user_1_id}")
             user_1_etag = ret.headers["ETag"]
             ret = client.delete(
                 f"{USERS_URL}{user_1_id}", headers={"If-Match": user_1_etag}
             )
-            assert ret.status_code == 409
-
-            # DELETE user_group violating fkey constraint
-            ret = client.get(f"{USER_GROUPS_URL}{ug_1_id}")
-            ug_1_etag = ret.headers["ETag"]
-            ret = client.delete(
-                f"{USER_GROUPS_URL}{ug_1_id}", headers={"If-Match": ug_1_etag}
-            )
-            assert ret.status_code == 409
-
-            # DELETE
-            ret = client.delete(f"{USERS_BY_USER_GROUPS_URL}{ubc_1_id}")
             assert ret.status_code == 204
-            ret = client.delete(f"{USERS_BY_USER_GROUPS_URL}{ubc_2_id}")
+
+            # DELETE user_group cascade
+            ret = client.get(f"{USER_GROUPS_URL}{ug_2_id}")
+            ug_2_etag = ret.headers["ETag"]
+            ret = client.delete(
+                f"{USER_GROUPS_URL}{ug_2_id}", headers={"If-Match": ug_2_etag}
+            )
             assert ret.status_code == 204
 
             # GET list
@@ -119,7 +122,7 @@ class TestUsersByCampaignsApi:
             assert len(ret_val) == 0
 
             # GET by id -> 404
-            ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubc_1_id}")
+            ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubug_1_id}")
             assert ret.status_code == 404
 
     def test_users_by_user_groups_as_user_api(
@@ -131,8 +134,8 @@ class TestUsersByCampaignsApi:
         user_2_id = users["Inactive"]["id"]
         ug_1_id = user_groups[0]
         ug_2_id = user_groups[1]
-        ubc_1_id = users_by_user_groups[0]
-        ubc_2_id = users_by_user_groups[1]
+        ubug_1_id = users_by_user_groups[0]
+        ubug_2_id = users_by_user_groups[1]
 
         client = app.test_client()
 
@@ -143,18 +146,18 @@ class TestUsersByCampaignsApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            ubc_1 = ret_val[0]
-            assert ubc_1["id"] == ubc_1_id
+            ubug_1 = ret_val[0]
+            assert ubug_1["id"] == ubug_1_id
 
             # POST
-            ubc_3 = {"user_group_id": ug_1_id, "user_id": user_1_id}
-            ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubc_3)
+            ubug_3 = {"user_group_id": ug_1_id, "user_id": user_1_id}
+            ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubug_3)
             assert ret.status_code == 403
 
             # GET by id
-            ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubc_1_id}")
+            ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubug_1_id}")
             assert ret.status_code == 200
-            ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubc_2_id}")
+            ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubug_2_id}")
             assert ret.status_code == 403
 
             # GET list (filtered)
@@ -164,7 +167,7 @@ class TestUsersByCampaignsApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]["id"] == ubc_1_id
+            assert ret_val[0]["id"] == ubug_1_id
             assert ret_val[0]["user_id"] == user_1_id
             assert ret_val[0]["user_group_id"] == ug_1_id
             ret = client.get(
@@ -181,7 +184,7 @@ class TestUsersByCampaignsApi:
             assert len(ret_val) == 0
 
             # DELETE
-            ret = client.delete(f"{USERS_BY_USER_GROUPS_URL}{ubc_1_id}")
+            ret = client.delete(f"{USERS_BY_USER_GROUPS_URL}{ubug_1_id}")
             assert ret.status_code == 403
 
     def test_users_by_user_groups_as_anonym_api(
@@ -190,7 +193,7 @@ class TestUsersByCampaignsApi:
 
         user_1_id = users["Active"]["id"]
         ug_1_id = user_groups[0]
-        ubc_1_id = users_by_user_groups[0]
+        ubug_1_id = users_by_user_groups[0]
 
         client = app.test_client()
 
@@ -199,14 +202,14 @@ class TestUsersByCampaignsApi:
         assert ret.status_code == 401
 
         # POST
-        ubc_1 = {"user_group_id": ug_1_id, "user_id": user_1_id}
-        ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubc_1)
+        ubug_1 = {"user_group_id": ug_1_id, "user_id": user_1_id}
+        ret = client.post(USERS_BY_USER_GROUPS_URL, json=ubug_1)
         assert ret.status_code == 401
 
         # GET by id
-        ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubc_1_id}")
+        ret = client.get(f"{USERS_BY_USER_GROUPS_URL}{ubug_1_id}")
         assert ret.status_code == 401
 
         # DELETE
-        ret = client.delete(f"{USERS_BY_USER_GROUPS_URL}{ubc_1_id}")
+        ret = client.delete(f"{USERS_BY_USER_GROUPS_URL}{ubug_1_id}")
         assert ret.status_code == 401

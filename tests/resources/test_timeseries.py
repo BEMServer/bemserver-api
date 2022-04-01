@@ -7,15 +7,18 @@ from tests.common import AuthHeader
 DUMMY_ID = "69"
 
 TIMESERIES_URL = "/timeseries/"
+CAMPAIGNS_URL = "/campaigns/"
+CAMPAIGN_SCOPES_URL = "/campaign_scopes/"
 
 
 class TestTimeseriesApi:
     def test_timeseries_api(self, app, users, campaigns, campaign_scopes):
 
         creds = users["Chuck"]["creds"]
-        campaign_1 = campaigns[0]
-        cs_1 = campaign_scopes[0]
-        cs_2 = campaign_scopes[1]
+        campaign_1_id = campaigns[0]
+        campaign_2_id = campaigns[1]
+        cs_1_id = campaign_scopes[0]
+        cs_2_id = campaign_scopes[1]
 
         client = app.test_client()
 
@@ -30,8 +33,8 @@ class TestTimeseriesApi:
             timeseries_1 = {
                 "name": "Timeseries 1",
                 "description": "Timeseries example 1",
-                "campaign_id": campaign_1,
-                "campaign_scope_id": cs_1,
+                "campaign_id": campaign_1_id,
+                "campaign_scope_id": cs_1_id,
             }
             ret = client.post(TIMESERIES_URL, json=timeseries_1)
             assert ret.status_code == 201
@@ -86,13 +89,11 @@ class TestTimeseriesApi:
             # POST TS 2
             timeseries_2 = {
                 "name": "Timeseries 2",
-                "campaign_id": campaign_1,
-                "campaign_scope_id": cs_2,
+                "campaign_id": campaign_1_id,
+                "campaign_scope_id": cs_2_id,
             }
             ret = client.post(TIMESERIES_URL, json=timeseries_2)
             ret_val = ret.json
-            timeseries_2_id = ret_val.pop("id")
-            timeseries_2_etag = ret.headers["ETag"]
 
             # PUT violating unique constraint
             timeseries_1_put["name"] = timeseries_2["name"]
@@ -104,15 +105,38 @@ class TestTimeseriesApi:
             assert ret.status_code == 409
 
             # DELETE
+            timeseries_3 = {
+                "name": "Timeseries 3",
+                "description": "Timeseries example 3",
+                "campaign_id": campaign_2_id,
+                "campaign_scope_id": cs_1_id,
+            }
+            ret = client.post(TIMESERIES_URL, json=timeseries_3)
+            ret_val = ret.json
+            assert ret.status_code == 201
+            timeseries_3_id = ret_val.pop("id")
+            timeseries_3_etag = ret.headers["ETag"]
             ret = client.delete(
-                f"{TIMESERIES_URL}{timeseries_1_id}",
-                headers={"If-Match": timeseries_1_etag},
+                f"{TIMESERIES_URL}{timeseries_3_id}",
+                headers={"If-Match": timeseries_3_etag},
             )
             assert ret.status_code == 204
+
+            # DELETE campaign scope cascade
+            ret = client.get(f"{CAMPAIGN_SCOPES_URL}{cs_1_id}")
+            cs_1_etag = ret.headers["ETag"]
             ret = client.delete(
-                f"{TIMESERIES_URL}{timeseries_2_id}",
-                headers={"If-Match": timeseries_2_etag},
+                f"{CAMPAIGN_SCOPES_URL}{cs_1_id}", headers={"If-Match": cs_1_etag}
             )
+            assert ret.status_code == 204
+
+            # DELETE campaign cascade
+            ret = client.get(f"{CAMPAIGNS_URL}{campaign_2_id}")
+            campaign_2_etag = ret.headers["ETag"]
+            ret = client.delete(
+                f"{CAMPAIGNS_URL}{campaign_2_id}", headers={"If-Match": campaign_2_etag}
+            )
+            assert ret.status_code == 204
 
             # GET list
             ret = client.get(TIMESERIES_URL)
@@ -129,8 +153,8 @@ class TestTimeseriesApi:
         self, app, users, timeseries, campaigns, campaign_scopes
     ):
 
-        campaign_1 = campaigns[0]
-        cs_1 = campaign_scopes[0]
+        campaign_1_id = campaigns[0]
+        cs_1_id = campaign_scopes[0]
         timeseries_1_id = timeseries[0]
         timeseries_2_id = timeseries[1]
 
@@ -145,15 +169,15 @@ class TestTimeseriesApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]["campaign_id"] == campaign_1
-            assert ret_val[0]["campaign_scope_id"] == cs_1
+            assert ret_val[0]["campaign_id"] == campaign_1_id
+            assert ret_val[0]["campaign_scope_id"] == cs_1_id
 
             # POST
             timeseries_1 = {
                 "name": "Timeseries 1",
                 "description": "Timeseries example 1",
-                "campaign_id": campaign_1,
-                "campaign_scope_id": cs_1,
+                "campaign_id": campaign_1_id,
+                "campaign_scope_id": cs_1_id,
             }
             ret = client.post(TIMESERIES_URL, json=timeseries_1)
             assert ret.status_code == 403
@@ -191,8 +215,8 @@ class TestTimeseriesApi:
         self, app, users, timeseries, campaigns, campaign_scopes
     ):
 
-        campaign_1 = campaigns[0]
-        cs_1 = campaign_scopes[0]
+        campaign_1_id = campaigns[0]
+        cs_1_id = campaign_scopes[0]
         timeseries_1_id = timeseries[0]
 
         client = app.test_client()
@@ -205,8 +229,8 @@ class TestTimeseriesApi:
         timeseries_1 = {
             "name": "Timeseries 1",
             "description": "Timeseries example 1",
-            "campaign_id": campaign_1,
-            "campaign_scope_id": cs_1,
+            "campaign_id": campaign_1_id,
+            "campaign_scope_id": cs_1_id,
         }
         ret = client.post(TIMESERIES_URL, json=timeseries_1)
         assert ret.status_code == 401

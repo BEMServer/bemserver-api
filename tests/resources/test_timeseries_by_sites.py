@@ -7,6 +7,7 @@ from tests.common import AuthHeader
 DUMMY_ID = "69"
 
 TIMESERIES_BY_SITES_URL = "/timeseries_by_sites/"
+SITES_URL = "/sites/"
 
 
 class TestTimeseriesBySiteApi:
@@ -122,12 +123,20 @@ class TestTimeseriesBySiteApi:
             )
             assert ret.status_code == 404
 
+            # DELETE site cascade
+            ret = client.get(f"{SITES_URL}{site_1_id}")
+            site_1_etag = ret.headers["ETag"]
+            ret = client.delete(
+                f"{SITES_URL}{site_1_id}", headers={"If-Match": site_1_etag}
+            )
+            assert ret.status_code == 204
+
             # DELETE
             ret = client.delete(
                 f"{TIMESERIES_BY_SITES_URL}{tbs_1_id}",
                 headers={"If-Match": tbs_1_etag},
             )
-            assert ret.status_code == 204
+            assert ret.status_code == 404
             ret = client.delete(
                 f"{TIMESERIES_BY_SITES_URL}{tbs_2_id}",
                 headers={"If-Match": tbs_2_etag},
