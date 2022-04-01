@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Space
 
-from bemserver_api import AutoSchema, Schema
+from bemserver_api import AutoSchema, Schema, SortField
 
 
 class SpaceSchema(AutoSchema):
@@ -23,6 +23,7 @@ class SpacePutSchema(SpaceSchema):
 
 
 class SpaceQueryArgsSchema(Schema):
+    sort = SortField(("name",))
     name = ma.fields.Str()
     storey_id = ma.fields.Int()
     ifc_id = ma.fields.String()

@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import CampaignScope
 
-from bemserver_api import AutoSchema, Schema
+from bemserver_api import AutoSchema, Schema, SortField
 
 
 class CampaignScopeSchema(AutoSchema):
@@ -23,4 +23,5 @@ class CampaignScopePutSchema(CampaignScopeSchema):
 
 
 class CampaignScopeQueryArgsSchema(Schema):
+    sort = SortField(("name",))
     name = ma.fields.Str()

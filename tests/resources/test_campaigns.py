@@ -119,6 +119,26 @@ class TestCampaignsApi:
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == campaign_1_id
 
+            # GET sorted list
+            ret = client.get(CAMPAIGNS_URL, query_string={"sort": "name"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            assert ret_val[0]["id"] == campaign_1_id
+            assert ret_val[1]["id"] == campaign_2_id
+            ret = client.get(CAMPAIGNS_URL, query_string={"sort": "+name"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            assert ret_val[0]["id"] == campaign_1_id
+            assert ret_val[1]["id"] == campaign_2_id
+            ret = client.get(CAMPAIGNS_URL, query_string={"sort": "-name"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            assert ret_val[0]["id"] == campaign_2_id
+            assert ret_val[1]["id"] == campaign_1_id
+
             # DELETE wrong ID -> 404
             ret = client.delete(
                 f"{CAMPAIGNS_URL}{DUMMY_ID}", headers={"If-Match": campaign_1_etag}

@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Zone
 
-from bemserver_api import AutoSchema, Schema
+from bemserver_api import AutoSchema, Schema, SortField
 
 
 class ZoneSchema(AutoSchema):
@@ -23,6 +23,7 @@ class ZonePutSchema(ZoneSchema):
 
 
 class ZoneQueryArgsSchema(Schema):
+    sort = SortField(("name",))
     name = ma.fields.Str()
     campaign_id = ma.fields.Int()
     ifc_id = ma.fields.String()
