@@ -7,6 +7,7 @@ from tests.common import AuthHeader
 DUMMY_ID = "69"
 
 SPACE_PROPERTY_DATA_URL = "/space_property_data/"
+SPACES_URL = "/spaces/"
 
 
 class TestSpacePropertyDataApi:
@@ -124,12 +125,20 @@ class TestSpacePropertyDataApi:
             )
             assert ret.status_code == 404
 
+            # DELETE space cascade
+            ret = client.get(f"{SPACES_URL}{space_1_id}")
+            space_1_etag = ret.headers["ETag"]
+            ret = client.delete(
+                f"{SPACES_URL}{space_1_id}", headers={"If-Match": space_1_etag}
+            )
+            assert ret.status_code == 204
+
             # DELETE
             ret = client.delete(
                 f"{SPACE_PROPERTY_DATA_URL}{spd_1_id}",
                 headers={"If-Match": spd_1_etag},
             )
-            assert ret.status_code == 204
+            assert ret.status_code == 404
             ret = client.delete(
                 f"{SPACE_PROPERTY_DATA_URL}{spd_2_id}",
                 headers={"If-Match": spd_2_etag},

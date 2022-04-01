@@ -7,6 +7,7 @@ from tests.common import AuthHeader
 DUMMY_ID = "69"
 
 CAMPAIGN_SCOPES_URL = "/campaign_scopes/"
+CAMPAIGNS_URL = "/campaigns/"
 
 
 class TestCampaignScopesApi:
@@ -14,6 +15,7 @@ class TestCampaignScopesApi:
 
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
+        campaign_2_id = campaigns[1]
 
         client = app.test_client()
 
@@ -81,7 +83,7 @@ class TestCampaignScopesApi:
             # POST campaign_scope 2
             cs_2 = {
                 "name": "Campaign scope 2",
-                "campaign_id": campaign_1_id,
+                "campaign_id": campaign_2_id,
             }
             ret = client.post(CAMPAIGN_SCOPES_URL, json=cs_2)
             ret_val = ret.json
@@ -118,11 +120,15 @@ class TestCampaignScopesApi:
             )
             assert ret.status_code == 404
 
-            # DELETE
+            # DELETE campaign cascade
+            ret = client.get(f"{CAMPAIGNS_URL}{campaign_1_id}")
+            campaign_1_etag = ret.headers["ETag"]
             ret = client.delete(
-                f"{CAMPAIGN_SCOPES_URL}{cs_1_id}", headers={"If-Match": cs_1_etag}
+                f"{CAMPAIGNS_URL}{campaign_1_id}", headers={"If-Match": campaign_1_etag}
             )
             assert ret.status_code == 204
+
+            # DELETE
             ret = client.delete(
                 f"{CAMPAIGN_SCOPES_URL}{cs_2_id}", headers={"If-Match": cs_2_etag}
             )

@@ -93,26 +93,29 @@ class TestUsersByCampaignsApi:
             ret = client.delete(f"{USER_GROUPS_BY_CAMPAIGNS_URL}{DUMMY_ID}")
             assert ret.status_code == 404
 
-            # DELETE user group violating fkey constraint
+            # DELETE
+            ugbc_3 = {"campaign_id": campaign_1_id, "user_group_id": ug_2_id}
+            ret = client.post(USER_GROUPS_BY_CAMPAIGNS_URL, json=ugbc_3)
+            ret_val = ret.json
+            ugbc_3_id = ret_val.pop("id")
+            assert ret.status_code == 201
+            ret = client.delete(f"{USER_GROUPS_BY_CAMPAIGNS_URL}{ugbc_3_id}")
+            assert ret.status_code == 204
+
+            # DELETE user group cascade
             ret = client.get(f"{USER_GROUPS_URL}{ug_1_id}")
             ug_1_etag = ret.headers["ETag"]
             ret = client.delete(
                 f"{USER_GROUPS_URL}{ug_1_id}", headers={"If-Match": ug_1_etag}
             )
-            assert ret.status_code == 409
-
-            # DELETE campaign violating fkey constraint
-            ret = client.get(f"{CAMPAIGNS_URL}{campaign_1_id}")
-            campaign_1_etag = ret.headers["ETag"]
-            ret = client.delete(
-                f"{CAMPAIGNS_URL}{campaign_1_id}", headers={"If-Match": campaign_1_etag}
-            )
-            assert ret.status_code == 409
-
-            # DELETE
-            ret = client.delete(f"{USER_GROUPS_BY_CAMPAIGNS_URL}{ugbc_1_id}")
             assert ret.status_code == 204
-            ret = client.delete(f"{USER_GROUPS_BY_CAMPAIGNS_URL}{ugbc_2_id}")
+
+            # DELETE campaign cascade
+            ret = client.get(f"{CAMPAIGNS_URL}{campaign_2_id}")
+            campaign_2_etag = ret.headers["ETag"]
+            ret = client.delete(
+                f"{CAMPAIGNS_URL}{campaign_2_id}", headers={"If-Match": campaign_2_etag}
+            )
             assert ret.status_code == 204
 
             # GET list

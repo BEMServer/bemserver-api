@@ -7,6 +7,7 @@ from tests.common import AuthHeader
 DUMMY_ID = "69"
 
 BUILDING_PROPERTY_DATA_URL = "/building_property_data/"
+BUILDINGS_URL = "/buildings/"
 
 
 class TestBuildingPropertyDataApi:
@@ -126,12 +127,20 @@ class TestBuildingPropertyDataApi:
             )
             assert ret.status_code == 404
 
+            # DELETE building cascade
+            ret = client.get(f"{BUILDINGS_URL}{building_1_id}")
+            building_1_etag = ret.headers["ETag"]
+            ret = client.delete(
+                f"{BUILDINGS_URL}{building_1_id}", headers={"If-Match": building_1_etag}
+            )
+            assert ret.status_code == 204
+
             # DELETE
             ret = client.delete(
                 f"{BUILDING_PROPERTY_DATA_URL}{bpd_1_id}",
                 headers={"If-Match": bpd_1_etag},
             )
-            assert ret.status_code == 204
+            assert ret.status_code == 404
             ret = client.delete(
                 f"{BUILDING_PROPERTY_DATA_URL}{bpd_2_id}",
                 headers={"If-Match": bpd_2_etag},
