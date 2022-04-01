@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import UserGroup
 
-from bemserver_api import AutoSchema, Schema
+from bemserver_api import AutoSchema, Schema, SortField
 
 
 class UserGroupSchema(AutoSchema):
@@ -16,4 +16,5 @@ class UserGroupSchema(AutoSchema):
 
 
 class UserGroupQueryArgsSchema(Schema):
+    sort = SortField(("name",))
     name = ma.fields.Str()

@@ -5,7 +5,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Event
 
-from bemserver_api import AutoSchema, Schema
+from bemserver_api import AutoSchema, Schema, SortField
 
 
 class EventSchema(AutoSchema):
@@ -24,9 +24,11 @@ class EventPutSchema(EventSchema):
 
 
 class EventQueryArgsSchema(Schema):
+    sort = SortField(("timestamp",))
     campaign_scope_id = ma.fields.Integer()
     source = ma.fields.Str()
     category = ma.fields.Str()
     level = ma.fields.Str()
     state = ma.fields.Str()
-    # TODO: timestamp min/max
+    timestamp_min = ma.fields.AwareDateTime()
+    timestamp_max = ma.fields.AwareDateTime()

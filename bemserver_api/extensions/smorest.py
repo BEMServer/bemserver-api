@@ -5,6 +5,7 @@ import http
 
 import marshmallow as ma
 import flask_smorest
+from webargs.fields import DelimitedList
 import marshmallow_sqlalchemy as msa
 
 from .ma_fields import Timezone
@@ -111,3 +112,18 @@ class SQLCursorPage(flask_smorest.Page):
     @property
     def item_count(self):
         return self.collection.count()
+
+
+class SortField(DelimitedList):
+    """Field used to specify sort order fields
+
+    :param list fields: List of fields to sort upon, by order of priority (the
+    first field is the first sort key). Each field is a field name, optionally
+    prefixed with "+" or "-".
+    """
+
+    def __init__(self, fields, **kwargs):
+        validator = ma.validate.OneOf(
+            [v for f in fields for v in [f, f"+{f}", f"-{f}"]]
+        )
+        super().__init__(ma.fields.String(validate=validator), **kwargs)

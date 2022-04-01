@@ -191,6 +191,26 @@ class TestEventsApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 0
+            ret = client.get(EVENTS_URL, query_string={"timestamp_min": c2_et})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(EVENTS_URL, query_string={"timestamp_max": c1_st})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+
+            # GET sorted list
+            ret = client.get(EVENTS_URL, query_string={"sort": "timestamp"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            assert ret_val[0]["id"] == tse_1_id
+            ret = client.get(EVENTS_URL, query_string={"sort": "-timestamp"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            assert ret_val[0]["id"] == tse_2_id
 
             # DELETE wrong ID -> 404
             # ETag is wrong but we get rejected before ETag check anyway

@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Timeseries
 
-from bemserver_api import AutoSchema, Schema
+from bemserver_api import AutoSchema, Schema, SortField
 
 
 class TimeseriesSchema(AutoSchema):
@@ -25,6 +25,7 @@ class TimeseriesPutSchema(TimeseriesSchema):
 
 
 class TimeseriesQueryArgsSchema(Schema):
+    sort = SortField(("name",))
     name = ma.fields.Str()
     unit_symbol = ma.fields.Str()
     campaign_id = ma.fields.Int()
