@@ -29,4 +29,5 @@ class TimeseriesQueryArgsSchema(Schema):
     name = ma.fields.Str()
     unit_symbol = ma.fields.Str()
     campaign_id = ma.fields.Int()
+    campaign_scope_id = ma.fields.Int()
     user_id = ma.fields.Int()
