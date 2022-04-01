@@ -1,6 +1,5 @@
 """Event levels API schemas"""
 
-import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import EventLevel
@@ -13,4 +12,3 @@ class EventLevelSchema(AutoSchema):
         table = EventLevel.__table__
 
     id = msa.auto_field(dump_only=True)
-    description = msa.auto_field(validate=ma.validate.Length(1, 250))
