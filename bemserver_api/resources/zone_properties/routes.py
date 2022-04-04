@@ -57,7 +57,6 @@ class ZonePropertyByIdViews(MethodView):
 
     @blp.login_required
     @blp.response(204)
-    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a zone property"""
         item = ZoneProperty.get_by_id(item_id)

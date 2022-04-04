@@ -57,7 +57,6 @@ class SitePropertyByIdViews(MethodView):
 
     @blp.login_required
     @blp.response(204)
-    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a site property"""
         item = SiteProperty.get_by_id(item_id)
