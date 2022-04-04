@@ -57,7 +57,6 @@ class StoreyPropertyByIdViews(MethodView):
 
     @blp.login_required
     @blp.response(204)
-    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a storey property"""
         item = StoreyProperty.get_by_id(item_id)

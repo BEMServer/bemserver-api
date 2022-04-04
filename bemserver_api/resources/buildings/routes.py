@@ -67,7 +67,6 @@ class BuildingByIdViews(MethodView):
     @blp.login_required
     @blp.etag
     @blp.response(204)
-    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a building"""
         item = Building.get_by_id(item_id)

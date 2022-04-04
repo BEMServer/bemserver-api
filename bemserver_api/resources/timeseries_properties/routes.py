@@ -69,7 +69,6 @@ class TimeseriesPropertyByIdViews(MethodView):
     @blp.login_required
     @blp.etag
     @blp.response(204)
-    @blp.catch_integrity_error
     def delete(self, item_id):
         """Delete a timeseries"""
         item = TimeseriesProperty.get_by_id(item_id)
