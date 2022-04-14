@@ -32,6 +32,8 @@ class TestCampaignsApi:
             ret_val = ret.json
             building_p_1_id = ret_val.pop("id")
             building_p_1_etag = ret.headers["ETag"]
+            sep = ret_val.pop("structural_element_property")
+            assert sep == {"name": "Surface"}
             assert ret_val == building_p_1
 
             # POST violating unique constraint
@@ -51,6 +53,7 @@ class TestCampaignsApi:
             assert ret.headers["ETag"] == building_p_1_etag
             ret_val = ret.json
             ret_val.pop("id")
+            ret_val.pop("structural_element_property")
             assert ret_val == building_p_1
 
             # POST sep 2
