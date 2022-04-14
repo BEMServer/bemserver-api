@@ -32,6 +32,8 @@ class TestZonePropertiesApi:
             ret_val = ret.json
             zone_p_1_id = ret_val.pop("id")
             zone_p_1_etag = ret.headers["ETag"]
+            sep = ret_val.pop("structural_element_property")
+            assert sep == {"name": "Surface"}
             assert ret_val == zone_p_1
 
             # POST violating unique constraint
@@ -51,6 +53,7 @@ class TestZonePropertiesApi:
             assert ret.headers["ETag"] == zone_p_1_etag
             ret_val = ret.json
             ret_val.pop("id")
+            ret_val.pop("structural_element_property")
             assert ret_val == zone_p_1
 
             # POST sep 2
