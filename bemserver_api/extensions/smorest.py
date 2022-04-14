@@ -6,6 +6,8 @@ import http
 import marshmallow as ma
 import flask_smorest
 from webargs.fields import DelimitedList
+from apispec.ext.marshmallow import MarshmallowPlugin
+from apispec.ext.marshmallow.common import resolve_schema_cls
 import marshmallow_sqlalchemy as msa
 
 from .ma_fields import Timezone
@@ -13,8 +15,27 @@ from .authentication import auth
 from . import integrity_error
 
 
+def resolver(schema):
+    # This is the default name resolver from apispec
+    schema_cls = resolve_schema_cls(schema)
+    name = schema_cls.__name__
+    if name.endswith("Schema"):
+        name = name[:-6] or name
+    # Except it appends ExcludeId to schemas where id is excluded.
+    if isinstance(schema, ma.Schema) and "id" in schema.exclude:
+        name = f"{name}ExcludeId"
+    return name
+
+
 class Api(flask_smorest.Api):
     """Api class"""
+
+    def __init__(self, app=None, *, spec_kwargs=None):
+        spec_kwargs = spec_kwargs or {}
+        spec_kwargs["marshmallow_plugin"] = MarshmallowPlugin(
+            schema_name_resolver=resolver
+        )
+        super().__init__(app=app, spec_kwargs=spec_kwargs)
 
     def init_app(self, app, *, spec_kwargs=None):
         super().init_app(app, spec_kwargs=spec_kwargs)
