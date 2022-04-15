@@ -61,7 +61,7 @@ class TimeseriesByZoneByIdViews(MethodView):
     @blp.response(200, TimeseriesByZoneSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Get an exsiting timeseries x zone association by ID"""
+        """Update an existing timeseries x zone association"""
         item = TimeseriesByZone.get_by_id(item_id)
         if item is None:
             abort(404)

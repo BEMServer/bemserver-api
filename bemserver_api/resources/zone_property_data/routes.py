@@ -61,7 +61,7 @@ class ZonePropertyDataByIdViews(MethodView):
     @blp.response(200, ZonePropertyDataSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Get an exsiting zone property data by ID"""
+        """Update an existing zone property data"""
         item = ZonePropertyData.get_by_id(item_id)
         if item is None:
             abort(404)

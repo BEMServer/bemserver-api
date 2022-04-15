@@ -61,7 +61,7 @@ class TimeseriesByStoreyByIdViews(MethodView):
     @blp.response(200, TimeseriesByStoreySchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Get an exsiting timeseries x storey association by ID"""
+        """Update an existing timeseries x storey association"""
         item = TimeseriesByStorey.get_by_id(item_id)
         if item is None:
             abort(404)

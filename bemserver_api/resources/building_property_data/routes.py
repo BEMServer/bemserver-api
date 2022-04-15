@@ -61,7 +61,7 @@ class BuildingPropertyDataByIdViews(MethodView):
     @blp.response(200, BuildingPropertyDataSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Get an exsiting building property data by ID"""
+        """Update an existing building property data"""
         item = BuildingPropertyData.get_by_id(item_id)
         if item is None:
             abort(404)

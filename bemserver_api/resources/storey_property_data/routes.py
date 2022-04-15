@@ -61,7 +61,7 @@ class StoreyPropertyDataByIdViews(MethodView):
     @blp.response(200, StoreyPropertyDataSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Get an exsiting storey property data by ID"""
+        """Update an existing storey property data"""
         item = StoreyPropertyData.get_by_id(item_id)
         if item is None:
             abort(404)

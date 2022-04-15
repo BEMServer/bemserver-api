@@ -61,7 +61,7 @@ class SitePropertyDataByIdViews(MethodView):
     @blp.response(200, SitePropertyDataSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Get an exsiting site property data by ID"""
+        """Update an existing site property data"""
         item = SitePropertyData.get_by_id(item_id)
         if item is None:
             abort(404)

@@ -61,7 +61,7 @@ class SpacePropertyDataByIdViews(MethodView):
     @blp.response(200, SpacePropertyDataSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Get an exsiting space property data by ID"""
+        """Update an existing space property data"""
         item = SpacePropertyData.get_by_id(item_id)
         if item is None:
             abort(404)
