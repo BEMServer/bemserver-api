@@ -10,9 +10,12 @@ SPACES_URL = "/spaces/"
 
 
 class TestSpacesApi:
-    def test_spaces_api(self, app, users, storeys):
+    def test_spaces_api(self, app, users, campaigns, sites, buildings, storeys):
 
         creds = users["Chuck"]["creds"]
+        campaign_1_id = campaigns[0]
+        site_1_id = sites[0]
+        building_1_id = buildings[0]
         storey_1_id = storeys[0]
         storey_2_id = storeys[1]
 
@@ -106,6 +109,21 @@ class TestSpacesApi:
 
             # GET list with filters
             ret = client.get(SPACES_URL, query_string={"name": "Space 1"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == space_1_id
+            ret = client.get(SPACES_URL, query_string={"campaign_id": campaign_1_id})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == space_1_id
+            ret = client.get(SPACES_URL, query_string={"site_id": site_1_id})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == space_1_id
+            ret = client.get(SPACES_URL, query_string={"building_id": building_1_id})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1

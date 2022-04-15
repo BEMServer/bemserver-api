@@ -25,5 +25,8 @@ class SpacePutSchema(SpaceSchema):
 class SpaceQueryArgsSchema(Schema):
     sort = SortField(("name",))
     name = ma.fields.Str()
+    campaign_id = ma.fields.Int()
+    site_id = ma.fields.Int()
+    building_id = ma.fields.Int()
     storey_id = ma.fields.Int()
     ifc_id = ma.fields.String()
