@@ -25,5 +25,6 @@ class BuildingPutSchema(BuildingSchema):
 class BuildingQueryArgsSchema(Schema):
     sort = SortField(("name",))
     name = ma.fields.Str()
+    campaign_id = ma.fields.Int()
     site_id = ma.fields.Int()
     ifc_id = ma.fields.String()
