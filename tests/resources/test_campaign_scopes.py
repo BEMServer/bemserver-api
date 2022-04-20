@@ -107,7 +107,7 @@ class TestCampaignScopesApi:
 
             # GET list with filters
             ret = client.get(
-                CAMPAIGN_SCOPES_URL, query_string={"name": "Campaign scope 1"}
+                CAMPAIGN_SCOPES_URL, query_string={"campaign_id": campaign_1_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json

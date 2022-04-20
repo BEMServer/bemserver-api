@@ -25,3 +25,4 @@ class CampaignScopePutSchema(CampaignScopeSchema):
 class CampaignScopeQueryArgsSchema(Schema):
     sort = SortField(("name",))
     name = ma.fields.Str()
+    campaign_id = ma.fields.Int()
