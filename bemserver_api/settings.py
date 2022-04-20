@@ -21,3 +21,6 @@ class Config:
         "show-header": "false",
         "render-style": "focused",
     }
+
+    # Plugins
+    PLUGINS = []

@@ -1,4 +1,6 @@
 """BEMServer API"""
+import importlib
+
 import flask
 
 from bemserver_core import BEMServerCore
@@ -34,6 +36,15 @@ def create_app(config_override=None):
     register_blueprints(api)
 
     bsc = BEMServerCore()
+    for path in app.config["PLUGINS"]:
+        mod, cls = path.rsplit(".", 1)
+        plugin = getattr(importlib.import_module(mod), cls)()
+        # Load plugin in BEMServer core
+        bsc.load_plugin(plugin)
+        # Register plugin API blueprint (if any)
+        blp = plugin.API_BLUEPRINT
+        if blp is not None:
+            api.register_blueprint(blp, url_prefix=f"/plugins{blp.url_prefix}")
     bsc.init_auth()
 
     return app
