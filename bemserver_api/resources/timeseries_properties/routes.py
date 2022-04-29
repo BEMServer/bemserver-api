@@ -20,7 +20,7 @@ blp = Blueprint(
 
 
 @blp.route("/")
-class TimeseriesPropertysViews(MethodView):
+class TimeseriesPropertiesViews(MethodView):
     @blp.login_required
     @blp.response(200, TimeseriesPropertySchema(many=True))
     def get(self):
@@ -33,7 +33,7 @@ class TimeseriesPropertysViews(MethodView):
     @blp.response(201, TimeseriesPropertySchema)
     @blp.catch_integrity_error
     def post(self, new_item):
-        """Add a new timeseries"""
+        """Add a new timeseries property"""
         item = TimeseriesProperty.new(**new_item)
         db.session.commit()
         return item
@@ -45,7 +45,7 @@ class TimeseriesPropertyByIdViews(MethodView):
     @blp.etag
     @blp.response(200, TimeseriesPropertySchema)
     def get(self, item_id):
-        """Get timeseries by ID"""
+        """Get timeseries property by ID"""
         item = TimeseriesProperty.get_by_id(item_id)
         if item is None:
             abort(404)
@@ -57,7 +57,7 @@ class TimeseriesPropertyByIdViews(MethodView):
     @blp.response(200, TimeseriesPropertySchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Update an existing timeseries"""
+        """Update an existing timeseries property"""
         item = TimeseriesProperty.get_by_id(item_id)
         if item is None:
             abort(404)
@@ -70,7 +70,7 @@ class TimeseriesPropertyByIdViews(MethodView):
     @blp.etag
     @blp.response(204)
     def delete(self, item_id):
-        """Delete a timeseries"""
+        """Delete a timeseries property"""
         item = TimeseriesProperty.get_by_id(item_id)
         if item is None:
             abort(404)
