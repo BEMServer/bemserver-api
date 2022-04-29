@@ -2,12 +2,12 @@
 import base64
 import datetime as dt
 
+import sqlalchemy as sqla
 import flask.testing
 
 from bemserver_core.database import db
 from bemserver_core.authorization import OpenBar
 from bemserver_core import model
-from bemserver_core.testutils import setup_db
 
 import pytest
 from pytest_postgresql import factories as ppf
@@ -26,6 +26,22 @@ postgresql_proc = ppf.postgresql_proc(
 postgresql = ppf.postgresql("postgresql_proc")
 
 
+def _get_db_url(postgresql):
+    return (
+        "postgresql+psycopg2://"
+        f"{postgresql.info.user}:{postgresql.info.password}"
+        f"@{postgresql.info.host}:{postgresql.info.port}/"
+        f"{postgresql.info.dbname}"
+    )
+
+
+@pytest.fixture
+def timescale_db(postgresql):
+    with sqla.create_engine(_get_db_url(postgresql)).connect() as connection:
+        connection.execute("CREATE EXTENSION IF NOT EXISTS timescaledb;")
+    yield postgresql
+
+
 class TestClient(flask.testing.FlaskClient):
     def open(self, *args, **kwargs):
         auth_header = AUTH_HEADER.get()
@@ -34,20 +50,16 @@ class TestClient(flask.testing.FlaskClient):
         return super().open(*args, **kwargs)
 
 
-@pytest.fixture
-def database(postgresql):
-    yield from setup_db(postgresql)
-
-
 @pytest.fixture(params=(TestConfig,))
-def app(request, database):
+def app(request, timescale_db):
     class AppConfig(request.param):
-        SQLALCHEMY_DATABASE_URI = database.url
+        SQLALCHEMY_DATABASE_URI = _get_db_url(timescale_db)
 
     application = create_app(AppConfig)
     application.test_client_class = TestClient
     db.create_all()
     yield application
+    db.session.remove()
 
 
 USERS = (
