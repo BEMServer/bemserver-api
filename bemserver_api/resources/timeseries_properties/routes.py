@@ -20,7 +20,7 @@ blp = Blueprint(
 
 
 @blp.route("/")
-class TimeseriesPropertysViews(MethodView):
+class TimeseriesPropertiesViews(MethodView):
     @blp.login_required
     @blp.response(200, TimeseriesPropertySchema(many=True))
     def get(self):
