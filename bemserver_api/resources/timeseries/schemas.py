@@ -16,7 +16,7 @@ class TimeseriesSchema(AutoSchema):
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
     campaign_id = ma.fields.Int(required=True)
     campaign_scope_id = ma.fields.Int(required=True)
-    unit_symbol = msa.auto_field(validate=ma.validate.Length(1, 20))
+    unit_symbol = msa.auto_field()
 
 
 class TimeseriesPutSchema(TimeseriesSchema):

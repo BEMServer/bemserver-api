@@ -14,7 +14,7 @@ class UserSchema(AutoSchema):
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
-    email = ma.fields.Email(required=True, validate=ma.validate.Length(1, 80))
+    email = ma.fields.Email(required=True)
     password = msa.auto_field(validate=ma.validate.Length(1, 80), load_only=True)
     is_admin = ma.fields.Boolean(dump_only=True)
     is_active = ma.fields.Boolean(dump_only=True)
