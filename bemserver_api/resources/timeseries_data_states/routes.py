@@ -33,7 +33,7 @@ class TimeseriesDataStatesViews(MethodView):
     @blp.response(201, TimeseriesDataStateSchema)
     @blp.catch_integrity_error
     def post(self, new_item):
-        """Add a new timeseries"""
+        """Add a new timeseries data state"""
         item = TimeseriesDataState.new(**new_item)
         db.session.commit()
         return item
@@ -45,7 +45,7 @@ class TimeseriesDataStateByIdViews(MethodView):
     @blp.etag
     @blp.response(200, TimeseriesDataStateSchema)
     def get(self, item_id):
-        """Get timeseries by ID"""
+        """Get timeseries data state by ID"""
         item = TimeseriesDataState.get_by_id(item_id)
         if item is None:
             abort(404)
@@ -57,7 +57,7 @@ class TimeseriesDataStateByIdViews(MethodView):
     @blp.response(200, TimeseriesDataStateSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Update an existing timeseries"""
+        """Update an existing timeseries data state"""
         item = TimeseriesDataState.get_by_id(item_id)
         if item is None:
             abort(404)
@@ -70,7 +70,7 @@ class TimeseriesDataStateByIdViews(MethodView):
     @blp.etag
     @blp.response(204)
     def delete(self, item_id):
-        """Delete a timeseries"""
+        """Delete a timeseries data state"""
         item = TimeseriesDataState.get_by_id(item_id)
         if item is None:
             abort(404)
