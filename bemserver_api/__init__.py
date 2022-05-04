@@ -2,6 +2,8 @@
 import flask
 import click
 
+from bemserver_core import BEMServerCore
+
 from . import database
 from .extensions import (  # noqa
     Api,
@@ -37,6 +39,9 @@ def create_app(config_override=None):
     api = Api()
     api.init_app(app)
     register_blueprints(api)
+
+    bsc = BEMServerCore()
+    bsc.init_auth()
 
     app.cli.add_command(setup_db)
 

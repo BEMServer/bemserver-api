@@ -2,12 +2,12 @@
 import base64
 import datetime as dt
 
+import sqlalchemy as sqla
 import flask.testing
 
 from bemserver_core.database import db
 from bemserver_core.authorization import OpenBar
 from bemserver_core import model
-from bemserver_core.testutils import setup_db
 
 import pytest
 from pytest_postgresql import factories as ppf
@@ -26,6 +26,22 @@ postgresql_proc = ppf.postgresql_proc(
 postgresql = ppf.postgresql("postgresql_proc")
 
 
+def _get_db_url(postgresql):
+    return (
+        "postgresql+psycopg2://"
+        f"{postgresql.info.user}:{postgresql.info.password}"
+        f"@{postgresql.info.host}:{postgresql.info.port}/"
+        f"{postgresql.info.dbname}"
+    )
+
+
+@pytest.fixture
+def timescale_db(postgresql):
+    with sqla.create_engine(_get_db_url(postgresql)).connect() as connection:
+        connection.execute("CREATE EXTENSION IF NOT EXISTS timescaledb;")
+    yield postgresql
+
+
 class TestClient(flask.testing.FlaskClient):
     def open(self, *args, **kwargs):
         auth_header = AUTH_HEADER.get()
@@ -34,19 +50,16 @@ class TestClient(flask.testing.FlaskClient):
         return super().open(*args, **kwargs)
 
 
-@pytest.fixture
-def database(postgresql):
-    yield from setup_db(postgresql)
-
-
 @pytest.fixture(params=(TestConfig,))
-def app(request, database):
+def app(request, timescale_db):
     class AppConfig(request.param):
-        SQLALCHEMY_DATABASE_URI = database.url
+        SQLALCHEMY_DATABASE_URI = _get_db_url(timescale_db)
 
     application = create_app(AppConfig)
     application.test_client_class = TestClient
+    db.create_all()
     yield application
+    db.session.remove()
 
 
 USERS = (
@@ -57,7 +70,7 @@ USERS = (
 
 
 @pytest.fixture(params=(USERS,))
-def users(database, request):
+def users(app, request):
     with OpenBar():
         ret = {}
         for user in request.param:
@@ -77,7 +90,7 @@ def users(database, request):
 
 
 @pytest.fixture
-def user_groups(database):
+def user_groups(app):
     with OpenBar():
         user_group_1 = model.UserGroup.new(
             name="User group 1",
@@ -90,7 +103,7 @@ def user_groups(database):
 
 
 @pytest.fixture
-def users_by_user_groups(database, users, user_groups):
+def users_by_user_groups(app, users, user_groups):
     with OpenBar():
         ubug_1 = model.UserByUserGroup.new(
             user_id=users["Active"]["id"],
@@ -105,7 +118,7 @@ def users_by_user_groups(database, users, user_groups):
 
 
 @pytest.fixture
-def campaigns(database):
+def campaigns(app):
     with OpenBar():
         campaign_1 = model.Campaign.new(
             name="Campaign 1",
@@ -121,7 +134,7 @@ def campaigns(database):
 
 
 @pytest.fixture
-def campaign_scopes(database, campaigns):
+def campaign_scopes(app, campaigns):
     with OpenBar():
         cs_1 = model.CampaignScope.new(
             name="Campaign 1 - Scope 1",
@@ -136,7 +149,7 @@ def campaign_scopes(database, campaigns):
 
 
 @pytest.fixture
-def user_groups_by_campaigns(database, user_groups, campaigns):
+def user_groups_by_campaigns(app, user_groups, campaigns):
     with OpenBar():
         ugbc_1 = model.UserGroupByCampaign.new(
             user_group_id=user_groups[0],
@@ -151,7 +164,7 @@ def user_groups_by_campaigns(database, user_groups, campaigns):
 
 
 @pytest.fixture
-def user_groups_by_campaign_scopes(database, user_groups, campaign_scopes):
+def user_groups_by_campaign_scopes(app, user_groups, campaign_scopes):
     with OpenBar():
         ugbcs_1 = model.UserGroupByCampaignScope.new(
             user_group_id=user_groups[0],
@@ -166,7 +179,7 @@ def user_groups_by_campaign_scopes(database, user_groups, campaign_scopes):
 
 
 @pytest.fixture
-def timeseries_properties(database):
+def timeseries_properties(app):
     with OpenBar():
         ts_p_1 = model.TimeseriesProperty.new(
             name="Min",
@@ -179,7 +192,7 @@ def timeseries_properties(database):
 
 
 @pytest.fixture(params=[2])
-def timeseries(request, database, campaigns, campaign_scopes):
+def timeseries(request, app, campaigns, campaign_scopes):
     with OpenBar():
         ts_l = []
         for i in range(request.param):
@@ -196,7 +209,7 @@ def timeseries(request, database, campaigns, campaign_scopes):
 
 
 @pytest.fixture
-def timeseries_property_data(request, database, timeseries_properties, timeseries):
+def timeseries_property_data(request, app, timeseries_properties, timeseries):
     with OpenBar():
         tspd_l = []
         for ts in timeseries:
@@ -220,7 +233,7 @@ def timeseries_property_data(request, database, timeseries_properties, timeserie
 
 
 @pytest.fixture(params=[2])
-def timeseries_by_data_states(request, database, timeseries):
+def timeseries_by_data_states(request, app, timeseries):
     with OpenBar():
         ts_l = []
         for i in range(request.param):
@@ -235,7 +248,7 @@ def timeseries_by_data_states(request, database, timeseries):
 
 
 @pytest.fixture(params=[4])
-def timeseries_data(request, database, timeseries_by_data_states):
+def timeseries_data(request, app, timeseries_by_data_states):
     with OpenBar():
         nb_tsd = request.param
         for tsbds_id in timeseries_by_data_states:
@@ -250,7 +263,7 @@ def timeseries_data(request, database, timeseries_by_data_states):
 
 
 @pytest.fixture
-def events(database, campaigns, campaign_scopes):
+def events(app, campaigns, campaign_scopes):
     with OpenBar():
         tse_1 = model.Event.new(
             campaign_scope_id=campaign_scopes[0],
@@ -273,7 +286,7 @@ def events(database, campaigns, campaign_scopes):
 
 
 @pytest.fixture
-def sites(database, campaigns):
+def sites(app, campaigns):
     with OpenBar():
         site_1 = model.Site.new(
             name="Site 1",
@@ -288,7 +301,7 @@ def sites(database, campaigns):
 
 
 @pytest.fixture
-def buildings(database, sites):
+def buildings(app, sites):
     with OpenBar():
         building_1 = model.Building.new(
             name="Building 1",
@@ -303,7 +316,7 @@ def buildings(database, sites):
 
 
 @pytest.fixture
-def storeys(database, buildings):
+def storeys(app, buildings):
     with OpenBar():
         storey_1 = model.Storey.new(
             name="Storey 1",
@@ -318,7 +331,7 @@ def storeys(database, buildings):
 
 
 @pytest.fixture
-def spaces(database, storeys):
+def spaces(app, storeys):
     with OpenBar():
         space_1 = model.Space.new(
             name="Space 1",
@@ -333,7 +346,7 @@ def spaces(database, storeys):
 
 
 @pytest.fixture
-def zones(database, campaigns):
+def zones(app, campaigns):
     with OpenBar():
         zone_1 = model.Zone.new(
             name="Zone 1",
@@ -348,7 +361,7 @@ def zones(database, campaigns):
 
 
 @pytest.fixture
-def structural_element_properties(database):
+def structural_element_properties(app):
     with OpenBar():
         sep_1 = model.StructuralElementProperty.new(
             name="Surface",
@@ -361,7 +374,7 @@ def structural_element_properties(database):
 
 
 @pytest.fixture
-def site_properties(database, structural_element_properties):
+def site_properties(app, structural_element_properties):
     with OpenBar():
         site_p_1 = model.SiteProperty.new(
             structural_element_property_id=structural_element_properties[0],
@@ -374,7 +387,7 @@ def site_properties(database, structural_element_properties):
 
 
 @pytest.fixture
-def building_properties(database, structural_element_properties):
+def building_properties(app, structural_element_properties):
     with OpenBar():
         building_p_1 = model.BuildingProperty.new(
             structural_element_property_id=structural_element_properties[0],
@@ -387,7 +400,7 @@ def building_properties(database, structural_element_properties):
 
 
 @pytest.fixture
-def storey_properties(database, structural_element_properties):
+def storey_properties(app, structural_element_properties):
     with OpenBar():
         storey_p_1 = model.StoreyProperty.new(
             structural_element_property_id=structural_element_properties[0],
@@ -400,7 +413,7 @@ def storey_properties(database, structural_element_properties):
 
 
 @pytest.fixture
-def space_properties(database, structural_element_properties):
+def space_properties(app, structural_element_properties):
     with OpenBar():
         space_p_1 = model.SpaceProperty.new(
             structural_element_property_id=structural_element_properties[0],
@@ -413,7 +426,7 @@ def space_properties(database, structural_element_properties):
 
 
 @pytest.fixture
-def zone_properties(database, structural_element_properties):
+def zone_properties(app, structural_element_properties):
     with OpenBar():
         zone_p_1 = model.ZoneProperty.new(
             structural_element_property_id=structural_element_properties[0],
@@ -426,7 +439,7 @@ def zone_properties(database, structural_element_properties):
 
 
 @pytest.fixture
-def site_property_data(database, sites, site_properties):
+def site_property_data(app, sites, site_properties):
     with OpenBar():
         spd_1 = model.SitePropertyData.new(
             site_id=sites[0],
@@ -443,7 +456,7 @@ def site_property_data(database, sites, site_properties):
 
 
 @pytest.fixture
-def building_property_data(database, sites, site_properties):
+def building_property_data(app, sites, site_properties):
     with OpenBar():
         bpd_1 = model.BuildingPropertyData.new(
             building_id=sites[0],
@@ -460,7 +473,7 @@ def building_property_data(database, sites, site_properties):
 
 
 @pytest.fixture
-def storey_property_data(database, storeys, storey_properties):
+def storey_property_data(app, storeys, storey_properties):
     with OpenBar():
         spd_1 = model.StoreyPropertyData.new(
             storey_id=storeys[0],
@@ -477,7 +490,7 @@ def storey_property_data(database, storeys, storey_properties):
 
 
 @pytest.fixture
-def space_property_data(database, spaces, space_properties):
+def space_property_data(app, spaces, space_properties):
     with OpenBar():
         spd_1 = model.SpacePropertyData.new(
             space_id=spaces[0],
@@ -494,7 +507,7 @@ def space_property_data(database, spaces, space_properties):
 
 
 @pytest.fixture
-def zone_property_data(database, zones, zone_properties):
+def zone_property_data(app, zones, zone_properties):
     with OpenBar():
         zpd_1 = model.ZonePropertyData.new(
             zone_id=zones[0],
@@ -511,7 +524,7 @@ def zone_property_data(database, zones, zone_properties):
 
 
 @pytest.fixture
-def timeseries_by_sites(database, sites, timeseries):
+def timeseries_by_sites(app, sites, timeseries):
     with OpenBar():
         tbs_1 = model.TimeseriesBySite.new(
             site_id=sites[0],
@@ -526,7 +539,7 @@ def timeseries_by_sites(database, sites, timeseries):
 
 
 @pytest.fixture
-def timeseries_by_buildings(database, buildings, timeseries):
+def timeseries_by_buildings(app, buildings, timeseries):
     with OpenBar():
         tbb_1 = model.TimeseriesByBuilding.new(
             building_id=buildings[0],
@@ -541,7 +554,7 @@ def timeseries_by_buildings(database, buildings, timeseries):
 
 
 @pytest.fixture
-def timeseries_by_storeys(database, storeys, timeseries):
+def timeseries_by_storeys(app, storeys, timeseries):
     with OpenBar():
         tbs_1 = model.TimeseriesByStorey.new(
             storey_id=storeys[0],
@@ -556,7 +569,7 @@ def timeseries_by_storeys(database, storeys, timeseries):
 
 
 @pytest.fixture
-def timeseries_by_spaces(database, spaces, timeseries):
+def timeseries_by_spaces(app, spaces, timeseries):
     with OpenBar():
         tbs_1 = model.TimeseriesBySpace.new(
             space_id=spaces[0],
@@ -571,7 +584,7 @@ def timeseries_by_spaces(database, spaces, timeseries):
 
 
 @pytest.fixture
-def timeseries_by_zones(database, spaces, timeseries):
+def timeseries_by_zones(app, spaces, timeseries):
     with OpenBar():
         tbz_1 = model.TimeseriesByZone.new(
             zone_id=spaces[0],
