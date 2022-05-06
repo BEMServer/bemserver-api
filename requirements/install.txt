@@ -4,13 +4,15 @@
 #
 #    pip-compile --output-file=requirements/install.txt setup.py
 #
+alembic==1.7.7
+    # via bemserver-core
 apispec[marshmallow]==5.1.1
     # via flask-smorest
 argon2-cffi==21.3.0
     # via bemserver-core
 argon2-cffi-bindings==21.2.0
     # via argon2-cffi
-bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/820693f.tar.gz
+bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/efd3351.tar.gz
     # via bemserver-api (setup.py)
 cffi==1.15.0
     # via
@@ -35,8 +37,12 @@ itsdangerous==2.1.2
     # via flask
 jinja2==3.1.1
     # via flask
+mako==1.2.0
+    # via alembic
 markupsafe==2.1.1
-    # via jinja2
+    # via
+    #   jinja2
+    #   mako
 marshmallow==3.15.0
     # via
     #   apispec
@@ -74,6 +80,7 @@ six==1.16.0
     # via python-dateutil
 sqlalchemy==1.4.32
     # via
+    #   alembic
     #   bemserver-core
     #   marshmallow-sqlalchemy
 webargs==8.1.0

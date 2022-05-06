@@ -79,7 +79,9 @@ class TestEventLevelsApi:
 
 class TestEventCategoriesApi:
     @pytest.mark.parametrize("user", ("user", "admin"))
-    def test_event_categories_api_as_admin_or_user(self, app, user, users):
+    def test_event_categories_api_as_admin_or_user(
+        self, app, user, users, event_categories
+    ):
 
         if user == "user":
             creds = users["Active"]["creds"]
@@ -104,11 +106,10 @@ class TestEventCategoriesApi:
 
 
 class TestEventsApi:
-    def test_events_api(self, app, users, campaign_scopes):
-        ec_1_id = campaign_scopes[0]
-        ec_2_id = campaign_scopes[1]
-        campaign_scope_1_id = campaign_scopes[0]
-        campaign_scope_2_id = campaign_scopes[1]
+    def test_events_api(self, app, users, campaign_scopes, event_categories):
+        cs_1_id = campaign_scopes[0]
+        cs_2_id = campaign_scopes[1]
+        ec_1_id = event_categories[0]
         c1_st = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
         c2_et = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
 
@@ -125,10 +126,10 @@ class TestEventsApi:
 
             # POST
             tse_1 = {
-                "campaign_scope_id": campaign_scope_1_id,
+                "campaign_scope_id": cs_1_id,
                 "timestamp": c1_st,
                 "source": "Event source",
-                "category": "observation_missing",
+                "category": ec_1_id,
                 "level": "INFO",
                 "state": "NEW",
             }
@@ -157,10 +158,10 @@ class TestEventsApi:
 
             # POST
             tse_2 = {
-                "campaign_scope_id": campaign_scope_2_id,
+                "campaign_scope_id": cs_2_id,
                 "timestamp": c2_et,
                 "source": "Another event source",
-                "category": "observation_missing",
+                "category": ec_1_id,
                 "level": "WARNING",
                 "state": "NEW",
             }
@@ -171,7 +172,7 @@ class TestEventsApi:
             tse_2_etag = ret.headers["ETag"]
 
             # GET list (filtered)
-            ret = client.get(EVENTS_URL, query_string={"campaign_scope_id": ec_1_id})
+            ret = client.get(EVENTS_URL, query_string={"campaign_scope_id": cs_1_id})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
@@ -184,7 +185,7 @@ class TestEventsApi:
             ret = client.get(
                 EVENTS_URL,
                 query_string={
-                    "campaign_scope_id": ec_2_id,
+                    "campaign_scope_id": cs_2_id,
                     "level": "INFO",
                 },
             )
@@ -244,9 +245,12 @@ class TestEventsApi:
 
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
-    def test_events_as_user_api(self, app, users, campaign_scopes, campaigns, events):
+    def test_events_as_user_api(
+        self, app, users, campaign_scopes, campaigns, events, event_categories
+    ):
         tse_1_id = events[0]
-        campaign_scope_1_id = campaign_scopes[0]
+        cs_1_id = campaign_scopes[0]
+        ec_1_id = event_categories[0]
         c1_st = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
 
         creds = users["Active"]["creds"]
@@ -262,10 +266,10 @@ class TestEventsApi:
 
             # POST
             tse = {
-                "campaign_scope_id": campaign_scope_1_id,
+                "campaign_scope_id": cs_1_id,
                 "timestamp": c1_st,
                 "source": "Event source",
-                "category": "observation_missing",
+                "category": ec_1_id,
                 "level": "INFO",
                 "state": "NEW",
             }
@@ -284,9 +288,10 @@ class TestEventsApi:
             )
             assert ret.status_code == 204
 
-    def test_events_as_anonym_api(self, app, campaign_scopes, events):
+    def test_events_as_anonym_api(self, app, campaign_scopes, events, event_categories):
         tse_1_id = events[0]
-        campaign_scope_1_id = campaign_scopes[0]
+        cs_1_id = campaign_scopes[0]
+        ec_1_id = event_categories[0]
         c1_st = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
 
         client = app.test_client()
@@ -297,10 +302,10 @@ class TestEventsApi:
 
         # POST
         tse = {
-            "campaign_scope_id": campaign_scope_1_id,
+            "campaign_scope_id": cs_1_id,
             "timestamp": c1_st,
             "source": "Event source",
-            "category": "observation_missing",
+            "category": ec_1_id,
             "level": "INFO",
             "state": "NEW",
         }

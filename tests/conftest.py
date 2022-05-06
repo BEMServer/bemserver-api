@@ -7,7 +7,7 @@ import flask.testing
 
 from bemserver_core.database import db
 from bemserver_core.authorization import OpenBar
-from bemserver_core import model
+from bemserver_core import model, setup_db
 
 import pytest
 from pytest_postgresql import factories as ppf
@@ -57,7 +57,7 @@ def app(request, timescale_db):
 
     application = create_app(AppConfig)
     application.test_client_class = TestClient
-    db.create_all()
+    setup_db()
     yield application
     db.session.remove()
 
@@ -263,13 +263,22 @@ def timeseries_data(request, app, timeseries_by_data_states):
 
 
 @pytest.fixture
-def events(app, campaigns, campaign_scopes):
+def event_categories(app):
+    with OpenBar():
+        ec_1 = model.EventCategory.new(id="Missing data")
+        ec_2 = model.EventCategory.new(id="Outlier data")
+        db.session.commit()
+    return (ec_1.id, ec_2.id)
+
+
+@pytest.fixture
+def events(app, campaigns, campaign_scopes, event_categories):
     with OpenBar():
         tse_1 = model.Event.new(
             campaign_scope_id=campaign_scopes[0],
             timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
             source="Event source",
-            category="observation_missing",
+            category=event_categories[0],
             level="INFO",
             state="NEW",
         )
@@ -277,7 +286,7 @@ def events(app, campaigns, campaign_scopes):
             campaign_scope_id=campaign_scopes[1],
             timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
             source="Another event source",
-            category="observation_missing",
+            category=event_categories[0],
             level="WARNING",
             state="ONGOING",
         )
