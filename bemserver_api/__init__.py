@@ -1,6 +1,5 @@
 """BEMServer API"""
 import flask
-import click
 
 from bemserver_core import BEMServerCore
 
@@ -15,12 +14,6 @@ from .extensions import (  # noqa
     authentication,
 )
 from .resources import register_blueprints
-
-
-@click.command()
-@flask.cli.with_appcontext
-def setup_db():
-    database.db.create_all()
 
 
 def create_app(config_override=None):
@@ -42,7 +35,5 @@ def create_app(config_override=None):
 
     bsc = BEMServerCore()
     bsc.init_auth()
-
-    app.cli.add_command(setup_db)
 
     return app
