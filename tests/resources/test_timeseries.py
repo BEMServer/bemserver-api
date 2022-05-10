@@ -209,6 +209,19 @@ class TestTimeseriesApi:
                 assert ret_val[0]["campaign_scope_id"] == cs_1_id
                 assert ret_val[0]["id"] == timeseries_1_id
 
+            # GET list using "in_name"
+            ret = client.get(TIMESERIES_URL, query_string={"in_name": "Toto"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(TIMESERIES_URL, query_string={"in_name": "series"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["campaign_id"] == campaign_1_id
+            assert ret_val[0]["campaign_scope_id"] == cs_1_id
+            assert ret_val[0]["id"] == timeseries_1_id
+
             # POST
             timeseries_1 = {
                 "name": "Timeseries 1",

@@ -27,6 +27,7 @@ class TimeseriesPutSchema(TimeseriesSchema):
 class TimeseriesQueryArgsSchema(Schema):
     sort = SortField(("name",))
     name = ma.fields.Str()
+    in_name = ma.fields.Str()
     unit_symbol = ma.fields.Str()
     campaign_id = ma.fields.Int()
     campaign_scope_id = ma.fields.Int()
