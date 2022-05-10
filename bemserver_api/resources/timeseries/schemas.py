@@ -31,3 +31,8 @@ class TimeseriesQueryArgsSchema(Schema):
     campaign_id = ma.fields.Int()
     campaign_scope_id = ma.fields.Int()
     user_id = ma.fields.Int()
+    site_id = ma.fields.Int()
+    building_id = ma.fields.Int()
+    storey_id = ma.fields.Int()
+    space_id = ma.fields.Int()
+    zone_id = ma.fields.Int()

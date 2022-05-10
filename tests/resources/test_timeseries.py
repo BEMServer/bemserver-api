@@ -148,9 +148,25 @@ class TestTimeseriesApi:
             assert ret.status_code == 404
 
     @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaigns")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
     def test_timeseries_as_user_api(
-        self, app, users, timeseries, campaigns, campaign_scopes
+        self,
+        app,
+        users,
+        timeseries,
+        campaigns,
+        campaign_scopes,
+        sites,
+        buildings,
+        storeys,
+        spaces,
+        zones,
+        timeseries_by_sites,
+        timeseries_by_buildings,
+        timeseries_by_storeys,
+        timeseries_by_spaces,
+        timeseries_by_zones,
     ):
 
         campaign_1_id = campaigns[0]
@@ -171,6 +187,27 @@ class TestTimeseriesApi:
             assert len(ret_val) == 1
             assert ret_val[0]["campaign_id"] == campaign_1_id
             assert ret_val[0]["campaign_scope_id"] == cs_1_id
+            assert ret_val[0]["id"] == timeseries_1_id
+
+            # GET list for a structural element
+            for struct_elmt_type in ["site", "building", "storey", "space", "zone"]:
+                ret = client.get(
+                    TIMESERIES_URL,
+                    query_string={f"{struct_elmt_type}_id": 666},
+                )
+                assert ret.status_code == 200
+                ret_val = ret.json
+                assert len(ret_val) == 0
+                ret = client.get(
+                    TIMESERIES_URL,
+                    query_string={f"{struct_elmt_type}_id": 1},
+                )
+                assert ret.status_code == 200
+                ret_val = ret.json
+                assert len(ret_val) == 1
+                assert ret_val[0]["campaign_id"] == campaign_1_id
+                assert ret_val[0]["campaign_scope_id"] == cs_1_id
+                assert ret_val[0]["id"] == timeseries_1_id
 
             # POST
             timeseries_1 = {
