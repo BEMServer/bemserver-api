@@ -14,7 +14,6 @@ class TestSitesApi:
 
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
-        campaign_2_id = campaigns[1]
 
         client = app.test_client()
 
@@ -82,7 +81,7 @@ class TestSitesApi:
             # POST site 2
             site_2 = {
                 "name": "Site 2",
-                "campaign_id": campaign_2_id,
+                "campaign_id": campaign_1_id,
             }
             ret = client.post(SITES_URL, json=site_2)
             ret_val = ret.json

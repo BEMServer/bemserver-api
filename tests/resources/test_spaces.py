@@ -13,11 +13,10 @@ class TestSpacesApi:
     def test_spaces_api(self, app, users, campaigns, sites, buildings, storeys):
 
         creds = users["Chuck"]["creds"]
-        campaign_1_id = campaigns[0]
-        site_1_id = sites[0]
-        building_1_id = buildings[0]
+        campaign_2_id = campaigns[1]
+        site_2_id = sites[1]
+        building_2_id = buildings[1]
         storey_1_id = storeys[0]
-        storey_2_id = storeys[1]
 
         client = app.test_client()
 
@@ -85,7 +84,7 @@ class TestSpacesApi:
             # POST space 2
             space_2 = {
                 "name": "Space 2",
-                "storey_id": storey_2_id,
+                "storey_id": storey_1_id,
             }
             ret = client.post(SPACES_URL, json=space_2)
             ret_val = ret.json
@@ -113,21 +112,18 @@ class TestSpacesApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == space_1_id
-            ret = client.get(SPACES_URL, query_string={"campaign_id": campaign_1_id})
+            ret = client.get(SPACES_URL, query_string={"campaign_id": campaign_2_id})
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 1
-            assert ret_val[0]["id"] == space_1_id
-            ret = client.get(SPACES_URL, query_string={"site_id": site_1_id})
+            assert not ret_val
+            ret = client.get(SPACES_URL, query_string={"site_id": site_2_id})
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 1
-            assert ret_val[0]["id"] == space_1_id
-            ret = client.get(SPACES_URL, query_string={"building_id": building_1_id})
+            assert not ret_val
+            ret = client.get(SPACES_URL, query_string={"building_id": building_2_id})
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 1
-            assert ret_val[0]["id"] == space_1_id
+            assert not ret_val
 
             # DELETE wrong ID -> 404
             ret = client.delete(

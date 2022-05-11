@@ -15,7 +15,6 @@ class TestCampaignScopesApi:
 
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
-        campaign_2_id = campaigns[1]
 
         client = app.test_client()
 
@@ -83,7 +82,7 @@ class TestCampaignScopesApi:
             # POST campaign_scope 2
             cs_2 = {
                 "name": "Campaign scope 2",
-                "campaign_id": campaign_2_id,
+                "campaign_id": campaign_1_id,
             }
             ret = client.post(CAMPAIGN_SCOPES_URL, json=cs_2)
             ret_val = ret.json
@@ -107,7 +106,7 @@ class TestCampaignScopesApi:
 
             # GET list with filters
             ret = client.get(
-                CAMPAIGN_SCOPES_URL, query_string={"campaign_id": campaign_1_id}
+                CAMPAIGN_SCOPES_URL, query_string={"name": "Campaign scope 1"}
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -120,17 +119,17 @@ class TestCampaignScopesApi:
             )
             assert ret.status_code == 404
 
+            # DELETE
+            ret = client.delete(
+                f"{CAMPAIGN_SCOPES_URL}{cs_2_id}", headers={"If-Match": cs_2_etag}
+            )
+            assert ret.status_code == 204
+
             # DELETE campaign cascade
             ret = client.get(f"{CAMPAIGNS_URL}{campaign_1_id}")
             campaign_1_etag = ret.headers["ETag"]
             ret = client.delete(
                 f"{CAMPAIGNS_URL}{campaign_1_id}", headers={"If-Match": campaign_1_etag}
-            )
-            assert ret.status_code == 204
-
-            # DELETE
-            ret = client.delete(
-                f"{CAMPAIGN_SCOPES_URL}{cs_2_id}", headers={"If-Match": cs_2_etag}
             )
             assert ret.status_code == 204
 

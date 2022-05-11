@@ -13,10 +13,9 @@ class TestStoreysApi:
     def test_storeys_api(self, app, users, campaigns, sites, buildings):
 
         creds = users["Chuck"]["creds"]
-        campaign_1_id = campaigns[0]
-        site_1_id = sites[0]
+        campaign_2_id = campaigns[1]
+        site_2_id = sites[1]
         building_1_id = buildings[0]
-        building_2_id = buildings[1]
 
         client = app.test_client()
 
@@ -84,7 +83,7 @@ class TestStoreysApi:
             # POST storey 2
             storey_2 = {
                 "name": "Storey 2",
-                "building_id": building_2_id,
+                "building_id": building_1_id,
             }
             ret = client.post(STOREYS_URL, json=storey_2)
             ret_val = ret.json
@@ -112,16 +111,14 @@ class TestStoreysApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == storey_1_id
-            ret = client.get(STOREYS_URL, query_string={"campaign_id": campaign_1_id})
+            ret = client.get(STOREYS_URL, query_string={"campaign_id": campaign_2_id})
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 1
-            assert ret_val[0]["id"] == storey_1_id
-            ret = client.get(STOREYS_URL, query_string={"site_id": site_1_id})
+            assert not ret_val
+            ret = client.get(STOREYS_URL, query_string={"site_id": site_2_id})
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 1
-            assert ret_val[0]["id"] == storey_1_id
+            assert not ret_val
 
             # DELETE wrong ID -> 404
             ret = client.delete(
