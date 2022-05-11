@@ -7,7 +7,8 @@ import flask.testing
 
 from bemserver_core.database import db
 from bemserver_core.authorization import OpenBar
-from bemserver_core import model, setup_db
+from bemserver_core import model
+from bemserver_core.commands import setup_db
 
 import pytest
 from pytest_postgresql import factories as ppf
@@ -36,10 +37,15 @@ def _get_db_url(postgresql):
 
 
 @pytest.fixture
-def timescale_db(postgresql):
-    with sqla.create_engine(_get_db_url(postgresql)).connect() as connection:
+def postgresql_db(postgresql):
+    yield _get_db_url(postgresql)
+
+
+@pytest.fixture
+def timescale_db(postgresql_db):
+    with sqla.create_engine(postgresql_db).connect() as connection:
         connection.execute("CREATE EXTENSION IF NOT EXISTS timescaledb;")
-    yield postgresql
+    yield postgresql_db
 
 
 class TestClient(flask.testing.FlaskClient):
@@ -53,7 +59,7 @@ class TestClient(flask.testing.FlaskClient):
 @pytest.fixture(params=(TestConfig,))
 def app(request, timescale_db):
     class AppConfig(request.param):
-        SQLALCHEMY_DATABASE_URI = _get_db_url(timescale_db)
+        SQLALCHEMY_DATABASE_URI = timescale_db
 
     application = create_app(AppConfig)
     application.test_client_class = TestClient
