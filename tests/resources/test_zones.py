@@ -14,7 +14,6 @@ class TestZonesApi:
 
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
-        campaign_2_id = campaigns[1]
 
         client = app.test_client()
 
@@ -82,7 +81,7 @@ class TestZonesApi:
             # POST zone 2
             zone_2 = {
                 "name": "Zone 2",
-                "campaign_id": campaign_2_id,
+                "campaign_id": campaign_1_id,
             }
             ret = client.post(ZONES_URL, json=zone_2)
             ret_val = ret.json

@@ -13,9 +13,8 @@ class TestBuildingsApi:
     def test_buildings_api(self, app, users, campaigns, sites):
 
         creds = users["Chuck"]["creds"]
-        campaign_1_id = campaigns[0]
+        campaign_2_id = campaigns[1]
         site_1_id = sites[0]
-        site_2_id = sites[1]
 
         client = app.test_client()
 
@@ -83,7 +82,7 @@ class TestBuildingsApi:
             # POST building 2
             building_2 = {
                 "name": "Building 2",
-                "site_id": site_2_id,
+                "site_id": site_1_id,
             }
             ret = client.post(BUILDINGS_URL, json=building_2)
             ret_val = ret.json
@@ -111,11 +110,10 @@ class TestBuildingsApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == building_1_id
-            ret = client.get(BUILDINGS_URL, query_string={"campaign_id": campaign_1_id})
+            ret = client.get(BUILDINGS_URL, query_string={"campaign_id": campaign_2_id})
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 1
-            assert ret_val[0]["id"] == building_1_id
+            assert not ret_val
 
             # DELETE wrong ID -> 404
             ret = client.delete(
