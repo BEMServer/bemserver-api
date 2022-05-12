@@ -5,7 +5,7 @@ import textwrap
 from flask import Response
 from flask_smorest import abort
 
-from bemserver_core.csv_io import tscsvio
+from bemserver_core.input_output import tsdcsvio
 from bemserver_core.exceptions import TimeseriesCSVIOError
 
 from bemserver_api import Blueprint
@@ -60,7 +60,7 @@ def get_csv(args):
     ```
     """
 
-    csv_str = tscsvio.export_csv(
+    csv_str = tsdcsvio.export_csv(
         args["start_time"],
         args["end_time"],
         args["timeseries"],
@@ -94,7 +94,7 @@ def get_aggregate_csv(args):
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
-    csv_str = tscsvio.export_csv_bucket(
+    csv_str = tsdcsvio.export_csv_bucket(
         args["start_time"],
         args["end_time"],
         args["timeseries"],
@@ -130,6 +130,6 @@ def post_csv(files, args):
     csv_file = files["csv_file"]
     with io.TextIOWrapper(csv_file) as csv_file_txt:
         try:
-            tscsvio.import_csv(csv_file_txt, args["data_state"])
+            tsdcsvio.import_csv(csv_file_txt, args["data_state"])
         except TimeseriesCSVIOError as exc:
             abort(422, message=f"Invalid csv file content: {exc}")
