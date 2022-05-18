@@ -15,3 +15,11 @@ class SitesCSVUploadFileSchema(Schema):
     storeys_csv = Upload()
     spaces_csv = Upload()
     zones_csv = Upload()
+
+
+class TimeseriesCSVUploadQueryArgsSchema(Schema):
+    campaign_id = ma.fields.Int(required=True)
+
+
+class TimeseriesCSVUploadFileSchema(Schema):
+    timeseries_csv = Upload(required=True)

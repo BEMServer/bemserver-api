@@ -8,7 +8,9 @@ from tests.common import AuthHeader
 
 INPUT_OUTPUT_URL = "/io/"
 INPUT_OUTPUT_SITES_URL = f"{INPUT_OUTPUT_URL}sites"
+INPUT_OUTPUT_TIMESERIES_URL = f"{INPUT_OUTPUT_URL}timeseries"
 BUILDINGS_URL = "/buildings/"
+TIMESERIES_URL = "/timeseries/"
 
 DUMMY_ID = "69"
 
@@ -187,6 +189,141 @@ class TestInputOutputSites:
                 },
                 data={
                     "sites_csv": (io.BytesIO(sites_csv.encode()), "sites.csv"),
+                },
+            )
+            assert ret.status_code == 422
+            ret_val = ret.json
+            assert "campaign_id" in ret_val["errors"]["query"]
+
+
+class TestInputOutputTimeseries:
+    @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    @pytest.mark.usefixtures("timeseries_properties")
+    @pytest.mark.usefixtures("sites")
+    @pytest.mark.usefixtures("buildings")
+    @pytest.mark.usefixtures("storeys")
+    @pytest.mark.usefixtures("spaces")
+    @pytest.mark.usefixtures("zones")
+    def test_timeseries_csv_post(self, app, user, users, campaigns):
+
+        campaign_1_id = campaigns[0]
+
+        if user == "admin":
+            creds = users["Chuck"]["creds"]
+            auth_context = AuthHeader(creds)
+        elif user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+        else:
+            auth_context = contextlib.nullcontext()
+
+        client = app.test_client()
+
+        timeseries_csv = (
+            "Name,Description,Unit,Campaign scope,Site,Building,"
+            "Storey,Space,Zone,Min,Max\n"
+            "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            "Storey 1,Space 1,Zone 1,-10,60\n"
+            "Space_2_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            "Storey 1,Space 1,Zone 1,-10,60\n"
+        )
+
+        with auth_context:
+
+            ret = client.post(
+                INPUT_OUTPUT_TIMESERIES_URL,
+                query_string={
+                    "campaign_id": campaign_1_id,
+                },
+                data={
+                    "timeseries_csv": (
+                        io.BytesIO(timeseries_csv.encode()),
+                        "timeseries.csv",
+                    ),
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            elif user == "user":
+                assert ret.status_code == 403
+            else:
+                assert ret.status_code == 201
+                ret = client.get(TIMESERIES_URL)
+                assert ret.status_code == 200
+                assert len(ret.json) == 2
+
+    @pytest.mark.usefixtures("campaign_scopes")
+    @pytest.mark.usefixtures("sites")
+    @pytest.mark.usefixtures("buildings")
+    @pytest.mark.usefixtures("storeys")
+    @pytest.mark.usefixtures("spaces")
+    @pytest.mark.usefixtures("zones")
+    def test_timeseries_csv_post_duplicate_timeseries(self, app, users, campaigns):
+
+        campaign_1_id = campaigns[0]
+
+        creds = users["Chuck"]["creds"]
+        auth_context = AuthHeader(creds)
+
+        client = app.test_client()
+
+        timeseries_csv = (
+            "Name,Description,Unit,Campaign scope,Site,Building,"
+            "Storey,Space,Zone\n"
+            "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            "Storey 1,Space 1,Zone 1\n"
+            "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            "Storey 1,Space 1,Zone 1\n"
+        )
+
+        with auth_context:
+
+            ret = client.post(
+                INPUT_OUTPUT_TIMESERIES_URL,
+                query_string={
+                    "campaign_id": campaign_1_id,
+                },
+                data={
+                    "timeseries_csv": (
+                        io.BytesIO(timeseries_csv.encode()),
+                        "timeseries.csv",
+                    ),
+                },
+            )
+            assert ret.status_code == 422
+
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    def test_timeseries_csv_post_unknown_campaign(self, app, users):
+
+        creds = users["Chuck"]["creds"]
+        auth_context = AuthHeader(creds)
+
+        client = app.test_client()
+
+        timeseries_csv = (
+            "Name,Description,Unit,Campaign scope,Site,Building,"
+            "Storey,Space,Zone\n"
+            "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            "Storey 1,Space 1,Zone 1\n"
+            "Space_2_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            "Storey 1,Space 1,Zone 1\n"
+        )
+
+        with auth_context:
+
+            ret = client.post(
+                INPUT_OUTPUT_TIMESERIES_URL,
+                query_string={
+                    "campaign_id": DUMMY_ID,
+                },
+                data={
+                    "timeseries_csv": (
+                        io.BytesIO(timeseries_csv.encode()),
+                        "timeseries.csv",
+                    ),
                 },
             )
             assert ret.status_code == 422
