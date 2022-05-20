@@ -16,6 +16,9 @@ from .extensions import (  # noqa
 from .resources import register_blueprints
 
 
+__version__ = "0.0.1"
+
+
 def create_app(config_override=None):
     """Create application
 
