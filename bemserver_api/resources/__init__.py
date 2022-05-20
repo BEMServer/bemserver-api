@@ -1,5 +1,6 @@
 """Resources initialization"""
 
+from . import about
 from . import users
 from . import user_groups
 from . import users_by_user_groups
@@ -41,6 +42,7 @@ from . import input_output
 
 
 MODULES = (
+    about,
     users,
     user_groups,
     users_by_user_groups,
