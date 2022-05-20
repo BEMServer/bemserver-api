@@ -33,7 +33,7 @@ class TestSitePropertiesApi:
             site_p_1_id = ret_val.pop("id")
             site_p_1_etag = ret.headers["ETag"]
             sep = ret_val.pop("structural_element_property")
-            assert sep == {"name": "Surface"}
+            assert sep == {"name": "Area"}
             assert ret_val == site_p_1
 
             # POST violating unique constraint

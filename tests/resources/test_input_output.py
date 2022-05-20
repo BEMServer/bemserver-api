@@ -40,29 +40,29 @@ class TestInputOutputSites:
         client = app.test_client()
 
         sites_csv = (
-            "Name,Description,IFC_ID,Surface\n"
+            "Name,Description,IFC_ID,Area\n"
             "Site 1,Great site 1,abcdefghijklmnopqrtsuv,1000\n"
             "Site 2,Great site 2,,2000\n"
         )
         buildings_csv = (
-            "Name,Description,Site,IFC_ID,Surface\n"
+            "Name,Description,Site,IFC_ID,Area\n"
             "Building 1,Great building 1,Site 1,bcdefghijklmnopqrtsuvw,1000\n"
             "Building 2,Great building 2,Site 2,,2000\n"
         )
         storeys_csv = (
-            "Name,Description,Site,Building,IFC_ID,Surface\n"
+            "Name,Description,Site,Building,IFC_ID,Area\n"
             "Storey 1,Great storey 1,Site 1,Building 1,cdefghijklmnopqrtsuvwx,1000\n"
             "Storey 2,Great storey 2,Site 2,Building 2,,2000\n"
         )
         spaces_csv = (
-            "Name,Description,Site,Building,Storey,IFC_ID,Surface\n"
+            "Name,Description,Site,Building,Storey,IFC_ID,Area\n"
             "Storey 1,Great storey 1,Site 1,Building 1,Storey 1,"
             "defghijklmnopqrtsuvwxy,1000\n"
             "Storey 2,Great storey 2,Site 2,Building 2,Storey 2,"
             ",2000\n"
         )
         zones_csv = (
-            "Name,Description,IFC_ID,Surface\n"
+            "Name,Description,IFC_ID,Area\n"
             "Zone 1,Great zone 1,efghijklmnopqrtsuvwxyz,1000\n"
             "Zone 2,Great zone 2,,2000\n"
         )
@@ -107,12 +107,12 @@ class TestInputOutputSites:
         client = app.test_client()
 
         sites_csv = (
-            "Name,Description,IFC_ID,Surface\n"
+            "Name,Description,IFC_ID,Area\n"
             "Site 1,Great site 1,,1000\n"
             "Site 2,Great site 2,,2000\n"
         )
         buildings_csv = (
-            "Name,Description,Site,IFC_ID,Surface\n"
+            "Name,Description,Site,IFC_ID,Area\n"
             "Building 1,Great building 1,Site 1,,1000\n"
             "Building 2,Great building 2,Site 2,,2000\n"
         )

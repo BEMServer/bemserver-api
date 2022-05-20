@@ -379,7 +379,7 @@ def zones(app, campaigns):
 def structural_element_properties(app):
     with OpenBar():
         sep_1 = model.StructuralElementProperty.new(
-            name="Surface",
+            name="Area",
         )
         sep_2 = model.StructuralElementProperty.new(
             name="Volume",

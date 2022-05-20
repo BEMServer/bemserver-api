@@ -23,7 +23,7 @@ class TestStructuralElementPropertiesApi:
 
             # POST
             sep_1 = {
-                "name": "Surface",
+                "name": "Area",
             }
             ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_1)
             assert ret.status_code == 201
@@ -98,7 +98,7 @@ class TestStructuralElementPropertiesApi:
 
             # GET list with filters
             ret = client.get(
-                STRUCTURAL_ELEMENT_PROPERTIES_URL, query_string={"name": "Surface"}
+                STRUCTURAL_ELEMENT_PROPERTIES_URL, query_string={"name": "Area"}
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -150,8 +150,6 @@ class TestStructuralElementPropertiesApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 2
-            sep_1 = ret_val[0]
-            assert sep_1.pop("id") == sep_1_id
 
             # POST
             sep_3 = {
@@ -163,6 +161,8 @@ class TestStructuralElementPropertiesApi:
             # GET by id
             ret = client.get(f"{STRUCTURAL_ELEMENT_PROPERTIES_URL}{sep_1_id}")
             assert ret.status_code == 200
+            sep_1 = ret.json
+            del sep_1["id"]
             sep_1_etag = ret.headers["ETag"]
 
             # PUT
