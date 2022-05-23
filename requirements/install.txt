@@ -12,14 +12,16 @@ argon2-cffi==21.3.0
     # via bemserver-core
 argon2-cffi-bindings==21.2.0
     # via argon2-cffi
-bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/a839928.tar.gz
+bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/a1b1304.tar.gz
     # via bemserver-api (setup.py)
 cffi==1.15.0
     # via
     #   argon2-cffi-bindings
     #   oso
-click==8.1.0
-    # via flask
+click==8.1.3
+    # via
+    #   bemserver-core
+    #   flask
 flask==2.1.0
     # via
     #   bemserver-api (setup.py)
