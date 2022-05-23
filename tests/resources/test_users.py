@@ -111,7 +111,7 @@ class TestUsersApi:
             user_2_etag = ret.headers["ETag"]
 
             # PUT violating unique constraint
-            user_2["name"] = user_1["name"]
+            user_2["email"] = user_1["email"]
             ret = client.put(
                 f"{USERS_URL}{user_2_id}",
                 json=user_2,
