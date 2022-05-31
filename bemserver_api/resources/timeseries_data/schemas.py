@@ -8,8 +8,28 @@ from bemserver_api import Schema
 from bemserver_api.extensions.ma_fields import Timezone
 
 
-class TimeseriesDataGetQueryArgsSchema(Schema):
-    """Timeseries values GET query parameters schema"""
+class TimeseriesIDListMixinSchema(Schema):
+    timeseries = ma.fields.List(
+        ma.fields.Int(),
+        required=True,
+        metadata={
+            "description": "List of timeseries ID",
+        },
+    )
+
+
+class TimeseriesNameListMixinSchema(Schema):
+    timeseries = ma.fields.List(
+        ma.fields.String(),
+        required=True,
+        metadata={
+            "description": "List of timeseries names",
+        },
+    )
+
+
+class TimeseriesDataGetBaseQueryArgsSchema(Schema):
+    """Timeseries values GET query parameters base schema"""
 
     start_time = ma.fields.AwareDateTime(
         required=True,
@@ -23,13 +43,6 @@ class TimeseriesDataGetQueryArgsSchema(Schema):
             "description": "End datetime (excluded from the interval)",
         },
     )
-    timeseries = ma.fields.List(
-        ma.fields.Int(),
-        required=True,
-        metadata={
-            "description": "List of timeseries ID",
-        },
-    )
     data_state = ma.fields.Int(
         required=True,
         metadata={
@@ -38,8 +51,22 @@ class TimeseriesDataGetQueryArgsSchema(Schema):
     )
 
 
-class TimeseriesDataGetAggregateQueryArgsSchema(TimeseriesDataGetQueryArgsSchema):
-    """Timeseries values aggregate GET query parameters schema"""
+class TimeseriesDataGetByIDQueryArgsSchema(
+    TimeseriesDataGetBaseQueryArgsSchema, TimeseriesIDListMixinSchema
+):
+    """Timeseries values GET by ID query parameters schema"""
+
+
+class TimeseriesDataGetByNameQueryArgsSchema(
+    TimeseriesDataGetBaseQueryArgsSchema, TimeseriesNameListMixinSchema
+):
+    """Timeseries values GET by name query parameters schema"""
+
+
+class TimeseriesDataGetAggregateBaseQueryArgsSchema(
+    TimeseriesDataGetBaseQueryArgsSchema
+):
+    """Timeseries values aggregate GET query parameters base schema"""
 
     # TODO: Create custom field for bucket width
     bucket_width = ma.fields.String(
@@ -58,6 +85,18 @@ class TimeseriesDataGetAggregateQueryArgsSchema(TimeseriesDataGetQueryArgsSchema
         load_default="avg",
         validate=ma.validate.OneOf(AGGREGATION_FUNCTIONS),
     )
+
+
+class TimeseriesDataGetByIDAggregateQueryArgsSchema(
+    TimeseriesDataGetAggregateBaseQueryArgsSchema, TimeseriesIDListMixinSchema
+):
+    """Timeseries values aggregate GET by ID query parameters schema"""
+
+
+class TimeseriesDataGetByNameAggregateQueryArgsSchema(
+    TimeseriesDataGetAggregateBaseQueryArgsSchema, TimeseriesNameListMixinSchema
+):
+    """Timeseries values aggregate GET by name query parameters schema"""
 
 
 class TimeseriesDataPostQueryArgsSchema(Schema):
