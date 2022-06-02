@@ -91,14 +91,18 @@ class TestTimeseriesDataApi:
             else:
                 assert ret.status_code == 200
 
-    def test_timeseries_data_get_unknown_campaign(
+    @pytest.mark.parametrize("for_campaign", (True, False))
+    def test_timeseries_data_get_errors(
         self,
         app,
         users,
+        campaigns,
         timeseries,
         timeseries_data,
+        for_campaign,
     ):
         start_time, end_time = timeseries_data
+        campaign_1_id = campaigns[0]
         ts_1_id = timeseries[0]
         ds_id = 1
 
@@ -108,8 +112,49 @@ class TestTimeseriesDataApi:
 
         with AuthHeader(creds):
 
-            query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
-            ts_l = (f"Timeseries {ts_1_id-1}",)
+            # Unknown campaign
+            if for_campaign:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+                ret = client.get(
+                    query_url,
+                    query_string={
+                        "start_time": start_time.isoformat(),
+                        "end_time": end_time.isoformat(),
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                    },
+                )
+                assert ret.status_code == 404
+
+            # Unknown data state
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": DUMMY_ID,
+                },
+            )
+            assert ret.status_code == 422
+            assert ret.json["message"] == "Unknown data state ID"
+
+            # Unknown timeseries
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (DUMMY_ID,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = ("Dummy name",)
 
             ret = client.get(
                 query_url,
@@ -120,7 +165,8 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                 },
             )
-            assert ret.status_code == 404
+            assert ret.status_code == 422
+            assert ret.json["message"].startswith("Unknown timeseries")
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
@@ -206,14 +252,18 @@ class TestTimeseriesDataApi:
             else:
                 assert ret.status_code == 200
 
-    def test_timeseries_data_get_aggregate_unknown_campaign(
+    @pytest.mark.parametrize("for_campaign", (True, False))
+    def test_timeseries_data_get_aggregate_errors(
         self,
         app,
         users,
+        campaigns,
         timeseries,
         timeseries_data,
+        for_campaign,
     ):
         start_time, end_time = timeseries_data
+        campaign_1_id = campaigns[0]
         ts_1_id = timeseries[0]
         ds_id = 1
 
@@ -223,8 +273,53 @@ class TestTimeseriesDataApi:
 
         with AuthHeader(creds):
 
-            query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
-            ts_l = (f"Timeseries {ts_1_id-1}",)
+            # Unknown campaign
+            if for_campaign:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+                ret = client.get(
+                    f"{query_url}aggregate",
+                    query_string={
+                        "start_time": start_time.isoformat(),
+                        "end_time": end_time.isoformat(),
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                        "bucket_width": "1 day",
+                        "timezone": "UTC",
+                    },
+                )
+                assert ret.status_code == 404
+
+            # Unknown data state
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": DUMMY_ID,
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                },
+            )
+            assert ret.status_code == 422
+            assert ret.json["message"] == "Unknown data state ID"
+
+            # Unknown timeseries
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (DUMMY_ID,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = ("Dummy name",)
 
             ret = client.get(
                 f"{query_url}aggregate",
@@ -237,7 +332,30 @@ class TestTimeseriesDataApi:
                     "timezone": "UTC",
                 },
             )
-            assert ret.status_code == 404
+            assert ret.status_code == 422
+            assert ret.json["message"].startswith("Unknown timeseries")
+
+            # Unknown aggregation method
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                    "aggregation": "dummy",
+                },
+            )
+            assert ret.status_code == 422
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
@@ -320,8 +438,11 @@ class TestTimeseriesDataApi:
             else:
                 assert ret.status_code == 201
 
-    def test_timeseries_data_post_unknown_campaign(self, app, users, timeseries):
-
+    @pytest.mark.parametrize("for_campaign", (True, False))
+    def test_timeseries_data_post_errors(
+        self, app, users, campaigns, timeseries, for_campaign
+    ):
+        campaign_1_id = campaigns[0]
         ts_1_id = timeseries[0]
         ds_id = 1
 
@@ -331,15 +452,49 @@ class TestTimeseriesDataApi:
 
         with AuthHeader(creds):
 
-            query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
-            header = f"Datetime,Timeseries {ts_1_id-1}\n"
+            # Unknown campaign
+            if for_campaign:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
+                header = f"Datetime,Timeseries {ts_1_id-1}\n"
 
-            csv_str = header + (
-                "2020-01-01T00:00:00+00:00,0\n"
-                "2020-01-01T01:00:00+00:00,1\n"
-                "2020-01-01T02:00:00+00:00,2\n"
-                "2020-01-01T03:00:00+00:00,3\n"
+                csv_str = header + ("2020-01-01T00:00:00+00:00,0\n")
+                ret = client.post(
+                    query_url,
+                    query_string={
+                        "data_state": ds_id,
+                    },
+                    data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
+                )
+                assert ret.status_code == 404
+
+            # Unknown data state
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                header = f"Datetime,{ts_1_id}\n"
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                header = f"Datetime,Timeseries {ts_1_id-1}\n"
+
+            csv_str = header + ("2020-01-01T00:00:00+00:00,0\n")
+            ret = client.post(
+                query_url,
+                query_string={
+                    "data_state": DUMMY_ID,
+                },
+                data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
             )
+            assert ret.status_code == 422
+            assert ret.json["message"] == "Unknown data state ID"
+
+            # Unknown timeseries
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                header = f"Datetime,{DUMMY_ID}\n"
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                header = "Datetime,Dummy name\n"
+
+            csv_str = header + ("2020-01-01T00:00:00+00:00,0\n")
             ret = client.post(
                 query_url,
                 query_string={
@@ -347,4 +502,21 @@ class TestTimeseriesDataApi:
                 },
                 data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
             )
-            assert ret.status_code == 404
+            assert ret.status_code == 422
+            assert ret.json["message"].startswith("Unknown timeseries")
+
+            # Invalid CSV content
+            csv_str = ""
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+
+            ret = client.post(
+                query_url,
+                query_string={
+                    "data_state": ds_id,
+                },
+                data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
+            )
+            assert ret.status_code == 422

@@ -7,7 +7,12 @@ from flask_smorest import abort
 
 from bemserver_core.model import Campaign
 from bemserver_core.input_output import tsdcsvio
-from bemserver_core.exceptions import TimeseriesCSVIOError
+from bemserver_core.exceptions import (
+    TimeseriesDataIOUnknownDataStateError,
+    TimeseriesDataIOUnknownTimeseriesError,
+    TimeseriesDataIOInvalidAggregationError,
+    TimeseriesDataCSVIOError,
+)
 
 from bemserver_api import Blueprint
 
@@ -71,13 +76,19 @@ def get_csv(args):
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
+    try:
+        csv_str = tsdcsvio.export_csv(
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
+            args["data_state"],
+        )
+    except (
+        TimeseriesDataIOUnknownDataStateError,
+        TimeseriesDataIOUnknownTimeseriesError,
+    ) as exc:
+        abort(422, message=str(exc))
 
-    csv_str = tsdcsvio.export_csv(
-        args["start_time"],
-        args["end_time"],
-        args["timeseries"],
-        args["data_state"],
-    )
     response = Response(csv_str, mimetype="text/csv")
     response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
     return response
@@ -106,15 +117,22 @@ def get_aggregate_csv(args):
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
-    csv_str = tsdcsvio.export_csv_bucket(
-        args["start_time"],
-        args["end_time"],
-        args["timeseries"],
-        args["data_state"],
-        args["bucket_width"],
-        args["timezone"],
-        args["aggregation"],
-    )
+    try:
+        csv_str = tsdcsvio.export_csv_bucket(
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
+            args["data_state"],
+            args["bucket_width"],
+            args["timezone"],
+            args["aggregation"],
+        )
+    except (
+        TimeseriesDataIOUnknownDataStateError,
+        TimeseriesDataIOUnknownTimeseriesError,
+        TimeseriesDataIOInvalidAggregationError,
+    ) as exc:
+        abort(422, message=str(exc))
     response = Response(csv_str, mimetype="text/csv")
     response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
     return response
@@ -143,7 +161,12 @@ def post_csv(files, args):
     with io.TextIOWrapper(csv_file) as csv_file_txt:
         try:
             tsdcsvio.import_csv(csv_file_txt, args["data_state"])
-        except TimeseriesCSVIOError as exc:
+        except (
+            TimeseriesDataIOUnknownDataStateError,
+            TimeseriesDataIOUnknownTimeseriesError,
+        ) as exc:
+            abort(422, message=str(exc))
+        except TimeseriesDataCSVIOError as exc:
             abort(422, message=f"Invalid csv file content: {exc}")
 
 
@@ -174,15 +197,20 @@ def get_csv_for_campaign(args, campaign_id):
     if campaign is None:
         abort(404)
 
-    # TODO: catch TimeseriesCSVIOError
+    try:
+        csv_str = tsdcsvio.export_csv(
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
+            args["data_state"],
+            campaign=campaign,
+        )
+    except (
+        TimeseriesDataIOUnknownDataStateError,
+        TimeseriesDataIOUnknownTimeseriesError,
+    ) as exc:
+        abort(422, message=str(exc))
 
-    csv_str = tsdcsvio.export_csv(
-        args["start_time"],
-        args["end_time"],
-        args["timeseries"],
-        args["data_state"],
-        campaign=campaign,
-    )
     response = Response(csv_str, mimetype="text/csv")
     response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
     return response
@@ -215,16 +243,24 @@ def get_aggregate_csv_for_campaign(args, campaign_id):
     if campaign is None:
         abort(404)
 
-    csv_str = tsdcsvio.export_csv_bucket(
-        args["start_time"],
-        args["end_time"],
-        args["timeseries"],
-        args["data_state"],
-        args["bucket_width"],
-        args["timezone"],
-        args["aggregation"],
-        campaign=campaign,
-    )
+    try:
+        csv_str = tsdcsvio.export_csv_bucket(
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
+            args["data_state"],
+            args["bucket_width"],
+            args["timezone"],
+            args["aggregation"],
+            campaign=campaign,
+        )
+    except (
+        TimeseriesDataIOUnknownDataStateError,
+        TimeseriesDataIOUnknownTimeseriesError,
+        TimeseriesDataIOInvalidAggregationError,
+    ) as exc:
+        abort(422, message=str(exc))
+
     response = Response(csv_str, mimetype="text/csv")
     response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
     return response
@@ -257,5 +293,10 @@ def post_csv_for_campaign(files, args, campaign_id):
     with io.TextIOWrapper(csv_file) as csv_file_txt:
         try:
             tsdcsvio.import_csv(csv_file_txt, args["data_state"], campaign=campaign)
-        except TimeseriesCSVIOError as exc:
+        except (
+            TimeseriesDataIOUnknownDataStateError,
+            TimeseriesDataIOUnknownTimeseriesError,
+        ) as exc:
+            abort(422, message=str(exc))
+        except TimeseriesDataCSVIOError as exc:
             abort(422, message=f"Invalid csv file content: {exc}")
