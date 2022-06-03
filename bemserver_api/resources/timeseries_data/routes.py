@@ -8,10 +8,10 @@ from flask_smorest import abort
 from bemserver_core.model import Campaign
 from bemserver_core.input_output import tsdcsvio
 from bemserver_core.exceptions import (
+    TimeseriesDataIOError,
     TimeseriesDataIOUnknownDataStateError,
     TimeseriesDataIOUnknownTimeseriesError,
     TimeseriesDataIOInvalidAggregationError,
-    TimeseriesDataCSVIOError,
 )
 
 from bemserver_api import Blueprint
@@ -161,13 +161,10 @@ def post_csv(files, args):
     with io.TextIOWrapper(csv_file) as csv_file_txt:
         try:
             tsdcsvio.import_csv(csv_file_txt, args["data_state"])
-        except (
-            TimeseriesDataIOUnknownDataStateError,
-            TimeseriesDataIOUnknownTimeseriesError,
-        ) as exc:
+        except TimeseriesDataIOUnknownDataStateError as exc:
             abort(422, message=str(exc))
-        except TimeseriesDataCSVIOError as exc:
-            abort(422, message=f"Invalid csv file content: {exc}")
+        except TimeseriesDataIOError as exc:
+            abort(422, message=f"Invalid CSV file content: {exc}")
 
 
 @blp.route("/campaign/<int:campaign_id>/", methods=("GET",))
@@ -293,10 +290,7 @@ def post_csv_for_campaign(files, args, campaign_id):
     with io.TextIOWrapper(csv_file) as csv_file_txt:
         try:
             tsdcsvio.import_csv(csv_file_txt, args["data_state"], campaign=campaign)
-        except (
-            TimeseriesDataIOUnknownDataStateError,
-            TimeseriesDataIOUnknownTimeseriesError,
-        ) as exc:
+        except TimeseriesDataIOUnknownDataStateError as exc:
             abort(422, message=str(exc))
-        except TimeseriesDataCSVIOError as exc:
-            abort(422, message=f"Invalid csv file content: {exc}")
+        except TimeseriesDataIOError as exc:
+            abort(422, message=f"Invalid CSV file content: {exc}")
