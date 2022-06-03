@@ -137,7 +137,21 @@ class TestInputOutputSites:
             assert ret.status_code == 200
             assert len(ret.json) == 2
 
-    def test_sites_csv_post_duplicate_site(self, app, users, campaigns):
+    @pytest.mark.parametrize(
+        "buildings_csv",
+        (
+            # Missing column in header
+            "Name,Description,Site",
+            # Missing column in row
+            "Name,Description,Site,IFC_ID\nBuilding 1,,",
+            # Duplicate building
+            "Name,Description,Site,IFC_ID\nBuilding 3,,Site 1,\nBuilding 3,,Site 1,",
+            # Unknown site
+            "Name,Description,Site,IFC_ID\nBuilding 1,,Dummy",
+        ),
+    )
+    @pytest.mark.usefixtures("sites")
+    def test_sites_csv_post_errors(self, app, users, campaigns, buildings_csv):
 
         campaign_1_id = campaigns[0]
 
@@ -145,12 +159,6 @@ class TestInputOutputSites:
         auth_context = AuthHeader(creds)
 
         client = app.test_client()
-
-        sites_csv = (
-            "Name,Description,IFC_ID\n"
-            "Site 1,Great site 1,\n"
-            "Site 1,Great site 2,\n"
-        )
 
         with auth_context:
 
@@ -160,13 +168,14 @@ class TestInputOutputSites:
                     "campaign_id": campaign_1_id,
                 },
                 data={
-                    "sites_csv": (io.BytesIO(sites_csv.encode()), "sites.csv"),
+                    "buildings_csv": (
+                        io.BytesIO(buildings_csv.encode()),
+                        "buildings.csv",
+                    ),
                 },
             )
             assert ret.status_code == 422
 
-    @pytest.mark.usefixtures("users_by_user_groups")
-    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
     def test_sites_csv_post_unknown_campaign(self, app, users):
 
         creds = users["Chuck"]["creds"]
@@ -254,13 +263,29 @@ class TestInputOutputTimeseries:
                 assert ret.status_code == 200
                 assert len(ret.json) == 2
 
+    @pytest.mark.parametrize(
+        "timeseries_csv",
+        (
+            # Missing column in header
+            (
+                "Name,Description,Unit,Campaign scope,\n"
+                "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,,,,,\n"
+            ),
+            # Duplicate timeseries
+            (
+                "Name,Description,Unit,Campaign scope,Site,Building,Storey,Space,Zone\n"
+                "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,,,,,\n"
+                "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,,,,,\n"
+            ),
+            # Unknown site
+            (
+                "Name,Description,Unit,Campaign scope,Site,Building,Storey,Space,Zone\n"
+                "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,Dummy,,,,\n"
+            ),
+        ),
+    )
     @pytest.mark.usefixtures("campaign_scopes")
-    @pytest.mark.usefixtures("sites")
-    @pytest.mark.usefixtures("buildings")
-    @pytest.mark.usefixtures("storeys")
-    @pytest.mark.usefixtures("spaces")
-    @pytest.mark.usefixtures("zones")
-    def test_timeseries_csv_post_duplicate_timeseries(self, app, users, campaigns):
+    def test_timeseries_csv_post_errors(self, app, users, campaigns, timeseries_csv):
 
         campaign_1_id = campaigns[0]
 
@@ -268,15 +293,6 @@ class TestInputOutputTimeseries:
         auth_context = AuthHeader(creds)
 
         client = app.test_client()
-
-        timeseries_csv = (
-            "Name,Description,Unit,Campaign scope,Site,Building,"
-            "Storey,Space,Zone\n"
-            "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
-            "Storey 1,Space 1,Zone 1\n"
-            "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
-            "Storey 1,Space 1,Zone 1\n"
-        )
 
         with auth_context:
 
@@ -294,8 +310,6 @@ class TestInputOutputTimeseries:
             )
             assert ret.status_code == 422
 
-    @pytest.mark.usefixtures("users_by_user_groups")
-    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
     def test_timeseries_csv_post_unknown_campaign(self, app, users):
 
         creds = users["Chuck"]["creds"]
