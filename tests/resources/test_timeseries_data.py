@@ -505,7 +505,10 @@ class TestTimeseriesDataApi:
                 data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
             )
             assert ret.status_code == 422
-            assert ret.json["message"] == f"Unknown timeseries: ['{dummy_ts}']"
+            assert (
+                ret.json["message"]
+                == f"Invalid CSV file content: Unknown timeseries: ['{dummy_ts}']"
+            )
 
             # Invalid CSV content
             csv_str = ""
@@ -522,3 +525,17 @@ class TestTimeseriesDataApi:
                 data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
             )
             assert ret.status_code == 422
+
+            # Invalid TS IDs
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                csv_str = "Datetime,Timeseries 1\n2020-01-01T00:00:00+00:00,0\n"
+
+                ret = client.post(
+                    query_url,
+                    query_string={
+                        "data_state": ds_id,
+                    },
+                    data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
+                )
+                assert ret.status_code == 422
