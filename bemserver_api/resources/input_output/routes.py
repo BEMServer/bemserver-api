@@ -5,9 +5,9 @@ from flask_smorest import abort
 
 from bemserver_core.model import Campaign
 from bemserver_core.input_output import sites_csv_io, timeseries_csv_io
+from bemserver_core.exceptions import BEMServerCoreIOError
 
 from bemserver_api import Blueprint
-from bemserver_core.exceptions import SitesCSVIOError, TimeseriesCSVIOError
 
 from .schemas import (
     SitesCSVUploadQueryArgsSchema,
@@ -41,7 +41,7 @@ def sites_csv_io_post(args, files):
         abort(422, errors={"query": {"campaign_id": ["Unknown campaign ID."]}})
     try:
         sites_csv_io.import_csv(campaign=campaign, **csv_files)
-    except SitesCSVIOError as exc:
+    except BEMServerCoreIOError as exc:
         abort(422, message=f"Invalid csv file content: {exc}")
 
 
@@ -60,5 +60,5 @@ def timeseries_csv_io_post(args, files):
         abort(422, errors={"query": {"campaign_id": ["Unknown campaign ID."]}})
     try:
         timeseries_csv_io.import_csv(campaign=campaign, timeseries_csv=timeseries_csv)
-    except TimeseriesCSVIOError as exc:
+    except BEMServerCoreIOError as exc:
         abort(422, message=f"Invalid csv file content: {exc}")
