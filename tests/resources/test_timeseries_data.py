@@ -91,86 +91,6 @@ class TestTimeseriesDataApi:
             else:
                 assert ret.status_code == 200
 
-    @pytest.mark.parametrize("method", ("get", "delete"))
-    @pytest.mark.parametrize("for_campaign", (True, False))
-    def test_timeseries_data_get_delete_errors(
-        self,
-        app,
-        users,
-        campaigns,
-        timeseries,
-        timeseries_data,
-        for_campaign,
-        method,
-    ):
-        start_time, end_time = timeseries_data
-        campaign_1_id = campaigns[0]
-        ts_1_id = timeseries[0]
-        ds_id = 1
-
-        creds = users["Chuck"]["creds"]
-
-        client = app.test_client()
-        client_method = getattr(client, method)
-
-        with AuthHeader(creds):
-
-            # Unknown campaign
-            if for_campaign:
-                query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
-
-                ret = client_method(
-                    query_url,
-                    query_string={
-                        "start_time": start_time.isoformat(),
-                        "end_time": end_time.isoformat(),
-                        "timeseries": ts_l,
-                        "data_state": ds_id,
-                    },
-                )
-                assert ret.status_code == 404
-
-            # Unknown data state
-            if not for_campaign:
-                query_url = TIMESERIES_DATA_URL
-                ts_l = (ts_1_id,)
-            else:
-                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
-
-            ret = client_method(
-                query_url,
-                query_string={
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat(),
-                    "timeseries": ts_l,
-                    "data_state": DUMMY_ID,
-                },
-            )
-            assert ret.status_code == 422
-            assert ret.json["message"] == "Unknown data state ID"
-
-            # Unknown timeseries
-            if not for_campaign:
-                query_url = TIMESERIES_DATA_URL
-                ts_l = (DUMMY_ID,)
-            else:
-                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = ("Dummy name",)
-
-            ret = client_method(
-                query_url,
-                query_string={
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat(),
-                    "timeseries": ts_l,
-                    "data_state": ds_id,
-                },
-            )
-            assert ret.status_code == 422
-            assert ret.json["message"].startswith("Unknown timeseries")
-
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
@@ -254,111 +174,6 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 200
-
-    @pytest.mark.parametrize("for_campaign", (True, False))
-    def test_timeseries_data_get_aggregate_errors(
-        self,
-        app,
-        users,
-        campaigns,
-        timeseries,
-        timeseries_data,
-        for_campaign,
-    ):
-        start_time, end_time = timeseries_data
-        campaign_1_id = campaigns[0]
-        ts_1_id = timeseries[0]
-        ds_id = 1
-
-        creds = users["Chuck"]["creds"]
-
-        client = app.test_client()
-
-        with AuthHeader(creds):
-
-            # Unknown campaign
-            if for_campaign:
-                query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
-
-                ret = client.get(
-                    f"{query_url}aggregate",
-                    query_string={
-                        "start_time": start_time.isoformat(),
-                        "end_time": end_time.isoformat(),
-                        "timeseries": ts_l,
-                        "data_state": ds_id,
-                        "bucket_width": "1 day",
-                        "timezone": "UTC",
-                    },
-                )
-                assert ret.status_code == 404
-
-            # Unknown data state
-            if not for_campaign:
-                query_url = TIMESERIES_DATA_URL
-                ts_l = (ts_1_id,)
-            else:
-                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
-
-            ret = client.get(
-                f"{query_url}aggregate",
-                query_string={
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat(),
-                    "timeseries": ts_l,
-                    "data_state": DUMMY_ID,
-                    "bucket_width": "1 day",
-                    "timezone": "UTC",
-                },
-            )
-            assert ret.status_code == 422
-            assert ret.json["message"] == "Unknown data state ID"
-
-            # Unknown timeseries
-            if not for_campaign:
-                query_url = TIMESERIES_DATA_URL
-                ts_l = (DUMMY_ID,)
-            else:
-                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = ("Dummy name",)
-
-            ret = client.get(
-                f"{query_url}aggregate",
-                query_string={
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat(),
-                    "timeseries": ts_l,
-                    "data_state": ds_id,
-                    "bucket_width": "1 day",
-                    "timezone": "UTC",
-                },
-            )
-            assert ret.status_code == 422
-            assert ret.json["message"].startswith("Unknown timeseries")
-
-            # Unknown aggregation method
-            if not for_campaign:
-                query_url = TIMESERIES_DATA_URL
-                ts_l = (ts_1_id,)
-            else:
-                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
-
-            ret = client.get(
-                f"{query_url}aggregate",
-                query_string={
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat(),
-                    "timeseries": ts_l,
-                    "data_state": ds_id,
-                    "bucket_width": "1 day",
-                    "timezone": "UTC",
-                    "aggregation": "dummy",
-                },
-            )
-            assert ret.status_code == 422
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
@@ -622,3 +437,188 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 204
+
+    @pytest.mark.parametrize("method", ("get", "delete"))
+    @pytest.mark.parametrize("for_campaign", (True, False))
+    def test_timeseries_data_get_delete_errors(
+        self,
+        app,
+        users,
+        campaigns,
+        timeseries,
+        timeseries_data,
+        for_campaign,
+        method,
+    ):
+        start_time, end_time = timeseries_data
+        campaign_1_id = campaigns[0]
+        ts_1_id = timeseries[0]
+        ds_id = 1
+
+        creds = users["Chuck"]["creds"]
+
+        client = app.test_client()
+        client_method = getattr(client, method)
+
+        with AuthHeader(creds):
+
+            # Unknown campaign
+            if for_campaign:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+                ret = client_method(
+                    query_url,
+                    query_string={
+                        "start_time": start_time.isoformat(),
+                        "end_time": end_time.isoformat(),
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                    },
+                )
+                assert ret.status_code == 404
+
+            # Unknown data state
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client_method(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": DUMMY_ID,
+                },
+            )
+            assert ret.status_code == 422
+            assert ret.json["message"] == "Unknown data state ID"
+
+            # Unknown timeseries
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (DUMMY_ID,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = ("Dummy name",)
+
+            ret = client_method(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                },
+            )
+            assert ret.status_code == 422
+            assert ret.json["message"].startswith("Unknown timeseries")
+
+    @pytest.mark.parametrize("for_campaign", (True, False))
+    def test_timeseries_data_get_aggregate_errors(
+        self,
+        app,
+        users,
+        campaigns,
+        timeseries,
+        timeseries_data,
+        for_campaign,
+    ):
+        start_time, end_time = timeseries_data
+        campaign_1_id = campaigns[0]
+        ts_1_id = timeseries[0]
+        ds_id = 1
+
+        creds = users["Chuck"]["creds"]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+
+            # Unknown campaign
+            if for_campaign:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+                ret = client.get(
+                    f"{query_url}aggregate",
+                    query_string={
+                        "start_time": start_time.isoformat(),
+                        "end_time": end_time.isoformat(),
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                        "bucket_width": "1 day",
+                        "timezone": "UTC",
+                    },
+                )
+                assert ret.status_code == 404
+
+            # Unknown data state
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": DUMMY_ID,
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                },
+            )
+            assert ret.status_code == 422
+            assert ret.json["message"] == "Unknown data state ID"
+
+            # Unknown timeseries
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (DUMMY_ID,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = ("Dummy name",)
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                },
+            )
+            assert ret.status_code == 422
+            assert ret.json["message"].startswith("Unknown timeseries")
+
+            # Unknown aggregation method
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width": "1 day",
+                    "timezone": "UTC",
+                    "aggregation": "dummy",
+                },
+            )
+            assert ret.status_code == 422
