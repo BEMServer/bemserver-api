@@ -91,8 +91,9 @@ class TestTimeseriesDataApi:
             else:
                 assert ret.status_code == 200
 
+    @pytest.mark.parametrize("method", ("get", "delete"))
     @pytest.mark.parametrize("for_campaign", (True, False))
-    def test_timeseries_data_get_errors(
+    def test_timeseries_data_get_delete_errors(
         self,
         app,
         users,
@@ -100,6 +101,7 @@ class TestTimeseriesDataApi:
         timeseries,
         timeseries_data,
         for_campaign,
+        method,
     ):
         start_time, end_time = timeseries_data
         campaign_1_id = campaigns[0]
@@ -109,6 +111,7 @@ class TestTimeseriesDataApi:
         creds = users["Chuck"]["creds"]
 
         client = app.test_client()
+        client_method = getattr(client, method)
 
         with AuthHeader(creds):
 
@@ -117,7 +120,7 @@ class TestTimeseriesDataApi:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
                 ts_l = (f"Timeseries {ts_1_id-1}",)
 
-                ret = client.get(
+                ret = client_method(
                     query_url,
                     query_string={
                         "start_time": start_time.isoformat(),
@@ -136,7 +139,7 @@ class TestTimeseriesDataApi:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
                 ts_l = (f"Timeseries {ts_1_id-1}",)
 
-            ret = client.get(
+            ret = client_method(
                 query_url,
                 query_string={
                     "start_time": start_time.isoformat(),
@@ -156,7 +159,7 @@ class TestTimeseriesDataApi:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
                 ts_l = ("Dummy name",)
 
-            ret = client.get(
+            ret = client_method(
                 query_url,
                 query_string={
                     "start_time": start_time.isoformat(),
@@ -539,3 +542,83 @@ class TestTimeseriesDataApi:
                     data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
                 )
                 assert ret.status_code == 422
+
+    @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaigns")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    @pytest.mark.parametrize("for_campaign", (True, False))
+    def test_timeseries_data_delete(
+        self,
+        app,
+        user,
+        users,
+        campaigns,
+        timeseries,
+        timeseries_data,
+        for_campaign,
+    ):
+        start_time, end_time = timeseries_data
+        ts_1_id = timeseries[0]
+        ts_2_id = timeseries[1]
+        campaign_1_id = campaigns[0]
+        campaign_2_id = campaigns[1]
+        ds_id = 1
+
+        if user == "admin":
+            creds = users["Chuck"]["creds"]
+            auth_context = AuthHeader(creds)
+        elif user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+        else:
+            auth_context = contextlib.nullcontext()
+
+        client = app.test_client()
+
+        with auth_context:
+
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.delete(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 204
+
+            # User not in Timeseries group
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_2_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_2_id}/"
+                ts_l = (f"Timeseries {ts_2_id-1}",)
+
+            ret = client.delete(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            elif user == "user":
+                assert ret.status_code == 403
+            else:
+                assert ret.status_code == 204

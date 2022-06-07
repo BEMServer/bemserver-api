@@ -167,6 +167,26 @@ def post_csv(files, args):
             abort(422, message=f"Invalid CSV file content: {exc}")
 
 
+@blp.route("/", methods=("DELETE",))
+@blp.login_required
+@blp.arguments(TimeseriesDataGetByIDQueryArgsSchema, location="query")
+@blp.response(204)
+def delete(args):
+    """Delete timeseries data"""
+    try:
+        tsdcsvio.delete(
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
+            args["data_state"],
+        )
+    except (
+        TimeseriesDataIOUnknownDataStateError,
+        TimeseriesDataIOUnknownTimeseriesError,
+    ) as exc:
+        abort(422, message=str(exc))
+
+
 @blp.route("/campaign/<int:campaign_id>/", methods=("GET",))
 @blp.login_required
 @blp.arguments(TimeseriesDataGetByNameQueryArgsSchema, location="query")
@@ -294,3 +314,28 @@ def post_csv_for_campaign(files, args, campaign_id):
             abort(422, message=str(exc))
         except TimeseriesDataIOError as exc:
             abort(422, message=f"Invalid CSV file content: {exc}")
+
+
+@blp.route("/campaign/<int:campaign_id>/", methods=("DELETE",))
+@blp.login_required
+@blp.arguments(TimeseriesDataGetByNameQueryArgsSchema, location="query")
+@blp.response(204)
+def delete_for_campaign(args, campaign_id):
+    """Delete timeseries data"""
+    campaign = Campaign.get_by_id(campaign_id)
+    if campaign is None:
+        abort(404)
+
+    try:
+        tsdcsvio.delete(
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
+            args["data_state"],
+            campaign=campaign,
+        )
+    except (
+        TimeseriesDataIOUnknownDataStateError,
+        TimeseriesDataIOUnknownTimeseriesError,
+    ) as exc:
+        abort(422, message=str(exc))
