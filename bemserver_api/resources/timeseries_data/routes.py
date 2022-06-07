@@ -53,6 +53,14 @@ blp = Blueprint(
 )
 
 
+blp4c = Blueprint(
+    "TimeseriesDataForCampaign",
+    __name__,
+    url_prefix="/timeseries_data/campaign/<int:campaign_id>",
+    description="Operations on timeseries data for a given campaign",
+)
+
+
 @blp.route("/", methods=("GET",))
 @blp.login_required
 @blp.arguments(TimeseriesDataGetByIDQueryArgsSchema, location="query")
@@ -167,17 +175,37 @@ def post_csv(files, args):
             abort(422, message=f"Invalid CSV file content: {exc}")
 
 
-@blp.route("/campaign/<int:campaign_id>/", methods=("GET",))
+@blp.route("/", methods=("DELETE",))
 @blp.login_required
-@blp.arguments(TimeseriesDataGetByNameQueryArgsSchema, location="query")
-@blp.response(
+@blp.arguments(TimeseriesDataGetByIDQueryArgsSchema, location="query")
+@blp.response(204)
+def delete(args):
+    """Delete timeseries data"""
+    try:
+        tsdcsvio.delete(
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
+            args["data_state"],
+        )
+    except (
+        TimeseriesDataIOUnknownDataStateError,
+        TimeseriesDataIOUnknownTimeseriesError,
+    ) as exc:
+        abort(422, message=str(exc))
+
+
+@blp4c.route("/", methods=("GET",))
+@blp4c.login_required
+@blp4c.arguments(TimeseriesDataGetByNameQueryArgsSchema, location="query")
+@blp4c.response(
     200,
     {"format": "binary", "type": "string"},
     content_type="application/csv",
     example=EXAMPLE_CSV_IN_OUT_FILE_TS_NAME,
 )
 def get_csv_for_campaign(args, campaign_id):
-    """Get timeseries data as CSV file
+    """Get timeseries data as CSV file for a given campaign
 
     Returns a CSV file where the first column is the timestamp as timezone aware
     datetime and each other column is a timeseries data. Column headers are
@@ -213,17 +241,17 @@ def get_csv_for_campaign(args, campaign_id):
     return response
 
 
-@blp.route("/campaign/<int:campaign_id>/aggregate", methods=("GET",))
-@blp.login_required
-@blp.arguments(TimeseriesDataGetByNameAggregateQueryArgsSchema, location="query")
-@blp.response(
+@blp4c.route("/aggregate", methods=("GET",))
+@blp4c.login_required
+@blp4c.arguments(TimeseriesDataGetByNameAggregateQueryArgsSchema, location="query")
+@blp4c.response(
     200,
     {"format": "binary", "type": "string"},
     content_type="application/csv",
     example=EXAMPLE_CSV_IN_OUT_FILE_TS_NAME,
 )
 def get_aggregate_csv_for_campaign(args, campaign_id):
-    """Get aggregated timeseries data as CSV file
+    """Get aggregated timeseries data as CSV file for a given campaign
 
     Returns a CSV file where the first column is the timestamp as timezone aware
     datetime and each other column is a timeseries data. Column headers are
@@ -263,13 +291,13 @@ def get_aggregate_csv_for_campaign(args, campaign_id):
     return response
 
 
-@blp.route("/campaign/<int:campaign_id>/", methods=("POST",))
-@blp.login_required
-@blp.arguments(TimeseriesDataPostFileSchema, location="files")
-@blp.arguments(TimeseriesDataPostQueryArgsSchema, location="query")
-@blp.response(201)
+@blp4c.route("/", methods=("POST",))
+@blp4c.login_required
+@blp4c.arguments(TimeseriesDataPostFileSchema, location="files")
+@blp4c.arguments(TimeseriesDataPostQueryArgsSchema, location="query")
+@blp4c.response(201)
 def post_csv_for_campaign(files, args, campaign_id):
-    """Post timeseries data as CSV file
+    """Post timeseries data as CSV file for a given campaign
 
     Loads a CSV file where the first column is the timestamp as timezone aware
     datetime and each other column is a timeseries data. Column headers are
@@ -294,3 +322,28 @@ def post_csv_for_campaign(files, args, campaign_id):
             abort(422, message=str(exc))
         except TimeseriesDataIOError as exc:
             abort(422, message=f"Invalid CSV file content: {exc}")
+
+
+@blp4c.route("/", methods=("DELETE",))
+@blp4c.login_required
+@blp4c.arguments(TimeseriesDataGetByNameQueryArgsSchema, location="query")
+@blp4c.response(204)
+def delete_for_campaign(args, campaign_id):
+    """Delete timeseries data for a given campaign"""
+    campaign = Campaign.get_by_id(campaign_id)
+    if campaign is None:
+        abort(404)
+
+    try:
+        tsdcsvio.delete(
+            args["start_time"],
+            args["end_time"],
+            args["timeseries"],
+            args["data_state"],
+            campaign=campaign,
+        )
+    except (
+        TimeseriesDataIOUnknownDataStateError,
+        TimeseriesDataIOUnknownTimeseriesError,
+    ) as exc:
+        abort(422, message=str(exc))
