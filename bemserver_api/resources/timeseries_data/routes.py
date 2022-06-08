@@ -166,7 +166,7 @@ def post_csv(files, args):
     ```
     """
     csv_file = files["csv_file"]
-    with io.TextIOWrapper(csv_file) as csv_file_txt:
+    with io.TextIOWrapper(csv_file, encoding="utf-8") as csv_file_txt:
         try:
             tsdcsvio.import_csv(csv_file_txt, args["data_state"])
         except TimeseriesDataIOUnknownDataStateError as exc:
@@ -315,7 +315,7 @@ def post_csv_for_campaign(files, args, campaign_id):
         abort(404)
 
     csv_file = files["csv_file"]
-    with io.TextIOWrapper(csv_file) as csv_file_txt:
+    with io.TextIOWrapper(csv_file, encoding="utf-8") as csv_file_txt:
         try:
             tsdcsvio.import_csv(csv_file_txt, args["data_state"], campaign=campaign)
         except TimeseriesDataIOUnknownDataStateError as exc:
