@@ -21,8 +21,6 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Topic :: Scientific/Engineering",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         (
@@ -30,7 +28,7 @@ setup(
             "GNU Affero General Public License v3 or later (AGPLv3+)"
         ),
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.9",
     install_requires=[
         "flask>=2.0.0",
         "python-dotenv>=0.9.0",
@@ -41,7 +39,7 @@ setup(
         (
             # https://github.com/jazzband/pip-tools/issues/1359
             "bemserver-core @ "
-            "https://github.com/BEMServer/bemserver-core/archive/c857f69.tar.gz"
+            "https://github.com/BEMServer/bemserver-core/archive/3b5a6c7.tar.gz"
         ),
     ],
     packages=find_packages(exclude=["tests*"]),
