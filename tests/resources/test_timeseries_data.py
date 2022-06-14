@@ -49,9 +49,11 @@ class TestTimeseriesDataApi:
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 ts_l = (ts_1_id,)
+                ret_line_1 = "Datetime,1"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
                 ts_l = (f"Timeseries {ts_1_id-1}",)
+                ret_line_1 = "Datetime,Timeseries 0"
 
             ret = client.get(
                 query_url,
@@ -66,14 +68,19 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 200
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert ret_csv_lines[0] == ret_line_1
+                assert len(ret_csv_lines) > 1
 
             # User not in Timeseries group
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 ts_l = (ts_2_id,)
+                ret_line_1 = "Datetime,2"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_2_id}/"
                 ts_l = (f"Timeseries {ts_2_id-1}",)
+                ret_line_1 = "Datetime,Timeseries 1"
 
             ret = client.get(
                 query_url,
@@ -90,6 +97,9 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 200
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert ret_csv_lines[0] == ret_line_1
+                assert len(ret_csv_lines) > 1
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
@@ -129,9 +139,11 @@ class TestTimeseriesDataApi:
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 ts_l = (ts_1_id,)
+                ret_line_1 = "Datetime,1"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
                 ts_l = (f"Timeseries {ts_1_id-1}",)
+                ret_line_1 = "Datetime,Timeseries 0"
 
             ret = client.get(
                 f"{query_url}aggregate",
@@ -148,14 +160,19 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 200
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert ret_csv_lines[0] == ret_line_1
+                assert len(ret_csv_lines) > 1
 
             # User not in Timeseries group
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 ts_l = (ts_2_id,)
+                ret_line_1 = "Datetime,2"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_2_id}/"
                 ts_l = (f"Timeseries {ts_2_id-1}",)
+                ret_line_1 = "Datetime,Timeseries 1"
 
             ret = client.get(
                 f"{query_url}aggregate",
@@ -174,6 +191,9 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 200
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert ret_csv_lines[0] == ret_line_1
+                assert len(ret_csv_lines) > 1
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
@@ -206,9 +226,11 @@ class TestTimeseriesDataApi:
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 header = f"Datetime,{ts_1_id}\n"
+                ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
                 header = f"Datetime,Timeseries {ts_1_id-1}\n"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
 
             csv_str = header + (
                 "2020-01-01T00:00:00+00:00,0\n"
@@ -227,14 +249,27 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 201
+                ret = client.get(
+                    query_url,
+                    query_string={
+                        "start_time": "2020-01-01T00:00:00+00:00",
+                        "end_time": "2020-01-01T03:00:00+00:00",
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                    },
+                )
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert len(ret_csv_lines) > 1
 
             # User not in Timeseries group
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 header = f"Datetime,{ts_2_id}\n"
+                ts_l = ts_2_id
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_2_id}/"
                 header = f"Datetime,Timeseries {ts_2_id-1}\n"
+                ts_l = (f"Timeseries {ts_2_id-1}",)
 
             csv_str = header + (
                 "2020-01-01T00:00:00+00:00,0\n"
@@ -255,6 +290,17 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 201
+                ret = client.get(
+                    query_url,
+                    query_string={
+                        "start_time": "2020-01-01T00:00:00+00:00",
+                        "end_time": "2020-01-01T03:00:00+00:00",
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                    },
+                )
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert len(ret_csv_lines) > 1
 
     @pytest.mark.parametrize("for_campaign", (True, False))
     def test_timeseries_data_post_errors(
@@ -400,6 +446,21 @@ class TestTimeseriesDataApi:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
                 ts_l = (f"Timeseries {ts_1_id-1}",)
 
+            if user == "admin":
+                # Check there is data before deleting
+                ret = client.get(
+                    query_url,
+                    query_string={
+                        "start_time": start_time.isoformat(),
+                        "end_time": end_time.isoformat(),
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                    },
+                )
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert len(ret_csv_lines) > 1
+
+            # Delete
             ret = client.delete(
                 query_url,
                 query_string={
@@ -413,6 +474,18 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 204
+                # Check data is deleted
+                ret = client.get(
+                    query_url,
+                    query_string={
+                        "start_time": start_time.isoformat(),
+                        "end_time": end_time.isoformat(),
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                    },
+                )
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert len(ret_csv_lines) == 1
 
             # User not in Timeseries group
             if not for_campaign:
@@ -422,6 +495,21 @@ class TestTimeseriesDataApi:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_2_id}/"
                 ts_l = (f"Timeseries {ts_2_id-1}",)
 
+            if user == "admin":
+                # Check there is data before deleting
+                ret = client.get(
+                    query_url,
+                    query_string={
+                        "start_time": start_time.isoformat(),
+                        "end_time": end_time.isoformat(),
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                    },
+                )
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert len(ret_csv_lines) > 1
+
+            # Delete
             ret = client.delete(
                 query_url,
                 query_string={
@@ -437,6 +525,18 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 204
+                # Check data is deleted
+                ret = client.get(
+                    query_url,
+                    query_string={
+                        "start_time": start_time.isoformat(),
+                        "end_time": end_time.isoformat(),
+                        "timeseries": ts_l,
+                        "data_state": ds_id,
+                    },
+                )
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert len(ret_csv_lines) == 1
 
     @pytest.mark.parametrize("method", ("get", "delete"))
     @pytest.mark.parametrize("for_campaign", (True, False))
