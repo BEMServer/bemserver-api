@@ -348,7 +348,7 @@ class TestTimeseriesDataApi:
                 data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
             )
             assert ret.status_code == 422
-            assert ret.json["message"] == "Unknown data state ID"
+            assert ret.json["errors"]["query"]["data_state"] == "Unknown data state ID"
 
             # Unknown timeseries
             if not for_campaign:
@@ -369,9 +369,8 @@ class TestTimeseriesDataApi:
                 data={"csv_file": (io.BytesIO(csv_str.encode()), "timeseries.csv")},
             )
             assert ret.status_code == 422
-            assert (
-                ret.json["message"]
-                == f"Invalid CSV file content: Unknown timeseries: ['{dummy_ts}']"
+            assert ret.json["message"].startswith(
+                "Invalid CSV file content: Unknown timeseries"
             )
 
             # Invalid CSV content
@@ -596,7 +595,7 @@ class TestTimeseriesDataApi:
                 },
             )
             assert ret.status_code == 422
-            assert ret.json["message"] == "Unknown data state ID"
+            assert ret.json["errors"]["query"]["data_state"] == "Unknown data state ID"
 
             # Unknown timeseries
             if not for_campaign:
@@ -677,7 +676,7 @@ class TestTimeseriesDataApi:
                 },
             )
             assert ret.status_code == 422
-            assert ret.json["message"] == "Unknown data state ID"
+            assert ret.json["errors"]["query"]["data_state"] == "Unknown data state ID"
 
             # Unknown timeseries
             if not for_campaign:
