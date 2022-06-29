@@ -1,5 +1,5 @@
 """Custom marshmallow fields"""
-import pytz
+import zoneinfo
 
 import marshmallow as ma
 
@@ -18,7 +18,7 @@ class Timezone(ma.fields.String):
 
     def _deserialize(self, value, attr, data, **kwargs):
         ret = super()._deserialize(value, attr, data, **kwargs)
-        if ret not in pytz.all_timezones:
+        if ret not in zoneinfo.available_timezones():
             raise self.make_error("invalid")
         return ret
 
