@@ -1,7 +1,9 @@
 """Custom marshmallow fields"""
-import pytz
+import zoneinfo
 
 import marshmallow as ma
+
+from bemserver_core.input_output.timeseries_data_io import INTERVAL_UNITS
 
 
 class Timezone(ma.fields.String):
@@ -16,6 +18,24 @@ class Timezone(ma.fields.String):
 
     def _deserialize(self, value, attr, data, **kwargs):
         ret = super()._deserialize(value, attr, data, **kwargs)
-        if ret not in pytz.all_timezones:
+        if ret not in zoneinfo.available_timezones():
+            raise self.make_error("invalid")
+        return ret
+
+
+class BucketWidth(ma.fields.String):
+    """A field validating bucket widths"""
+
+    #: Default error messages.
+    default_error_messages = {"invalid": "Not a valid bucket width."}
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        ret = super()._deserialize(value, attr, data, **kwargs)
+        try:
+            val, unit = ret.split()
+            int(val)
+        except ValueError as exc:
+            raise self.make_error("invalid") from exc
+        if unit not in INTERVAL_UNITS:
             raise self.make_error("invalid")
         return ret

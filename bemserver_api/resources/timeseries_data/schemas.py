@@ -5,7 +5,7 @@ from flask_smorest.fields import Upload
 from bemserver_core.input_output.timeseries_data_io import AGGREGATION_FUNCTIONS
 
 from bemserver_api import Schema
-from bemserver_api.extensions.ma_fields import Timezone
+from bemserver_api.extensions.ma_fields import Timezone, BucketWidth
 
 
 class TimeseriesIDListMixinSchema(Schema):
@@ -68,11 +68,10 @@ class TimeseriesDataGetAggregateBaseQueryArgsSchema(
 ):
     """Timeseries values aggregate GET query parameters base schema"""
 
-    # TODO: Create custom field for bucket width
-    bucket_width = ma.fields.String(
+    bucket_width = BucketWidth(
         required=True,
         metadata={
-            "description": "Bucket width (ISO 8601 duration or PostgreSQL)",
+            "description": "Bucket width",
         },
     )
     timezone = Timezone(
