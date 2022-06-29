@@ -149,8 +149,8 @@ def get_aggregate_csv(args):
         timeseries,
         data_state,
         args["bucket_width"],
-        args["timezone"],
         args["aggregation"],
+        timezone=args["timezone"],
         col_label="id",
     )
     response = Response(csv_str, mimetype="text/csv")
@@ -275,8 +275,8 @@ def get_aggregate_csv_for_campaign(args, campaign_id):
         timeseries,
         data_state,
         args["bucket_width"],
-        args["timezone"],
         args["aggregation"],
+        timezone=args["timezone"],
         col_label="name",
     )
     response = Response(csv_str, mimetype="text/csv")
