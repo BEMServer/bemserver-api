@@ -164,6 +164,40 @@ class TestTimeseriesDataApi:
                 assert ret_csv_lines[0] == ret_line_1
                 assert len(ret_csv_lines) > 1
 
+            # Wrong bucket width
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width": "wrong bucket width",
+                    "timezone": "UTC",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 422
+
+            # Wrong timezone
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width": "1 day",
+                    "timezone": "DTC",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 422
+
             # User not in Timeseries group
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
