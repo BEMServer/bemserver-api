@@ -34,7 +34,9 @@ class TestMaFields:
         (
             "lol",
             "12",
-            "1.6 hour",
+            "1.6 minute",
+            "-2 hour",
+            "0 day",
             "month",
             "1 test",
             '{"whatever": "nonsense"}',

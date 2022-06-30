@@ -33,9 +33,11 @@ class BucketWidth(ma.fields.String):
         ret = super()._deserialize(value, attr, data, **kwargs)
         try:
             val, unit = ret.split()
-            int(val)
+            val = int(val)
         except ValueError as exc:
             raise self.make_error("invalid") from exc
         if unit not in INTERVAL_UNITS:
+            raise self.make_error("invalid")
+        if val < 1:
             raise self.make_error("invalid")
         return ret
