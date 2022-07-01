@@ -139,6 +139,22 @@ class TestCampaignsApi:
             assert ret_val[0]["id"] == campaign_2_id
             assert ret_val[1]["id"] == campaign_1_id
 
+            # GET list using "in_name"
+            ret = client.get(CAMPAIGNS_URL, query_string={"in_name": "not"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(CAMPAIGNS_URL, query_string={"in_name": "paign"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            assert ret_val[0]["id"] == campaign_1_id
+            ret = client.get(CAMPAIGNS_URL, query_string={"in_name": "paign 2"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == campaign_2_id
+
             # DELETE wrong ID -> 404
             ret = client.delete(
                 f"{CAMPAIGNS_URL}{DUMMY_ID}", headers={"If-Match": campaign_1_etag}
@@ -193,6 +209,17 @@ class TestCampaignsApi:
             ret = client.get(CAMPAIGNS_URL, query_string={"name": "Campaign 2"})
             assert ret.status_code == 200
             assert not ret.json
+
+            # GET list using "in_name"
+            ret = client.get(CAMPAIGNS_URL, query_string={"in_name": "not"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(CAMPAIGNS_URL, query_string={"in_name": "paign"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == campaign_1_id
 
             # POST
             campaign_3 = {

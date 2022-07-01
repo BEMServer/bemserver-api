@@ -20,3 +20,9 @@ class CampaignSchema(AutoSchema):
 class CampaignQueryArgsSchema(Schema):
     sort = SortField(("name",))
     name = ma.fields.Str()
+    in_name = ma.fields.Str(
+        metadata={
+            "description": """
+Search for items whose name contains this input value (case insensitive)""",
+        }
+    )
