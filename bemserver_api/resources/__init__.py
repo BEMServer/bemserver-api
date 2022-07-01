@@ -39,6 +39,7 @@ from . import timeseries_by_storeys
 from . import timeseries_by_spaces
 from . import timeseries_by_zones
 from . import input_output
+from . import analysis
 
 
 MODULES = (
@@ -81,6 +82,7 @@ MODULES = (
     timeseries_by_spaces,
     timeseries_by_zones,
     input_output,
+    analysis,
 )
 
 
