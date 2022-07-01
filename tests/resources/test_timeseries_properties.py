@@ -20,7 +20,8 @@ class TestTimeseriesDataStatesApi:
             ret = client.get(TIMESERIES_PROPERTIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert not ret_val
+            assert len(ret_val) == 1
+            assert ret_val[0]["name"] == "Interval"
 
             # POST
             tds_1 = {
@@ -41,8 +42,8 @@ class TestTimeseriesDataStatesApi:
             ret = client.get(TIMESERIES_PROPERTIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 1
-            assert ret_val[0]["name"] == "Min"
+            assert len(ret_val) == 2
+            assert {x["name"] for x in ret_val} == {"Min", "Interval"}
 
             # GET by id
             ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}")
@@ -106,7 +107,8 @@ class TestTimeseriesDataStatesApi:
             ret = client.get(TIMESERIES_PROPERTIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert not ret_val
+            assert len(ret_val) == 1
+            assert ret_val[0]["name"] == "Interval"
 
             # GET by id -> 404
             ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}")
@@ -126,8 +128,8 @@ class TestTimeseriesDataStatesApi:
             ret = client.get(TIMESERIES_PROPERTIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 2
-            assert {x["name"] for x in ret_val} == {"Min", "Max"}
+            assert len(ret_val) == 3
+            assert {x["name"] for x in ret_val} == {"Min", "Max", "Interval"}
 
             # POST
             tds = {
