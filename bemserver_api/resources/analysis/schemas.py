@@ -93,9 +93,6 @@ class CompletenessQueryArgsSchema(Schema):
     )
     bucket_width = BucketWidth(
         required=True,
-        metadata={
-            "description": "Bucket width",
-        },
     )
     timezone = Timezone(
         load_default="UTC",
