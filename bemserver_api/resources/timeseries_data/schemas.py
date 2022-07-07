@@ -2,10 +2,13 @@
 import marshmallow as ma
 from flask_smorest.fields import Upload
 
-from bemserver_core.input_output.timeseries_data_io import AGGREGATION_FUNCTIONS
+from bemserver_core.input_output.timeseries_data_io import (
+    AGGREGATION_FUNCTIONS,
+    INTERVAL_UNITS,
+)
 
 from bemserver_api import Schema
-from bemserver_api.extensions.ma_fields import Timezone, BucketWidth
+from bemserver_api.extensions.ma_fields import Timezone
 
 
 class TimeseriesIDListMixinSchema(Schema):
@@ -68,7 +71,12 @@ class TimeseriesDataGetAggregateBaseQueryArgsSchema(
 ):
     """Timeseries values aggregate GET query parameters base schema"""
 
-    bucket_width = BucketWidth(
+    bucket_width_value = ma.fields.Int(
+        validate=ma.validate.Range(min=1),
+        required=True,
+    )
+    bucket_width_unit = ma.fields.String(
+        validate=ma.validate.OneOf(INTERVAL_UNITS),
         required=True,
     )
     timezone = Timezone(
