@@ -52,7 +52,8 @@ class TestAnalysisApi:
                     "end_time": end_time.isoformat(),
                     "timeseries": ts_l,
                     "data_state": ds_id,
-                    "bucket_width": "1 hour",
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
                     "timezone": "UTC",
                 },
             )
@@ -69,7 +70,8 @@ class TestAnalysisApi:
                         "2020-01-01T03:00:00+00:00",
                     ],
                     "timeseries": {
-                        "Timeseries 0": {
+                        "1": {
+                            "name": "Timeseries 0",
                             "avg_count": 1.0,
                             "avg_ratio": 1.0,
                             "count": [1, 1, 1, 1],
@@ -93,7 +95,8 @@ class TestAnalysisApi:
                     "end_time": end_time.isoformat(),
                     "timeseries": ts_l,
                     "data_state": ds_id,
-                    "bucket_width": "1 hour",
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
                     "timezone": "UTC",
                 },
             )
@@ -112,7 +115,8 @@ class TestAnalysisApi:
                         "2020-01-01T03:00:00+00:00",
                     ],
                     "timeseries": {
-                        "Timeseries 1": {
+                        "2": {
+                            "name": "Timeseries 1",
                             "avg_count": 1.0,
                             "avg_ratio": 1.0,
                             "count": [1, 1, 1, 1],

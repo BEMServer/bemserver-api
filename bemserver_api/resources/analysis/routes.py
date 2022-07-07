@@ -46,7 +46,8 @@ def get(args, campaign_id):
         args["end_time"],
         timeseries,
         data_state,
-        args["bucket_width"],
+        args["bucket_width_value"],
+        args["bucket_width_unit"],
         timezone=args["timezone"],
     )
 
