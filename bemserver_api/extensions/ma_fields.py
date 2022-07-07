@@ -23,11 +23,28 @@ class Timezone(ma.fields.String):
         return ret
 
 
+BUCKET_WIDTH_EXAMPLES = [
+    "1 year",
+    "2 month",
+    "3 week",
+    "4 day",
+    "5 hour",
+    "6 minute",
+    "7 second",
+]
+
+
 class BucketWidth(ma.fields.String):
     """A field validating bucket widths"""
 
     #: Default error messages.
     default_error_messages = {"invalid": "Not a valid bucket width."}
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("metadata", {})
+        kwargs["metadata"].setdefault("description", "Bucket width")
+        kwargs["metadata"].setdefault("examples", BUCKET_WIDTH_EXAMPLES)
+        super().__init__(*args, **kwargs)
 
     def _deserialize(self, value, attr, data, **kwargs):
         ret = super()._deserialize(value, attr, data, **kwargs)
