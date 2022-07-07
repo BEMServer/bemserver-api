@@ -85,10 +85,10 @@ class CompletenessQueryArgsSchema(Schema):
         },
     )
     timeseries = ma.fields.List(
-        ma.fields.String(),
+        ma.fields.Int(),
         required=True,
         metadata={
-            "description": "List of timeseries names",
+            "description": "List of timeseries ID",
         },
     )
     data_state = ma.fields.Int(
