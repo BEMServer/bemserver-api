@@ -11,7 +11,6 @@ from bemserver_api import AutoSchema, Schema, SortField
 class EventSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
         table = Event.__table__
-        exclude = ("_campaign_scope_id", "_timestamp")
 
     id = msa.auto_field(dump_only=True)
     timestamp = ma.fields.AwareDateTime()
@@ -20,7 +19,7 @@ class EventSchema(AutoSchema):
 
 class EventPutSchema(EventSchema):
     class Meta(EventSchema.Meta):
-        exclude = EventSchema.Meta.exclude + ("campaign_scope_id", "timestamp")
+        exclude = ("campaign_scope_id", "timestamp")
 
 
 class EventQueryArgsSchema(Schema):
