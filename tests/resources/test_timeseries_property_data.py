@@ -1,4 +1,5 @@
 """Timeseries property data tests"""
+import copy
 import pytest
 
 from tests.common import AuthHeader
@@ -33,7 +34,7 @@ class TestTimeseriesPropertyDataApi:
             tsg_1 = {
                 "timeseries_id": ts_1_id,
                 "property_id": tsp_1_id,
-                "value": 12,
+                "value": "12",
             }
             ret = client.post(TIMESERIES_PROPERTY_DATA_URL, json=tsg_1)
             assert ret.status_code == 201
@@ -45,6 +46,15 @@ class TestTimeseriesPropertyDataApi:
             # POST violating unique constraint
             ret = client.post(TIMESERIES_PROPERTY_DATA_URL, json=tsg_1)
             assert ret.status_code == 409
+
+            # POST wrong value type
+            tsg_post = {
+                "timeseries_id": ts_1_id,
+                "property_id": tsp_2_id,
+                "value": "wrong type",
+            }
+            ret = client.post(TIMESERIES_PROPERTY_DATA_URL, json=tsg_post)
+            assert ret.status_code == 422
 
             # GET list
             ret = client.get(TIMESERIES_PROPERTY_DATA_URL)
@@ -62,7 +72,7 @@ class TestTimeseriesPropertyDataApi:
             assert ret_val == tsg_1
 
             # PUT
-            tsg_1["value"] = 42
+            tsg_1["value"] = "42"
             ret = client.put(
                 f"{TIMESERIES_PROPERTY_DATA_URL}{tsg_1_id}",
                 json=tsg_1,
@@ -73,6 +83,16 @@ class TestTimeseriesPropertyDataApi:
             ret_val.pop("id")
             tsg_1_etag = ret.headers["ETag"]
             assert ret_val == tsg_1
+
+            # PUT wrong value type
+            tsg_1_put = copy.deepcopy(tsg_1)
+            tsg_1_put["value"] = "wrong type"
+            ret = client.put(
+                f"{TIMESERIES_PROPERTY_DATA_URL}{tsg_1_id}",
+                json=tsg_1_put,
+                headers={"If-Match": tsg_1_etag},
+            )
+            assert ret.status_code == 422
 
             # PUT wrong ID -> 404
             ret = client.put(
@@ -86,7 +106,7 @@ class TestTimeseriesPropertyDataApi:
             tsg_2 = {
                 "timeseries_id": ts_1_id,
                 "property_id": tsp_2_id,
-                "value": 42,
+                "value": "42",
             }
             ret = client.post(TIMESERIES_PROPERTY_DATA_URL, json=tsg_2)
             ret_val = ret.json
@@ -155,7 +175,7 @@ class TestTimeseriesPropertyDataApi:
             tspd = {
                 "timeseries_id": ts_1_id,
                 "property_id": tsp_1_id,
-                "value": 12,
+                "value": "12",
             }
             ret = client.post(TIMESERIES_PROPERTY_DATA_URL, json=tspd)
             # This would trigger a unique constraint violation error
@@ -175,7 +195,7 @@ class TestTimeseriesPropertyDataApi:
             assert ret.status_code == 403
 
             # PUT
-            tspd_1["value"] = 42
+            tspd_1["value"] = "42"
             ret = client.put(
                 f"{TIMESERIES_PROPERTY_DATA_URL}{tspd_1_id}",
                 json=tspd_1,
@@ -215,7 +235,7 @@ class TestTimeseriesPropertyDataApi:
         tspd = {
             "timeseries_id": ts_1_id,
             "property_id": tsp_1_id,
-            "value": 12,
+            "value": "12",
         }
         ret = client.post(TIMESERIES_PROPERTY_DATA_URL, json=tspd)
         assert ret.status_code == 401
@@ -225,7 +245,7 @@ class TestTimeseriesPropertyDataApi:
         assert ret.status_code == 401
 
         # PUT
-        tspd["value"] = 42
+        tspd["value"] = "42"
         ret = client.put(
             f"{TIMESERIES_PROPERTY_DATA_URL}{tspd_1_id}",
             json=tspd,

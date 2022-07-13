@@ -1,4 +1,5 @@
 """Building property data routes tests"""
+import copy
 import pytest
 
 from tests.common import AuthHeader
@@ -47,6 +48,15 @@ class TestBuildingPropertyDataApi:
             ret = client.post(BUILDING_PROPERTY_DATA_URL, json=bpd_1)
             assert ret.status_code == 409
 
+            # POST wrong value type
+            bpd_post = {
+                "building_id": building_1_id,
+                "building_property_id": building_p_2_id,
+                "value": "wrong type",
+            }
+            ret = client.post(BUILDING_PROPERTY_DATA_URL, json=bpd_post)
+            assert ret.status_code == 422
+
             # GET list
             ret = client.get(BUILDING_PROPERTY_DATA_URL)
             assert ret.status_code == 200
@@ -74,6 +84,16 @@ class TestBuildingPropertyDataApi:
             ret_val.pop("id")
             bpd_1_etag = ret.headers["ETag"]
             assert ret_val == bpd_1
+
+            # PUT wrong value type
+            bpd_1_put = copy.deepcopy(bpd_1)
+            bpd_1_put["value"] = "wrong type"
+            ret = client.put(
+                f"{BUILDING_PROPERTY_DATA_URL}{bpd_1_id}",
+                json=bpd_1_put,
+                headers={"If-Match": bpd_1_etag},
+            )
+            assert ret.status_code == 422
 
             # PUT wrong ID -> 404
             ret = client.put(

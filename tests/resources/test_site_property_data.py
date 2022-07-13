@@ -1,4 +1,5 @@
 """Site property data routes tests"""
+import copy
 import pytest
 
 from tests.common import AuthHeader
@@ -45,6 +46,15 @@ class TestSitePropertyDataApi:
             ret = client.post(SITE_PROPERTY_DATA_URL, json=spd_1)
             assert ret.status_code == 409
 
+            # POST wrong value type
+            spd_post = {
+                "site_id": site_1_id,
+                "site_property_id": site_p_2_id,
+                "value": "wrong type",
+            }
+            ret = client.post(SITE_PROPERTY_DATA_URL, json=spd_post)
+            assert ret.status_code == 422
+
             # GET list
             ret = client.get(SITE_PROPERTY_DATA_URL)
             assert ret.status_code == 200
@@ -72,6 +82,16 @@ class TestSitePropertyDataApi:
             ret_val.pop("id")
             spd_1_etag = ret.headers["ETag"]
             assert ret_val == spd_1
+
+            # PUT wrong value type
+            spd_1_put = copy.deepcopy(spd_1)
+            spd_1_put["value"] = "wrong type"
+            ret = client.put(
+                f"{SITE_PROPERTY_DATA_URL}{spd_1_id}",
+                json=spd_1_put,
+                headers={"If-Match": spd_1_etag},
+            )
+            assert ret.status_code == 422
 
             # PUT wrong ID -> 404
             ret = client.put(

@@ -7,7 +7,7 @@ import flask.testing
 
 from bemserver_core.database import db
 from bemserver_core.authorization import OpenBar
-from bemserver_core import model
+from bemserver_core import model, common
 from bemserver_core.commands import setup_db
 
 import pytest
@@ -189,9 +189,11 @@ def timeseries_properties(app):
     with OpenBar():
         ts_p_1 = model.TimeseriesProperty.new(
             name="Min",
+            value_type=common.PropertyType.float,
         )
         ts_p_2 = model.TimeseriesProperty.new(
             name="Max",
+            value_type=common.PropertyType.float,
         )
         db.session.commit()
     return ts_p_1.id, ts_p_2.id
@@ -380,12 +382,22 @@ def structural_element_properties(app):
     with OpenBar():
         sep_1 = model.StructuralElementProperty.new(
             name="Area",
+            value_type=common.PropertyType.integer,
         )
         sep_2 = model.StructuralElementProperty.new(
             name="Volume",
+            value_type=common.PropertyType.float,
+        )
+        sep_3 = model.StructuralElementProperty.new(
+            name="Window state",
+            value_type=common.PropertyType.boolean,
+        )
+        sep_4 = model.StructuralElementProperty.new(
+            name="Architect",
+            value_type=common.PropertyType.string,
         )
         db.session.commit()
-    return (sep_1.id, sep_2.id)
+    return (sep_1.id, sep_2.id, sep_3.id, sep_4.id)
 
 
 @pytest.fixture

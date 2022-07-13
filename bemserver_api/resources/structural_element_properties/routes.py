@@ -9,6 +9,7 @@ from bemserver_api.database import db
 
 from .schemas import (
     StructuralElementPropertySchema,
+    StructuralElementPropertyPutSchema,
     StructuralElementPropertyQueryArgsSchema,
 )
 
@@ -57,7 +58,7 @@ class StructuralElementPropertyByIdViews(MethodView):
 
     @blp.login_required
     @blp.etag
-    @blp.arguments(StructuralElementPropertySchema)
+    @blp.arguments(StructuralElementPropertyPutSchema)
     @blp.response(200, StructuralElementPropertySchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):

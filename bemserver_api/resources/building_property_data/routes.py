@@ -3,6 +3,7 @@ from flask.views import MethodView
 from flask_smorest import abort
 
 from bemserver_core.model import BuildingPropertyData
+from bemserver_core.exceptions import PropertyTypeInvalidError
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
@@ -39,7 +40,10 @@ class StructuralElementPropertiesViews(MethodView):
     def post(self, new_item):
         """Add a new building property data"""
         item = BuildingPropertyData.new(**new_item)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except PropertyTypeInvalidError:
+            abort(422, message="Invalid value type")
         return item
 
 
@@ -67,7 +71,10 @@ class BuildingPropertyDataByIdViews(MethodView):
             abort(404)
         blp.check_etag(item, BuildingPropertyDataSchema)
         item.update(**new_item)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except PropertyTypeInvalidError:
+            abort(422, message="Invalid value type")
         return item
 
     @blp.login_required

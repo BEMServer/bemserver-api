@@ -8,7 +8,7 @@ from bemserver_core.model import TimeseriesProperty
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import TimeseriesPropertySchema
+from .schemas import TimeseriesPropertySchema, TimeseriesPropertyPutSchema
 
 
 blp = Blueprint(
@@ -53,7 +53,7 @@ class TimeseriesPropertyByIdViews(MethodView):
 
     @blp.login_required
     @blp.etag
-    @blp.arguments(TimeseriesPropertySchema)
+    @blp.arguments(TimeseriesPropertyPutSchema)
     @blp.response(200, TimeseriesPropertySchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):

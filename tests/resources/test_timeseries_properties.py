@@ -1,5 +1,9 @@
 """Timeseries properties tests"""
+import copy
+
 from tests.common import AuthHeader
+
+from bemserver_core.common import PropertyType
 
 
 DUMMY_ID = "69"
@@ -26,6 +30,7 @@ class TestTimeseriesDataStatesApi:
             # POST
             tds_1 = {
                 "name": "Min",
+                "value_type": PropertyType.float.name,
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds_1)
             assert ret.status_code == 201
@@ -55,9 +60,11 @@ class TestTimeseriesDataStatesApi:
 
             # PUT
             tds_1["name"] = "Qualität"
+            tds_1_put = copy.deepcopy(tds_1)
+            del tds_1_put["value_type"]
             ret = client.put(
                 f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}",
-                json=tds_1,
+                json=tds_1_put,
                 headers={"If-Match": tds_1_etag},
             )
             assert ret.status_code == 200
@@ -69,7 +76,7 @@ class TestTimeseriesDataStatesApi:
             # PUT wrong ID -> 404
             ret = client.put(
                 f"{TIMESERIES_PROPERTIES_URL}{DUMMY_ID}",
-                json=tds_1,
+                json=tds_1_put,
                 headers={"If-Match": tds_1_etag},
             )
             assert ret.status_code == 404
@@ -77,6 +84,7 @@ class TestTimeseriesDataStatesApi:
             # POST TSP 2
             tds_2 = {
                 "name": "Max",
+                "value_type": PropertyType.float.name,
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds_2)
             ret_val = ret.json
@@ -84,10 +92,12 @@ class TestTimeseriesDataStatesApi:
             tds_2_etag = ret.headers["ETag"]
 
             # PUT violating unique constraint
-            tds_2["name"] = "Qualität"
+            tds_2_put = copy.deepcopy(tds_2)
+            del tds_2_put["value_type"]
+            tds_2_put["name"] = "Qualität"
             ret = client.put(
                 f"{TIMESERIES_PROPERTIES_URL}{tds_2_id}",
-                json=tds_2,
+                json=tds_2_put,
                 headers={"If-Match": tds_2_etag},
             )
             assert ret.status_code == 409
@@ -134,6 +144,7 @@ class TestTimeseriesDataStatesApi:
             # POST
             tds = {
                 "name": "Frequency",
+                "value_type": PropertyType.integer.name,
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds)
             assert ret.status_code == 403
@@ -147,10 +158,12 @@ class TestTimeseriesDataStatesApi:
             tds_1 = ret_val
 
             # PUT
-            tds_1["name"] = "Qualität"
+            tds_1_put = copy.deepcopy(tds_1)
+            del tds_1_put["value_type"]
+            tds_1_put["name"] = "Qualität"
             ret = client.put(
                 f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}",
-                json=tds_1,
+                json=tds_1_put,
                 headers={"If-Match": tds_1_etag},
             )
             assert ret.status_code == 403
