@@ -19,3 +19,14 @@ class Timezone(ma.fields.String):
         if ret not in zoneinfo.available_timezones():
             raise self.make_error("invalid")
         return ret
+
+
+class EnumField(ma.fields.String):
+    """Marshmallow field for enum type."""
+
+    def _serialize(self, value, attr, obj, **kwargs):
+        """Serialize an enum value to a string"""
+        try:
+            return value.name
+        except AttributeError:
+            return value
