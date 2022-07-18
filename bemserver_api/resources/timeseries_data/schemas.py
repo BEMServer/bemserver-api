@@ -52,6 +52,12 @@ class TimeseriesDataGetBaseQueryArgsSchema(Schema):
             "description": "Data state ID",
         },
     )
+    timezone = Timezone(
+        load_default="UTC",
+        metadata={
+            "description": "Timezone to use for response data",
+        },
+    )
 
 
 class TimeseriesDataGetByIDQueryArgsSchema(
@@ -78,12 +84,6 @@ class TimeseriesDataGetAggregateBaseQueryArgsSchema(
     bucket_width_unit = ma.fields.String(
         validate=ma.validate.OneOf(INTERVAL_UNITS),
         required=True,
-    )
-    timezone = Timezone(
-        load_default="UTC",
-        metadata={
-            "description": "Timezone to use for the aggreagation",
-        },
     )
     aggregation = ma.fields.String(
         load_default="avg",
