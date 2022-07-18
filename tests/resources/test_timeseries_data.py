@@ -62,6 +62,7 @@ class TestTimeseriesDataApi:
                     "end_time": end_time.isoformat(),
                     "timeseries": ts_l,
                     "data_state": ds_id,
+                    "timezone": "UTC",
                 },
             )
             if user == "anonym":
@@ -100,6 +101,22 @@ class TestTimeseriesDataApi:
                 ret_csv_lines = ret.data.decode("utf-8").splitlines()
                 assert ret_csv_lines[0] == ret_line_1
                 assert len(ret_csv_lines) > 1
+
+            # Unknown timezone
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "timezone": "DTC",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 422
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
@@ -165,24 +182,6 @@ class TestTimeseriesDataApi:
                 assert ret_csv_lines[0] == ret_line_1
                 assert len(ret_csv_lines) > 1
 
-            # Wrong timezone
-            ret = client.get(
-                f"{query_url}aggregate",
-                query_string={
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat(),
-                    "timeseries": ts_l,
-                    "data_state": ds_id,
-                    "bucket_width_value": 1,
-                    "bucket_width_unit": "day",
-                    "timezone": "DTC",
-                },
-            )
-            if user == "anonym":
-                assert ret.status_code == 401
-            else:
-                assert ret.status_code == 422
-
             # User not in Timeseries group
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
@@ -202,7 +201,6 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                     "bucket_width_value": 1,
                     "bucket_width_unit": "day",
-                    "timezone": "UTC",
                 },
             )
             if user == "anonym":
@@ -672,7 +670,6 @@ class TestTimeseriesDataApi:
                         "data_state": ds_id,
                         "bucket_width_value": 1,
                         "bucket_width_unit": "day",
-                        "timezone": "UTC",
                     },
                 )
                 assert ret.status_code == 404
@@ -694,7 +691,6 @@ class TestTimeseriesDataApi:
                     "data_state": DUMMY_ID,
                     "bucket_width_value": 1,
                     "bucket_width_unit": "day",
-                    "timezone": "UTC",
                 },
             )
             assert ret.status_code == 422
@@ -717,7 +713,6 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                     "bucket_width_value": 1,
                     "bucket_width_unit": "day",
-                    "timezone": "UTC",
                 },
             )
             assert ret.status_code == 422
@@ -740,8 +735,22 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                     "bucket_width_value": 1,
                     "bucket_width_unit": "day",
-                    "timezone": "UTC",
                     "aggregation": "dummy",
+                },
+            )
+            assert ret.status_code == 422
+
+            # Unknown timezone
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "day",
+                    "timezone": "DTC",
                 },
             )
             assert ret.status_code == 422
