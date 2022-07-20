@@ -16,10 +16,7 @@ class StructuralElementPropertySchema(AutoSchema):
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
-    value_type = EnumField(
-        validate=ma.validate.OneOf([x.name for x in PropertyType]),
-        required=True,
-    )
+    value_type = EnumField(PropertyType, required=True)
 
 
 class StructuralElementPropertyPutSchema(StructuralElementPropertySchema):
@@ -30,6 +27,4 @@ class StructuralElementPropertyPutSchema(StructuralElementPropertySchema):
 class StructuralElementPropertyQueryArgsSchema(Schema):
     sort = SortField(("name",))
     name = ma.fields.Str()
-    value_type = ma.fields.Str(
-        validate=ma.validate.OneOf([x.name for x in PropertyType]),
-    )
+    value_type = EnumField(PropertyType)

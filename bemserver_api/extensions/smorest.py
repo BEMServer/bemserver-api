@@ -10,7 +10,7 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec.ext.marshmallow.common import resolve_schema_cls
 import marshmallow_sqlalchemy as msa
 
-from .ma_fields import Timezone
+from .ma_fields import Timezone, EnumField
 from .authentication import auth
 from . import integrity_error
 
@@ -40,6 +40,7 @@ class Api(flask_smorest.Api):
     def init_app(self, app, *, spec_kwargs=None):
         super().init_app(app, spec_kwargs=spec_kwargs)
         self.register_field(Timezone, "string", "iana-tz")
+        self.register_field(EnumField, "string", "enum")
         self.spec.components.security_scheme(
             "BasicAuthentication", {"type": "http", "scheme": "basic"}
         )
