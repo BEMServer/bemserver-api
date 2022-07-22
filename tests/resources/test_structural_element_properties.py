@@ -1,5 +1,9 @@
 """Structural element properties routes tests"""
+import copy
+
 from tests.common import AuthHeader
+
+from bemserver_core.common import PropertyType
 
 
 DUMMY_ID = "69"
@@ -24,6 +28,7 @@ class TestStructuralElementPropertiesApi:
             # POST
             sep_1 = {
                 "name": "Area",
+                "value_type": PropertyType.integer.name,
             }
             ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_1)
             assert ret.status_code == 201
@@ -53,9 +58,11 @@ class TestStructuralElementPropertiesApi:
 
             # PUT
             sep_1["description"] = "Fantastic sep"
+            sep_1_put = copy.deepcopy(sep_1)
+            del sep_1_put["value_type"]
             ret = client.put(
                 f"{STRUCTURAL_ELEMENT_PROPERTIES_URL}{sep_1_id}",
-                json=sep_1,
+                json=sep_1_put,
                 headers={"If-Match": sep_1_etag},
             )
             assert ret.status_code == 200
@@ -67,7 +74,7 @@ class TestStructuralElementPropertiesApi:
             # PUT wrong ID -> 404
             ret = client.put(
                 f"{STRUCTURAL_ELEMENT_PROPERTIES_URL}{DUMMY_ID}",
-                json=sep_1,
+                json=sep_1_put,
                 headers={"If-Match": sep_1_etag},
             )
             assert ret.status_code == 404
@@ -75,17 +82,21 @@ class TestStructuralElementPropertiesApi:
             # POST sep 2
             sep_2 = {
                 "name": "Volume",
+                "value_type": PropertyType.float.name,
             }
             ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_2)
+            assert ret.status_code == 201
             ret_val = ret.json
             sep_2_id = ret_val.pop("id")
             sep_2_etag = ret.headers["ETag"]
 
             # PUT violating unique constraint
-            sep_2["name"] = sep_1["name"]
+            sep_2_put = copy.deepcopy(sep_2)
+            del sep_2_put["value_type"]
+            sep_2_put["name"] = sep_1["name"]
             ret = client.put(
                 f"{STRUCTURAL_ELEMENT_PROPERTIES_URL}{sep_2_id}",
-                json=sep_2,
+                json=sep_2_put,
                 headers={"If-Match": sep_2_etag},
             )
             assert ret.status_code == 409
@@ -104,6 +115,21 @@ class TestStructuralElementPropertiesApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == sep_1_id
+            ret = client.get(
+                STRUCTURAL_ELEMENT_PROPERTIES_URL,
+                query_string={"value_type": PropertyType.integer.name},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == sep_1_id
+            ret = client.get(
+                STRUCTURAL_ELEMENT_PROPERTIES_URL,
+                query_string={"value_type": PropertyType.boolean.name},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
 
             # DELETE wrong ID -> 404
             ret = client.delete(
@@ -149,11 +175,12 @@ class TestStructuralElementPropertiesApi:
             ret = client.get(STRUCTURAL_ELEMENT_PROPERTIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 2
+            assert len(ret_val) == 4
 
             # POST
             sep_3 = {
                 "name": "Temperature setpoint",
+                "value_type": PropertyType.float.name,
             }
             ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_3)
             assert ret.status_code == 403
@@ -166,10 +193,12 @@ class TestStructuralElementPropertiesApi:
             sep_1_etag = ret.headers["ETag"]
 
             # PUT
-            sep_1["description"] = "Fantastic sep"
+            sep_1_put = copy.deepcopy(sep_1)
+            del sep_1_put["value_type"]
+            sep_1_put["description"] = "Fantastic sep"
             ret = client.put(
                 f"{STRUCTURAL_ELEMENT_PROPERTIES_URL}{sep_1_id}",
-                json=sep_1,
+                json=sep_1_put,
                 headers={"If-Match": sep_1_etag},
             )
             assert ret.status_code == 403
@@ -194,6 +223,7 @@ class TestStructuralElementPropertiesApi:
         # POST
         sep_3 = {
             "name": "Temperature setpoint",
+            "value_type": PropertyType.float.name,
         }
         ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_3)
         assert ret.status_code == 401

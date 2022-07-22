@@ -33,7 +33,7 @@ class TestSpacePropertiesApi:
             space_p_1_id = ret_val.pop("id")
             space_p_1_etag = ret.headers["ETag"]
             sep = ret_val.pop("structural_element_property")
-            assert sep == {"name": "Area"}
+            assert sep == {"name": "Area", "value_type": "integer"}
             assert ret_val == space_p_1
 
             # POST violating unique constraint
