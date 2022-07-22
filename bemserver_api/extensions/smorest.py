@@ -27,6 +27,18 @@ def resolver(schema):
     return name
 
 
+def enum2properties(self, field, **kwargs) -> dict:
+    """Document :class:`EnumField <bemserver_api.extensions.ma_fields.EnumField>` fields.
+
+    :param Field field: A marshmallow field.
+    :rtype: dict
+    """
+    ret = {}
+    if isinstance(field, EnumField):
+        ret["enum"] = list(field._enum_obj.__members__)
+    return ret
+
+
 class Api(flask_smorest.Api):
     """Api class"""
 
@@ -44,6 +56,7 @@ class Api(flask_smorest.Api):
         self.spec.components.security_scheme(
             "BasicAuthentication", {"type": "http", "scheme": "basic"}
         )
+        self.ma_plugin.converter.add_attribute_function(enum2properties)
 
 
 class Blueprint(flask_smorest.Blueprint):
