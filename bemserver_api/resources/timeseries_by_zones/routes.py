@@ -22,7 +22,7 @@ blp = Blueprint(
 
 
 @blp.route("/")
-class StructuralElementPropertiesViews(MethodView):
+class TimeseriesByZoneViews(MethodView):
     @blp.login_required
     @blp.etag
     @blp.arguments(TimeseriesByZoneQueryArgsSchema, location="query")

@@ -23,7 +23,7 @@ blp = Blueprint(
 
 
 @blp.route("/")
-class StructuralElementPropertiesViews(MethodView):
+class SitePropertyDataViews(MethodView):
     @blp.login_required
     @blp.etag
     @blp.arguments(SitePropertyDataQueryArgsSchema, location="query")
