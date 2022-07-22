@@ -43,7 +43,7 @@ class TimeseriesPropertyDataViews(MethodView):
         try:
             db.session.commit()
         except PropertyTypeInvalidError:
-            abort(422, message="Invalid value type")
+            abort(422, errors={"json": {"value": ["Invalid type."]}})
         return item
 
 
@@ -74,7 +74,7 @@ class TimeseriesPropertyDataByIdViews(MethodView):
         try:
             db.session.commit()
         except PropertyTypeInvalidError:
-            abort(422, message="Invalid value type")
+            abort(422, errors={"json": {"value": ["Invalid type."]}})
         return item
 
     @blp.login_required
