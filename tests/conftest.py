@@ -187,16 +187,7 @@ def user_groups_by_campaign_scopes(app, user_groups, campaign_scopes):
 @pytest.fixture
 def timeseries_properties(app):
     with OpenBar():
-        ts_p_1 = model.TimeseriesProperty.new(
-            name="Min",
-            value_type=common.PropertyType.float,
-        )
-        ts_p_2 = model.TimeseriesProperty.new(
-            name="Max",
-            value_type=common.PropertyType.float,
-        )
-        db.session.commit()
-    return ts_p_1.id, ts_p_2.id
+        return [x.id for x in model.TimeseriesProperty.get()]
 
 
 @pytest.fixture(params=[2])

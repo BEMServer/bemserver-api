@@ -209,7 +209,6 @@ class TestInputOutputTimeseries:
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
-    @pytest.mark.usefixtures("timeseries_properties")
     @pytest.mark.usefixtures("sites")
     @pytest.mark.usefixtures("buildings")
     @pytest.mark.usefixtures("storeys")

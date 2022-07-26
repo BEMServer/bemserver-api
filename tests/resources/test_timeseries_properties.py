@@ -24,12 +24,12 @@ class TestTimeseriesDataStatesApi:
             ret = client.get(TIMESERIES_PROPERTIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 1
-            assert ret_val[0]["name"] == "Interval"
+            nb_ts_props = len(ret_val)
+            assert nb_ts_props > 0
 
             # POST
             tds_1 = {
-                "name": "Min",
+                "name": "Deutsche Qualität",
                 "value_type": PropertyType.float.name,
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds_1)
@@ -47,8 +47,8 @@ class TestTimeseriesDataStatesApi:
             ret = client.get(TIMESERIES_PROPERTIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 2
-            assert {x["name"] for x in ret_val} == {"Min", "Interval"}
+            assert len(ret_val) == nb_ts_props + 1
+            assert tds_1["name"] in [x["name"] for x in ret_val]
 
             # GET by id
             ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}")
@@ -83,7 +83,7 @@ class TestTimeseriesDataStatesApi:
 
             # POST TSP 2
             tds_2 = {
-                "name": "Max",
+                "name": "Autentica qualità",
                 "value_type": PropertyType.float.name,
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds_2)
@@ -112,19 +112,19 @@ class TestTimeseriesDataStatesApi:
                 f"{TIMESERIES_PROPERTIES_URL}{tds_2_id}",
                 headers={"If-Match": tds_2_etag},
             )
+            assert ret.status_code == 204
 
             # GET list
             ret = client.get(TIMESERIES_PROPERTIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 1
-            assert ret_val[0]["name"] == "Interval"
+            assert len(ret_val) == nb_ts_props
 
             # GET by id -> 404
             ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}")
             assert ret.status_code == 404
 
-    def test_timeseries_properties_as_user_api(self, app, users, timeseries_properties):
+    def test_timeseries_properties_as_user_api(self, app, users):
 
         tds_1_id = 1
 
@@ -138,12 +138,12 @@ class TestTimeseriesDataStatesApi:
             ret = client.get(TIMESERIES_PROPERTIES_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 3
-            assert {x["name"] for x in ret_val} == {"Min", "Max", "Interval"}
+            nb_ts_props = len(ret_val)
+            assert nb_ts_props > 0
 
             # POST
             tds = {
-                "name": "Frequency",
+                "name": "Frequency (test)",
                 "value_type": PropertyType.integer.name,
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds)
@@ -179,7 +179,7 @@ class TestTimeseriesDataStatesApi:
         self, app, users, timeseries_properties
     ):
 
-        tds_1_id = timeseries_properties[0]
+        tsp_1_id = timeseries_properties[0]
 
         client = app.test_client()
 
@@ -189,18 +189,18 @@ class TestTimeseriesDataStatesApi:
 
         # POST
         tds = {
-            "name": "Frequency",
+            "name": "Frequency (test)",
         }
         ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds)
         assert ret.status_code == 401
 
         # GET by id
-        ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}")
+        ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tsp_1_id}")
         assert ret.status_code == 401
 
         # PUT
         ret = client.put(
-            f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}",
+            f"{TIMESERIES_PROPERTIES_URL}{tsp_1_id}",
             json=tds,
             headers={"If-Match": "Dummy-ETag"},
         )
@@ -209,7 +209,7 @@ class TestTimeseriesDataStatesApi:
 
         # DELETE
         ret = client.delete(
-            f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}",
+            f"{TIMESERIES_PROPERTIES_URL}{tsp_1_id}",
             headers={"If-Match": "Dummy-ETag"},
         )
         # ETag is wrong but we get rejected before ETag check anyway
