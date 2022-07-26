@@ -35,6 +35,7 @@ class TestTimeseriesApi:
                 "description": "Timeseries example 1",
                 "campaign_id": campaign_1_id,
                 "campaign_scope_id": cs_1_id,
+                "unit_symbol": "°C",
             }
             ret = client.post(TIMESERIES_URL, json=timeseries_1)
             assert ret.status_code == 201
@@ -103,6 +104,22 @@ class TestTimeseriesApi:
                 headers={"If-Match": timeseries_1_etag},
             )
             assert ret.status_code == 409
+
+            # GET list with filters
+            ret = client.get(TIMESERIES_URL, query_string={"name": "Timeseries 1"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == timeseries_1_id
+            ret = client.get(TIMESERIES_URL, query_string={"unit_symbol": "°C"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == timeseries_1_id
+            ret = client.get(TIMESERIES_URL, query_string={"unit_symbol": "kWh"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
 
             # DELETE
             timeseries_3 = {

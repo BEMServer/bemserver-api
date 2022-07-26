@@ -83,6 +83,7 @@ class TestStructuralElementPropertiesApi:
             sep_2 = {
                 "name": "Volume",
                 "value_type": PropertyType.float.name,
+                "unit_symbol": "L",
             }
             ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_2)
             assert ret.status_code == 201
@@ -126,6 +127,20 @@ class TestStructuralElementPropertiesApi:
             ret = client.get(
                 STRUCTURAL_ELEMENT_PROPERTIES_URL,
                 query_string={"value_type": PropertyType.boolean.name},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(
+                STRUCTURAL_ELEMENT_PROPERTIES_URL,
+                query_string={"unit_symbol": "L"},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(
+                STRUCTURAL_ELEMENT_PROPERTIES_URL,
+                query_string={"unit_symbol": "kWh"},
             )
             assert ret.status_code == 200
             ret_val = ret.json
