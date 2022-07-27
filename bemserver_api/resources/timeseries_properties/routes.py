@@ -8,7 +8,11 @@ from bemserver_core.model import TimeseriesProperty
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import TimeseriesPropertySchema, TimeseriesPropertyPutSchema
+from .schemas import (
+    TimeseriesPropertySchema,
+    TimeseriesPropertyPutSchema,
+    TimeseriesPropertyQueryArgsSchema,
+)
 
 
 blp = Blueprint(
@@ -22,10 +26,11 @@ blp = Blueprint(
 @blp.route("/")
 class TimeseriesPropertiesViews(MethodView):
     @blp.login_required
+    @blp.arguments(TimeseriesPropertyQueryArgsSchema, location="query")
     @blp.response(200, TimeseriesPropertySchema(many=True))
-    def get(self):
+    def get(self, args):
         """List timeseries properties"""
-        return TimeseriesProperty.get()
+        return TimeseriesProperty.get(**args)
 
     @blp.login_required
     @blp.etag

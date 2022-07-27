@@ -26,21 +26,28 @@ class TestTimeseriesDataStatesApi:
             ret_val = ret.json
             nb_ts_props = len(ret_val)
             assert nb_ts_props > 0
+            nb_float = len(
+                [x for x in ret_val if x["value_type"] == PropertyType.float.name]
+            )
+            nb_bool = len(
+                [x for x in ret_val if x["value_type"] == PropertyType.boolean.name]
+            )
 
             # POST
-            tds_1 = {
+            tsp_1 = {
                 "name": "Deutsche Qualität",
                 "value_type": PropertyType.float.name,
+                "unit_symbol": "Qualität unit",
             }
-            ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds_1)
+            ret = client.post(TIMESERIES_PROPERTIES_URL, json=tsp_1)
             assert ret.status_code == 201
             ret_val = ret.json
-            tds_1_id = ret_val.pop("id")
-            tds_1_etag = ret.headers["ETag"]
-            assert ret_val == tds_1
+            tsp_1_id = ret_val.pop("id")
+            tsp_1_etag = ret.headers["ETag"]
+            assert ret_val == tsp_1
 
             # POST violating unique constraint
-            ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds_1)
+            ret = client.post(TIMESERIES_PROPERTIES_URL, json=tsp_1)
             assert ret.status_code == 409
 
             # GET list
@@ -48,69 +55,106 @@ class TestTimeseriesDataStatesApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == nb_ts_props + 1
-            assert tds_1["name"] in [x["name"] for x in ret_val]
+            assert tsp_1["name"] in [x["name"] for x in ret_val]
 
             # GET by id
-            ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}")
+            ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tsp_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == tds_1_etag
+            assert ret.headers["ETag"] == tsp_1_etag
             ret_val = ret.json
             ret_val.pop("id")
-            assert ret_val == tds_1
+            assert ret_val == tsp_1
 
             # PUT
-            tds_1["name"] = "Qualität"
-            tds_1_put = copy.deepcopy(tds_1)
-            del tds_1_put["value_type"]
+            tsp_1["name"] = "Qualität"
+            tsp_1_put = copy.deepcopy(tsp_1)
+            del tsp_1_put["value_type"]
             ret = client.put(
-                f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}",
-                json=tds_1_put,
-                headers={"If-Match": tds_1_etag},
+                f"{TIMESERIES_PROPERTIES_URL}{tsp_1_id}",
+                json=tsp_1_put,
+                headers={"If-Match": tsp_1_etag},
             )
             assert ret.status_code == 200
             ret_val = ret.json
             ret_val.pop("id")
-            tds_1_etag = ret.headers["ETag"]
-            assert ret_val == tds_1
+            tsp_1_etag = ret.headers["ETag"]
+            assert ret_val == tsp_1
 
             # PUT wrong ID -> 404
             ret = client.put(
                 f"{TIMESERIES_PROPERTIES_URL}{DUMMY_ID}",
-                json=tds_1_put,
-                headers={"If-Match": tds_1_etag},
+                json=tsp_1_put,
+                headers={"If-Match": tsp_1_etag},
             )
             assert ret.status_code == 404
 
             # POST TSP 2
-            tds_2 = {
+            tsp_2 = {
                 "name": "Autentica qualità",
                 "value_type": PropertyType.float.name,
             }
-            ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds_2)
+            ret = client.post(TIMESERIES_PROPERTIES_URL, json=tsp_2)
             ret_val = ret.json
-            tds_2_id = ret_val.pop("id")
-            tds_2_etag = ret.headers["ETag"]
+            tsp_2_id = ret_val.pop("id")
+            tsp_2_etag = ret.headers["ETag"]
 
             # PUT violating unique constraint
-            tds_2_put = copy.deepcopy(tds_2)
-            del tds_2_put["value_type"]
-            tds_2_put["name"] = "Qualität"
+            tsp_2_put = copy.deepcopy(tsp_2)
+            del tsp_2_put["value_type"]
+            tsp_2_put["name"] = "Qualität"
             ret = client.put(
-                f"{TIMESERIES_PROPERTIES_URL}{tds_2_id}",
-                json=tds_2_put,
-                headers={"If-Match": tds_2_etag},
+                f"{TIMESERIES_PROPERTIES_URL}{tsp_2_id}",
+                json=tsp_2_put,
+                headers={"If-Match": tsp_2_etag},
             )
             assert ret.status_code == 409
 
+            # GET list with filters
+            ret = client.get(
+                TIMESERIES_PROPERTIES_URL, query_string={"name": "Qualität"}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == tsp_1_id
+            ret = client.get(
+                TIMESERIES_PROPERTIES_URL,
+                query_string={"value_type": PropertyType.float.name},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == nb_float + 2
+            ret = client.get(
+                TIMESERIES_PROPERTIES_URL,
+                query_string={"value_type": PropertyType.boolean.name},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == nb_bool
+            ret = client.get(
+                TIMESERIES_PROPERTIES_URL,
+                query_string={"unit_symbol": "Qualität unit"},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(
+                TIMESERIES_PROPERTIES_URL,
+                query_string={"unit_symbol": "Qualità unit"},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+
             # DELETE
             ret = client.delete(
-                f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}",
-                headers={"If-Match": tds_1_etag},
+                f"{TIMESERIES_PROPERTIES_URL}{tsp_1_id}",
+                headers={"If-Match": tsp_1_etag},
             )
             assert ret.status_code == 204
             ret = client.delete(
-                f"{TIMESERIES_PROPERTIES_URL}{tds_2_id}",
-                headers={"If-Match": tds_2_etag},
+                f"{TIMESERIES_PROPERTIES_URL}{tsp_2_id}",
+                headers={"If-Match": tsp_2_etag},
             )
             assert ret.status_code == 204
 
@@ -121,7 +165,7 @@ class TestTimeseriesDataStatesApi:
             assert len(ret_val) == nb_ts_props
 
             # GET by id -> 404
-            ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tds_1_id}")
+            ret = client.get(f"{TIMESERIES_PROPERTIES_URL}{tsp_1_id}")
             assert ret.status_code == 404
 
     def test_timeseries_properties_as_user_api(self, app, users):

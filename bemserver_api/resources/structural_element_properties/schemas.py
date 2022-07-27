@@ -28,3 +28,4 @@ class StructuralElementPropertyQueryArgsSchema(Schema):
     sort = SortField(("name",))
     name = ma.fields.Str()
     value_type = EnumField(PropertyType)
+    unit_symbol = ma.fields.Str()
