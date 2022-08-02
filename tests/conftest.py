@@ -129,11 +129,13 @@ def campaigns(app):
         campaign_1 = model.Campaign.new(
             name="Campaign 1",
             start_time=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
+            timezone="UTC",
         )
         campaign_2 = model.Campaign.new(
             name="Campaign 2",
             start_time=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
             end_time=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
+            timezone="Europe/Paris",
         )
         db.session.commit()
     return campaign_1.id, campaign_2.id
