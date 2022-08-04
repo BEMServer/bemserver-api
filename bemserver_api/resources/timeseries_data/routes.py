@@ -16,7 +16,9 @@ from bemserver_api import Blueprint
 
 from .schemas import (
     TimeseriesDataGetByIDQueryArgsSchema,
+    TimeseriesDataDeleteByIDQueryArgsSchema,
     TimeseriesDataGetByNameQueryArgsSchema,
+    TimeseriesDataDeleteByNameQueryArgsSchema,
     TimeseriesDataGetByIDAggregateQueryArgsSchema,
     TimeseriesDataGetByNameAggregateQueryArgsSchema,
     TimeseriesDataPostQueryArgsSchema,
@@ -190,7 +192,7 @@ def post_csv(files, args):
 
 @blp.route("/", methods=("DELETE",))
 @blp.login_required
-@blp.arguments(TimeseriesDataGetByIDQueryArgsSchema, location="query")
+@blp.arguments(TimeseriesDataDeleteByIDQueryArgsSchema, location="query")
 @blp.response(204)
 def delete(args):
     """Delete timeseries data"""
@@ -319,7 +321,7 @@ def post_csv_for_campaign(files, args, campaign_id):
 
 @blp4c.route("/", methods=("DELETE",))
 @blp4c.login_required
-@blp4c.arguments(TimeseriesDataGetByNameQueryArgsSchema, location="query")
+@blp4c.arguments(TimeseriesDataDeleteByNameQueryArgsSchema, location="query")
 @blp4c.response(204)
 def delete_for_campaign(args, campaign_id):
     """Delete timeseries data for a given campaign"""

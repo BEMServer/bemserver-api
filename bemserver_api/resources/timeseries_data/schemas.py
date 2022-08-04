@@ -66,10 +66,20 @@ class TimeseriesDataGetByIDQueryArgsSchema(
     """Timeseries values GET by ID query parameters schema"""
 
 
+class TimeseriesDataDeleteByIDQueryArgsSchema(TimeseriesDataGetByIDQueryArgsSchema):
+    class Meta(TimeseriesDataGetByIDQueryArgsSchema.Meta):
+        exclude = ("timezone",)
+
+
 class TimeseriesDataGetByNameQueryArgsSchema(
     TimeseriesDataGetBaseQueryArgsSchema, TimeseriesNameListMixinSchema
 ):
     """Timeseries values GET by name query parameters schema"""
+
+
+class TimeseriesDataDeleteByNameQueryArgsSchema(TimeseriesDataGetByNameQueryArgsSchema):
+    class Meta(TimeseriesDataGetByNameQueryArgsSchema.Meta):
+        exclude = ("timezone",)
 
 
 class TimeseriesDataGetAggregateBaseQueryArgsSchema(
