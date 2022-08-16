@@ -34,12 +34,12 @@ setup(
         "python-dotenv>=0.9.0",
         "marshmallow>=3.14.0,<4.0",
         "marshmallow-sqlalchemy>=0.24.0",
-        "flask_smorest>=0.37.0,<0.38",
+        "flask_smorest>=0.37.0,<0.40",
         "flask-httpauth>=0.5.0",
         (
             # https://github.com/jazzband/pip-tools/issues/1359
             "bemserver-core @ "
-            "https://github.com/BEMServer/bemserver-core/archive/ecd1d16.tar.gz"
+            "https://github.com/BEMServer/bemserver-core/archive/9ded6f3.tar.gz"
         ),
     ],
     packages=find_packages(exclude=["tests*"]),
