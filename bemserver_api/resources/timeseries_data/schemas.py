@@ -31,8 +31,8 @@ class TimeseriesNameListMixinSchema(Schema):
     )
 
 
-class TimeseriesDataGetBaseQueryArgsSchema(Schema):
-    """Timeseries values GET query parameters base schema"""
+class TimeseriesDataBaseQueryArgsSchema(Schema):
+    """Timeseries values query parameters base schema"""
 
     start_time = ma.fields.AwareDateTime(
         required=True,
@@ -52,6 +52,23 @@ class TimeseriesDataGetBaseQueryArgsSchema(Schema):
             "description": "Data state ID",
         },
     )
+
+
+class TimeseriesDataDeleteByIDQueryArgsSchema(
+    TimeseriesDataBaseQueryArgsSchema, TimeseriesIDListMixinSchema
+):
+    """Timeseries values DELETE by ID query parameters schema"""
+
+
+class TimeseriesDataDeleteByNameQueryArgsSchema(
+    TimeseriesDataBaseQueryArgsSchema, TimeseriesNameListMixinSchema
+):
+    """Timeseries values DELETE by name query parameters schema"""
+
+
+class TimeseriesDataGetBaseQueryArgsSchema(TimeseriesDataBaseQueryArgsSchema):
+    """Timeseries values GET query parameters base schema"""
+
     timezone = Timezone(
         load_default="UTC",
         metadata={

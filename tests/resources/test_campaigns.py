@@ -34,6 +34,7 @@ class TestCampaignsApi:
                 "end_time": (
                     dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
                 ),
+                "timezone": "Europe/Paris",
             }
             ret = client.post(CAMPAIGNS_URL, json=campaign_1)
             assert ret.status_code == 201
@@ -91,6 +92,7 @@ class TestCampaignsApi:
                 "end_time": (
                     dt.datetime(2019, 9, 20, tzinfo=dt.timezone.utc).isoformat()
                 ),
+                "timezone": "UTC",
             }
             ret = client.post(CAMPAIGNS_URL, json=campaign_2)
             ret_val = ret.json
@@ -230,6 +232,7 @@ class TestCampaignsApi:
                 "end_time": (
                     dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
                 ),
+                "timezone": "UTC",
             }
             ret = client.post(CAMPAIGNS_URL, json=campaign_3)
             assert ret.status_code == 403
@@ -272,6 +275,7 @@ class TestCampaignsApi:
             "name": "Campaign 3",
             "start_time": (dt.datetime(2012, 9, 4, tzinfo=dt.timezone.utc).isoformat()),
             "end_time": (dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()),
+            "timezone": "UTC",
         }
         ret = client.post(CAMPAIGNS_URL, json=campaign_3)
         assert ret.status_code == 401
