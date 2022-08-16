@@ -110,6 +110,7 @@ def get_csv(args):
         args["end_time"],
         timeseries,
         data_state,
+        timezone=args["timezone"],
         col_label="id",
     )
     response = Response(csv_str, mimetype="text/csv")
@@ -236,6 +237,7 @@ def get_csv_for_campaign(args, campaign_id):
         args["end_time"],
         timeseries,
         data_state,
+        timezone=args["timezone"],
         col_label="name",
     )
     response = Response(csv_str, mimetype="text/csv")

@@ -62,7 +62,6 @@ class TestTimeseriesDataApi:
                     "end_time": end_time.isoformat(),
                     "timeseries": ts_l,
                     "data_state": ds_id,
-                    "timezone": "UTC",
                 },
             )
             if user == "anonym":
@@ -71,7 +70,25 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 200
                 ret_csv_lines = ret.data.decode("utf-8").splitlines()
                 assert ret_csv_lines[0] == ret_line_1
-                assert len(ret_csv_lines) > 1
+                assert ret_csv_lines[1] == "2020-01-01T00:00:00+0000,0.0"
+
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "timezone": "Europe/Paris",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert ret_csv_lines[0] == ret_line_1
+                assert ret_csv_lines[1] == "2020-01-01T01:00:00+0100,0.0"
 
             # User not in Timeseries group
             if not for_campaign:
