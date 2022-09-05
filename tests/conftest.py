@@ -7,7 +7,7 @@ import flask.testing
 
 from bemserver_core.database import db
 from bemserver_core.authorization import OpenBar
-from bemserver_core import model, common
+from bemserver_core import common, model, scheduled_tasks
 from bemserver_core.commands import setup_db
 
 import pytest
@@ -616,3 +616,33 @@ def timeseries_by_zones(app, spaces, timeseries):
         )
         db.session.commit()
     return (tbz_1.id, tbz_2.id)
+
+
+@pytest.fixture
+def st_cleanups_by_campaigns(app, campaigns):
+    with OpenBar():
+        st_cbc_1 = scheduled_tasks.ST_CleanupByCampaign.new(
+            campaign_id=campaigns[0],
+            enabled=True,
+        )
+        st_cbc_2 = scheduled_tasks.ST_CleanupByCampaign.new(
+            campaign_id=campaigns[1],
+            enabled=True,
+        )
+        db.session.commit()
+    return (st_cbc_1.id, st_cbc_2.id)
+
+
+@pytest.fixture
+def st_cleanups_by_timeseries(app, st_cleanups_by_campaigns, timeseries):
+    with OpenBar():
+        st_cbt_1 = scheduled_tasks.ST_CleanupByTimeseries.new(
+            st_cleanup_by_campaign_id=st_cleanups_by_campaigns[0],
+            timeseries_id=timeseries[0],
+        )
+        st_cbt_2 = scheduled_tasks.ST_CleanupByTimeseries.new(
+            st_cleanup_by_campaign_id=st_cleanups_by_campaigns[1],
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (st_cbt_1.id, st_cbt_2.id)

@@ -40,6 +40,8 @@ from . import timeseries_by_spaces
 from . import timeseries_by_zones
 from . import input_output
 from . import analysis
+from . import st_cleanups_by_campaigns
+from . import st_cleanups_by_timeseries
 
 
 MODULES = (
@@ -83,6 +85,8 @@ MODULES = (
     timeseries_by_zones,
     input_output,
     analysis,
+    st_cleanups_by_campaigns,
+    st_cleanups_by_timeseries,
 )
 
 
