@@ -16,4 +16,3 @@ class ST_CleanupByCampaignSchema(AutoSchema):
 
 class ST_CleanupByCampaignQueryArgsSchema(Schema):
     campaign_id = ma.fields.Int()
-    enabled = ma.fields.Bool()

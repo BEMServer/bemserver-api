@@ -54,21 +54,6 @@ class ST_CleanupByCampaignByIdViews(MethodView):
 
     @blp.login_required
     @blp.etag
-    @blp.arguments(ST_CleanupByCampaignSchema)
-    @blp.response(200, ST_CleanupByCampaignSchema)
-    @blp.catch_integrity_error
-    def put(self, new_item, item_id):
-        """Update an existing cleanup scheduled tasks x campaign association"""
-        item = ST_CleanupByCampaign.get_by_id(item_id)
-        if item is None:
-            abort(404)
-        blp.check_etag(item, ST_CleanupByCampaignSchema)
-        item.update(**new_item)
-        db.session.commit()
-        return item
-
-    @blp.login_required
-    @blp.etag
     @blp.response(204)
     def delete(self, item_id):
         """Delete a cleanup scheduled tasks x campaign associations"""
