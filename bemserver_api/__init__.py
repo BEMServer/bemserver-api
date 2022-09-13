@@ -31,7 +31,6 @@ def create_app(config_override=None):
     app.config.from_object(config_override)
 
     database.init_app(app)
-    authentication.init_app(app)
     api = Api()
     api.init_app(app)
     register_blueprints(api)

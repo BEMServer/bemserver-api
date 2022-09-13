@@ -43,19 +43,17 @@ class Auth(HTTPBasicAuth):
 auth = Auth()
 
 
-def init_app(app):
-    """Initialize application authentication"""
+@auth.verify_password
+def verify_password(username, password):
+    """Check password and return User instance"""
+    user = db.session.execute(sqla.select(User).where(User.email == username)).scalar()
+    if user is not None and user.check_password(password):
+        return user
+    return None
 
-    @auth.verify_password
-    def verify_password(username, password):
-        user = db.session.execute(
-            sqla.select(User).where(User.email == username)
-        ).scalar()
-        if user is not None and user.check_password(password):
-            return user
-        return None
 
-    @auth.error_handler
-    def auth_error(status):
-        # Call abort to trigger error handler and get consistent JSON output
-        abort(status, message="Authentication error")
+@auth.error_handler
+def auth_error(status):
+    """Authentication error handler"""
+    # Call abort to trigger error handler and get consistent JSON output
+    abort(status, message="Authentication error")
