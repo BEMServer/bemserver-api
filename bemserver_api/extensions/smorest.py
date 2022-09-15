@@ -28,7 +28,7 @@ def resolver(schema):
 
 
 def enum2properties(self, field, **kwargs) -> dict:
-    """Document :class:`EnumField <bemserver_api.extensions.ma_fields.EnumField>` fields.
+    """Document :class:`EnumField <bemserver_api.extensions.ma_fields.EnumField>` field.
 
     :param Field field: A marshmallow field.
     :rtype: dict
