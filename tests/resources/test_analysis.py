@@ -18,7 +18,6 @@ class TestAnalysisApi:
         app,
         user,
         users,
-        campaigns,
         timeseries,
         timeseries_data,
     ):
