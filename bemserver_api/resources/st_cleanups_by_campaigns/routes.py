@@ -7,7 +7,13 @@ from bemserver_core.scheduled_tasks import ST_CleanupByCampaign
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import ST_CleanupByCampaignSchema, ST_CleanupByCampaignQueryArgsSchema
+from .schemas import (
+    ST_CleanupByCampaignSchema,
+    ST_CleanupByCampaignQueryArgsSchema,
+    ST_CleanupByCampaignPutSchema,
+    ST_CleanupByCampaignFullSchema,
+    ST_CleanupByCampaignFullQueryArgsSchema,
+)
 
 
 blp = Blueprint(
@@ -54,6 +60,20 @@ class ST_CleanupByCampaignByIdViews(MethodView):
 
     @blp.login_required
     @blp.etag
+    @blp.arguments(ST_CleanupByCampaignPutSchema)
+    @blp.response(200, ST_CleanupByCampaignSchema)
+    def put(self, item_data, item_id):
+        """Update cleanup scheduled tasks x campaign association by ID"""
+        item = ST_CleanupByCampaign.get_by_id(item_id)
+        if item is None:
+            abort(404)
+        blp.check_etag(item, ST_CleanupByCampaignSchema)
+        item.update(**item_data)
+        db.session.commit()
+        return item
+
+    @blp.login_required
+    @blp.etag
     @blp.response(204)
     def delete(self, item_id):
         """Delete a cleanup scheduled tasks x campaign associations"""
@@ -63,3 +83,13 @@ class ST_CleanupByCampaignByIdViews(MethodView):
         blp.check_etag(item, ST_CleanupByCampaignSchema)
         item.delete()
         db.session.commit()
+
+
+@blp.route("/full")
+@blp.login_required
+@blp.etag
+@blp.arguments(ST_CleanupByCampaignFullQueryArgsSchema, location="query")
+@blp.response(200, ST_CleanupByCampaignFullSchema(many=True))
+def get_full(args):
+    """List cleanup service state for all campaigns"""
+    return ST_CleanupByCampaign.get_all(**args)

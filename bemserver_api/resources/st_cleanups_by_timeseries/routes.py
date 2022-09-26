@@ -6,7 +6,12 @@ from bemserver_core.scheduled_tasks import ST_CleanupByTimeseries
 
 from bemserver_api import Blueprint
 
-from .schemas import ST_CleanupByTimeseriesSchema, ST_CleanupByTimeseriesQueryArgsSchema
+from .schemas import (
+    ST_CleanupByTimeseriesSchema,
+    ST_CleanupByTimeseriesQueryArgsSchema,
+    ST_CleanupByTimeseriesFullSchema,
+    ST_CleanupByTimeseriesFullQueryArgsSchema,
+)
 
 
 blp = Blueprint(
@@ -39,3 +44,13 @@ class ST_CleanupByTimeseriesByIdViews(MethodView):
         if item is None:
             abort(404)
         return item
+
+
+@blp.route("/full")
+@blp.login_required
+@blp.etag
+@blp.arguments(ST_CleanupByTimeseriesFullQueryArgsSchema, location="query")
+@blp.response(200, ST_CleanupByTimeseriesFullSchema(many=True))
+def get_full(args):
+    """List cleanup service last timestamp for all timeseries"""
+    return ST_CleanupByTimeseries.get_all(**args)

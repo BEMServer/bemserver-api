@@ -634,7 +634,8 @@ def st_cleanups_by_timeseries(app, st_cleanups_by_campaigns, timeseries):
             timeseries_id=timeseries[0]
         )
         st_cbt_2 = scheduled_tasks.ST_CleanupByTimeseries.new(
-            timeseries_id=timeseries[1]
+            timeseries_id=timeseries[1],
+            last_timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
         )
         db.session.commit()
     return (st_cbt_1.id, st_cbt_2.id)
