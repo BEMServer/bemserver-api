@@ -1,5 +1,6 @@
 """STCleanupByCampaigns routes tests"""
 import pytest
+from copy import deepcopy
 
 from tests.common import AuthHeader
 
@@ -32,7 +33,9 @@ class TestST_CleanupByCampaignsApi:
             ret_val = ret.json
             st_cbc_1_id = ret_val.pop("id")
             st_cbc_1_etag = ret.headers["ETag"]
-            assert ret_val == st_cbc_1
+            st_cbc_1_expected = deepcopy(st_cbc_1)
+            st_cbc_1_expected["is_enabled"] = True
+            assert ret_val == st_cbc_1_expected
 
             # POST violating unique constraint
             ret = client.post(ST_CLEANUPS_BY_CAMPAIGNS_URL, json=st_cbc_1)
@@ -51,7 +54,28 @@ class TestST_CleanupByCampaignsApi:
             assert ret.headers["ETag"] == st_cbc_1_etag
             ret_val = ret.json
             ret_val.pop("id")
-            assert ret_val == st_cbc_1
+            assert ret_val == st_cbc_1_expected
+
+            # PUT
+            st_cbc_1_expected["is_enabled"] = False
+            ret = client.put(
+                f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}{st_cbc_1_id}",
+                json={"is_enabled": False},
+                headers={"If-Match": st_cbc_1_etag},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            ret_val.pop("id")
+            st_cbc_1_etag = ret.headers["ETag"]
+            assert ret_val == st_cbc_1_expected
+
+            # PUT wrong ID -> 404
+            ret = client.put(
+                f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}{DUMMY_ID}",
+                json={"is_enabled": False},
+                headers={"If-Match": st_cbc_1_etag},
+            )
+            assert ret.status_code == 404
 
             # POST campaign 2
             st_cbc_2 = {"campaign_id": campaign_2_id}
@@ -75,6 +99,33 @@ class TestST_CleanupByCampaignsApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == st_cbc_1_id
+
+            # GET list (full), sort by campaign name
+            ret = client.get(
+                f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}full",
+                query_string={"sort": "+campaign_name"},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            assert ret_val[0]["id"] == st_cbc_1_id
+            assert ret_val[0]["campaign_id"] == campaign_1_id
+            assert not ret_val[0]["is_enabled"]
+            assert ret_val[1]["id"] == st_cbc_2_id
+            assert ret_val[1]["campaign_id"] == campaign_2_id
+            assert ret_val[1]["is_enabled"]
+
+            # GET list (full), sort by campaign name and filter by state
+            ret = client.get(
+                f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}full",
+                query_string={"is_enabled": True, "sort": "+campaign_name"},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == st_cbc_2_id
+            assert ret_val[0]["campaign_id"] == campaign_2_id
+            assert ret_val[0]["is_enabled"]
 
             # DELETE wrong ID -> 404
             ret = client.delete(
@@ -142,12 +193,35 @@ class TestST_CleanupByCampaignsApi:
             ret = client.get(f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}{st_cbc_2_id}")
             assert ret.status_code == 403
 
+            # PUT
+            ret = client.put(
+                f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}{st_cbc_1_id}",
+                json={"is_enabled": False},
+                headers={"If-Match": st_cbc_1_etag},
+            )
+            assert ret.status_code == 403
+
             # DELETE
             ret = client.delete(
                 f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}{st_cbc_1_id}",
                 headers={"If-Match": st_cbc_1_etag},
             )
             assert ret.status_code == 403
+
+            # GET list (full)
+            ret = client.get(f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}full")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == st_cbc_1_id
+
+            # GET list (full), filter by state is_enabled
+            ret = client.get(
+                f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}full",
+                query_string={"is_enabled": False},
+            )
+            assert ret.status_code == 200
+            assert len(ret.json) == 0
 
     def test_st_cleanups_by_campaigns_as_anonym_api(
         self, app, campaigns, st_cleanups_by_campaigns
@@ -171,10 +245,23 @@ class TestST_CleanupByCampaignsApi:
         ret = client.get(f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}{st_cbc_1_id}")
         assert ret.status_code == 401
 
+        # PUT
+        ret = client.put(
+            f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}{st_cbc_1_id}",
+            json={"is_enabled": False},
+            headers={"If-Match": "Dummy-Etag"},
+        )
+        # ETag is wrong but we get rejected before ETag check anyway
+        assert ret.status_code == 401
+
         # DELETE
         ret = client.delete(
             f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}{st_cbc_1_id}",
             headers={"If-Match": "Dummy-Etag"},
         )
         # ETag is wrong but we get rejected before ETag check anyway
+        assert ret.status_code == 401
+
+        # GET list (full)
+        ret = client.get(f"{ST_CLEANUPS_BY_CAMPAIGNS_URL}full")
         assert ret.status_code == 401
