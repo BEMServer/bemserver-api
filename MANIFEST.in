@@ -1,3 +1,5 @@
+include bemserver_api/extensions/timezones.json
+
 include LICENSE
 
 graft tests
