@@ -619,6 +619,56 @@ def timeseries_by_zones(app, spaces, timeseries):
 
 
 @pytest.fixture
+def energy_sources(app):
+    with OpenBar():
+        return [x.id for x in model.EnergySource.get()]
+
+
+@pytest.fixture
+def energy_end_uses(app):
+    with OpenBar():
+        return [x.id for x in model.EnergyEndUse.get()]
+
+
+@pytest.fixture
+def energy_consumption_timeseries_by_sites(app, timeseries, sites):
+    with OpenBar():
+        ectbs_1 = model.EnergyConsumptionTimeseriesBySite.new(
+            site_id=sites[0],
+            source_id=1,
+            end_use_id=1,
+            timeseries_id=timeseries[0],
+        )
+        ectbs_2 = model.EnergyConsumptionTimeseriesBySite.new(
+            site_id=sites[1],
+            source_id=2,
+            end_use_id=2,
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (ectbs_1.id, ectbs_2.id)
+
+
+@pytest.fixture
+def energy_consumption_timeseries_by_buildings(app, timeseries, buildings):
+    with OpenBar():
+        ectbs_1 = model.EnergyConsumptionTimeseriesByBuilding.new(
+            building_id=buildings[0],
+            source_id=1,
+            end_use_id=1,
+            timeseries_id=timeseries[0],
+        )
+        ectbs_2 = model.EnergyConsumptionTimeseriesByBuilding.new(
+            building_id=buildings[1],
+            source_id=2,
+            end_use_id=2,
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (ectbs_1.id, ectbs_2.id)
+
+
+@pytest.fixture
 def st_cleanups_by_campaigns(app, campaigns):
     with OpenBar():
         st_cbc_1 = scheduled_tasks.ST_CleanupByCampaign.new(campaign_id=campaigns[0])
