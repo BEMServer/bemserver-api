@@ -18,7 +18,7 @@ blp = Blueprint(
 
 
 @blp.route("/")
-class EventCategoriesViews(MethodView):
+class EnergySourceViews(MethodView):
     @blp.login_required
     @blp.etag
     @blp.response(200, EnergySourceSchema(many=True))
