@@ -12,7 +12,6 @@ blp = Blueprint(
 
 
 @blp.get("/")
-@blp.login_required
 @blp.etag
 @blp.response(200, AboutSchema)
 def about():
