@@ -11,7 +11,7 @@ from ..structural_element_properties.schemas import StructuralElementPropertySch
 
 class SitePropertySchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = SiteProperty.__table__
+        model = SiteProperty
 
     id = msa.auto_field(dump_only=True)
     structural_element_property = ma.fields.Nested(

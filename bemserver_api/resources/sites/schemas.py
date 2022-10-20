@@ -9,7 +9,7 @@ from bemserver_api import AutoSchema, Schema, SortField
 
 class SiteSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = Site.__table__
+        model = Site
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))

@@ -10,7 +10,7 @@ from bemserver_api import AutoSchema, Schema
 
 class SpacePropertyDataSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = SpacePropertyData.__table__
+        model = SpacePropertyData
 
     id = msa.auto_field(dump_only=True)
 

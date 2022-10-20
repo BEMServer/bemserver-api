@@ -9,7 +9,7 @@ from bemserver_api import AutoSchema, Schema, SortField
 
 class UserSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = User.__table__
+        model = User
         exclude = ("_is_active", "_is_admin")
 
     id = msa.auto_field(dump_only=True)

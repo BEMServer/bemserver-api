@@ -9,7 +9,7 @@ from bemserver_api import AutoSchema, Schema, SortField
 
 class CampaignScopeSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = CampaignScope.__table__
+        model = CampaignScope
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))

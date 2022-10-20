@@ -9,7 +9,7 @@ from bemserver_api import AutoSchema, Schema, SortField
 
 class UserGroupSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = UserGroup.__table__
+        model = UserGroup
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))

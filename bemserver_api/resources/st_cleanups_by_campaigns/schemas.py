@@ -9,7 +9,7 @@ from bemserver_api import AutoSchema, Schema, SortField
 
 class ST_CleanupByCampaignSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = ST_CleanupByCampaign.__table__
+        model = ST_CleanupByCampaign
 
     id = msa.auto_field(dump_only=True)
 

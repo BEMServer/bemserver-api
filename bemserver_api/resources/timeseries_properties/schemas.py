@@ -12,7 +12,7 @@ from bemserver_api.extensions.ma_fields import EnumField
 
 class TimeseriesPropertySchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = TimeseriesProperty.__table__
+        model = TimeseriesProperty
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))

@@ -9,7 +9,7 @@ from bemserver_api import AutoSchema, Schema
 
 class EnergyConsumptionTimeseriesByBuildingSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = EnergyConsumptionTimeseriesByBuilding.__table__
+        model = EnergyConsumptionTimeseriesByBuilding
 
     id = msa.auto_field(dump_only=True)
 
