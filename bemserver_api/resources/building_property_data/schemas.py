@@ -10,7 +10,7 @@ from bemserver_api import AutoSchema, Schema
 
 class BuildingPropertyDataSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = BuildingPropertyData.__table__
+        model = BuildingPropertyData
 
     id = msa.auto_field(dump_only=True)
 

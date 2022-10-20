@@ -9,6 +9,6 @@ from bemserver_api import AutoSchema
 
 class EnergyEndUseSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = EnergyEndUse.__table__
+        model = EnergyEndUse
 
     id = msa.auto_field(dump_only=True)

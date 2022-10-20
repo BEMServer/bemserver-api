@@ -10,7 +10,7 @@ from bemserver_api import AutoSchema, Schema
 
 class TimeseriesByStoreySchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = TimeseriesByStorey.__table__
+        model = TimeseriesByStorey
 
     id = msa.auto_field(dump_only=True)
 

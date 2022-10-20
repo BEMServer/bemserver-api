@@ -9,7 +9,7 @@ from bemserver_api import AutoSchema, Schema
 
 class UserByUserGroupSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = UserByUserGroup.__table__
+        model = UserByUserGroup
 
     id = msa.auto_field(dump_only=True)
 

@@ -12,7 +12,7 @@ from bemserver_api.extensions.ma_fields import EnumField
 
 class StructuralElementPropertySchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = StructuralElementProperty.__table__
+        model = StructuralElementProperty
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))

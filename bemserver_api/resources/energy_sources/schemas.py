@@ -9,6 +9,6 @@ from bemserver_api import AutoSchema
 
 class EnergySourceSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = EnergySource.__table__
+        model = EnergySource
 
     id = msa.auto_field(dump_only=True)

@@ -9,7 +9,7 @@ from bemserver_api import AutoSchema, Schema, SortField
 
 class ST_CleanupByTimeseriesSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        table = ST_CleanupByTimeseries.__table__
+        model = ST_CleanupByTimeseries
 
     id = msa.auto_field(dump_only=True)
 
