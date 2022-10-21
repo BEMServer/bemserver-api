@@ -1,4 +1,4 @@
-"""Process resources"""
+"""Completeness resources"""
 from flask_smorest import abort
 
 from bemserver_core.process.completeness import compute_completeness
@@ -12,16 +12,19 @@ from .schemas import CompletenessSchema, CompletenessQueryArgsSchema
 
 
 blp = Blueprint(
-    "Analysis", __name__, url_prefix="/analysis", description="Data analysis operations"
+    "Completeness",
+    __name__,
+    url_prefix="/completeness",
+    description="Completness operations",
 )
 
 
-@blp.route("/completeness")
+@blp.route("")
 @blp.login_required
 @blp.etag
 @blp.arguments(CompletenessQueryArgsSchema, location="query")
 @blp.response(200, CompletenessSchema)
-def get(args):
+def get_completeness(args):
     """Get timeseries data completeness
 
     Returns a report about data completeness, involving the number of values

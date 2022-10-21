@@ -1,9 +1,10 @@
-"""Process API schemas"""
+"""Completeness API schemas"""
 import marshmallow as ma
+
+from bemserver_core.input_output.timeseries_data_io import INTERVAL_UNITS
 
 from bemserver_api import Schema
 from bemserver_api.extensions.ma_fields import Timezone
-from bemserver_core.input_output.timeseries_data_io import INTERVAL_UNITS
 
 
 class TimeseriesCompletenessSchema(Schema):
@@ -67,7 +68,8 @@ class CompletenessSchema(Schema):
         },
     )
     timeseries = ma.fields.Dict(
-        keys=ma.fields.String(), values=ma.fields.Nested(TimeseriesCompletenessSchema)
+        keys=ma.fields.String(metadata={"description": "LOL"}),
+        values=ma.fields.Nested(TimeseriesCompletenessSchema),
     )
 
 

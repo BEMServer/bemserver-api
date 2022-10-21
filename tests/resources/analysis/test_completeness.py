@@ -1,14 +1,15 @@
-"""Analysis tests"""
+"""Completeness tests"""
 import contextlib
 
 import pytest
 
 from tests.common import AuthHeader
 
-ANALYSIS_URL = "/analysis/"
+
+COMPLETENESS_URL = "/analysis/completeness"
 
 
-class TestAnalysisApi:
+class TestAnalysisApiCompleteness:
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
@@ -39,7 +40,7 @@ class TestAnalysisApi:
 
         with auth_context:
 
-            query_url = ANALYSIS_URL + "completeness"
+            query_url = COMPLETENESS_URL
             ts_l = (ts_1_id,)
 
             ret = client.get(
@@ -82,7 +83,7 @@ class TestAnalysisApi:
                 }
 
             # User not in Timeseries group
-            query_url = ANALYSIS_URL + "completeness"
+            query_url = COMPLETENESS_URL
             ts_l = (ts_2_id,)
 
             ret = client.get(
