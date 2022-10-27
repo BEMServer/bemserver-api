@@ -19,6 +19,7 @@ class CampaignSchema(AutoSchema):
     timezone = Timezone(
         required=True,
         metadata={
+            "default": "UTC",
             "description": "Timezone used to localize timeseries in this campaign",
         },
     )

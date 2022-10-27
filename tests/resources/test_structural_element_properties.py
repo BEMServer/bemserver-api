@@ -3,8 +3,6 @@ import copy
 
 from tests.common import AuthHeader
 
-from bemserver_core.common import PropertyType
-
 
 DUMMY_ID = "69"
 
@@ -28,7 +26,7 @@ class TestStructuralElementPropertiesApi:
             # POST
             sep_1 = {
                 "name": "Area",
-                "value_type": PropertyType.integer.name,
+                "value_type": "integer",
             }
             ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_1)
             assert ret.status_code == 201
@@ -82,18 +80,17 @@ class TestStructuralElementPropertiesApi:
             # POST sep 2
             sep_2 = {
                 "name": "Volume",
-                "value_type": PropertyType.float.name,
                 "unit_symbol": "L",
             }
             ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_2)
             assert ret.status_code == 201
             ret_val = ret.json
+            assert ret_val["value_type"] == "string"
             sep_2_id = ret_val.pop("id")
             sep_2_etag = ret.headers["ETag"]
 
             # PUT violating unique constraint
             sep_2_put = copy.deepcopy(sep_2)
-            del sep_2_put["value_type"]
             sep_2_put["name"] = sep_1["name"]
             ret = client.put(
                 f"{STRUCTURAL_ELEMENT_PROPERTIES_URL}{sep_2_id}",
@@ -118,7 +115,7 @@ class TestStructuralElementPropertiesApi:
             assert ret_val[0]["id"] == sep_1_id
             ret = client.get(
                 STRUCTURAL_ELEMENT_PROPERTIES_URL,
-                query_string={"value_type": PropertyType.integer.name},
+                query_string={"value_type": "integer"},
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -126,7 +123,7 @@ class TestStructuralElementPropertiesApi:
             assert ret_val[0]["id"] == sep_1_id
             ret = client.get(
                 STRUCTURAL_ELEMENT_PROPERTIES_URL,
-                query_string={"value_type": PropertyType.boolean.name},
+                query_string={"value_type": "boolean"},
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -195,7 +192,7 @@ class TestStructuralElementPropertiesApi:
             # POST
             sep_3 = {
                 "name": "Temperature setpoint",
-                "value_type": PropertyType.float.name,
+                "value_type": "float",
             }
             ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_3)
             assert ret.status_code == 403
@@ -238,7 +235,7 @@ class TestStructuralElementPropertiesApi:
         # POST
         sep_3 = {
             "name": "Temperature setpoint",
-            "value_type": PropertyType.float.name,
+            "value_type": "float",
         }
         ret = client.post(STRUCTURAL_ELEMENT_PROPERTIES_URL, json=sep_3)
         assert ret.status_code == 401

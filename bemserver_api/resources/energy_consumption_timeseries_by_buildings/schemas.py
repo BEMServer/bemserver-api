@@ -12,6 +12,7 @@ class EnergyConsumptionTimeseriesByBuildingSchema(AutoSchema):
         model = EnergyConsumptionTimeseriesByBuilding
 
     id = msa.auto_field(dump_only=True)
+    wh_conversion_factor = msa.auto_field(metadata={"default": 1})
 
 
 class EnergyConsumptionTimeseriesByBuildingQueryArgsSchema(Schema):

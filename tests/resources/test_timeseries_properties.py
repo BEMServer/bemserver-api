@@ -3,8 +3,6 @@ import copy
 
 from tests.common import AuthHeader
 
-from bemserver_core.common import PropertyType
-
 
 DUMMY_ID = "69"
 
@@ -26,17 +24,13 @@ class TestTimeseriesDataStatesApi:
             ret_val = ret.json
             nb_ts_props = len(ret_val)
             assert nb_ts_props > 0
-            nb_float = len(
-                [x for x in ret_val if x["value_type"] == PropertyType.float.name]
-            )
-            nb_bool = len(
-                [x for x in ret_val if x["value_type"] == PropertyType.boolean.name]
-            )
+            nb_float = len([x for x in ret_val if x["value_type"] == "float"])
+            nb_bool = len([x for x in ret_val if x["value_type"] == "boolean"])
 
             # POST
             tsp_1 = {
                 "name": "Deutsche Qualität",
-                "value_type": PropertyType.float.name,
+                "value_type": "float",
                 "unit_symbol": "Qualität unit",
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tsp_1)
@@ -91,7 +85,7 @@ class TestTimeseriesDataStatesApi:
             # POST TSP 2
             tsp_2 = {
                 "name": "Autentica qualità",
-                "value_type": PropertyType.float.name,
+                "value_type": "float",
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tsp_2)
             ret_val = ret.json
@@ -119,14 +113,14 @@ class TestTimeseriesDataStatesApi:
             assert ret_val[0]["id"] == tsp_1_id
             ret = client.get(
                 TIMESERIES_PROPERTIES_URL,
-                query_string={"value_type": PropertyType.float.name},
+                query_string={"value_type": "float"},
             )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == nb_float + 2
             ret = client.get(
                 TIMESERIES_PROPERTIES_URL,
-                query_string={"value_type": PropertyType.boolean.name},
+                query_string={"value_type": "boolean"},
             )
             assert ret.status_code == 200
             ret_val = ret.json
@@ -188,7 +182,7 @@ class TestTimeseriesDataStatesApi:
             # POST
             tds = {
                 "name": "Frequency (test)",
-                "value_type": PropertyType.integer.name,
+                "value_type": "integer",
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tds)
             assert ret.status_code == 403

@@ -16,7 +16,7 @@ class StructuralElementPropertySchema(AutoSchema):
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
-    value_type = EnumField(PropertyType, required=True)
+    value_type = EnumField(PropertyType, metadata={"default": "string"})
 
 
 class StructuralElementPropertyPutSchema(StructuralElementPropertySchema):
