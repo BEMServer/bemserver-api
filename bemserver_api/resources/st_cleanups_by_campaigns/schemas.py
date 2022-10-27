@@ -12,6 +12,7 @@ class ST_CleanupByCampaignSchema(AutoSchema):
         model = ST_CleanupByCampaign
 
     id = msa.auto_field(dump_only=True)
+    is_enabled = msa.auto_field(metadata={"default": True})
 
 
 class ST_CleanupByCampaignPutSchema(Schema):
