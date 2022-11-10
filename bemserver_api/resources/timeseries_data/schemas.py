@@ -2,10 +2,8 @@
 import marshmallow as ma
 from flask_smorest.fields import Upload
 
-from bemserver_core.input_output.timeseries_data_io import (
-    AGGREGATION_FUNCTIONS,
-    INTERVAL_UNITS,
-)
+from bemserver_core.input_output.timeseries_data_io import AGGREGATION_FUNCTIONS
+from bemserver_core.time_utils import PERIODS, FIXED_SIZE_PERIODS
 
 from bemserver_api import Schema
 from bemserver_api.extensions.ma_fields import Timezone
@@ -89,19 +87,46 @@ class TimeseriesDataGetByNameQueryArgsSchema(
     """Timeseries values GET by name query parameters schema"""
 
 
-class TimeseriesDataGetAggregateBaseQueryArgsSchema(
-    TimeseriesDataGetBaseQueryArgsSchema
-):
-    """Timeseries values aggregate GET query parameters base schema"""
+class TimeseriesBucketWidthSchema(Schema):
+    """Timeseries bucket width schema, with custom validation on fixed size periods"""
+
+    _VALIDATION_MSG = (
+        f"Only fixed bucket width units ({', '.join(FIXED_SIZE_PERIODS)})"
+        " accept a value different than 1."
+    )
 
     bucket_width_value = ma.fields.Int(
         validate=ma.validate.Range(min=1),
         required=True,
+        metadata={
+            "description": _VALIDATION_MSG,
+        },
     )
     bucket_width_unit = ma.fields.String(
-        validate=ma.validate.OneOf(INTERVAL_UNITS),
+        validate=ma.validate.OneOf(PERIODS),
         required=True,
     )
+
+    @ma.validates_schema
+    def validate_bucket(self, data, **kwargs):
+        if (
+            data["bucket_width_unit"] not in FIXED_SIZE_PERIODS
+            and data["bucket_width_value"] != 1
+        ):
+            raise ma.ValidationError(
+                self._VALIDATION_MSG,
+                field_name="bucket_width_value",
+                data=data["bucket_width_value"],
+                valid_data=FIXED_SIZE_PERIODS,
+            )
+
+
+class TimeseriesDataGetAggregateBaseQueryArgsSchema(
+    TimeseriesDataGetBaseQueryArgsSchema,
+    TimeseriesBucketWidthSchema,
+):
+    """Timeseries values aggregate GET query parameters base schema"""
+
     aggregation = ma.fields.String(
         load_default="avg",
         validate=ma.validate.OneOf(AGGREGATION_FUNCTIONS),

@@ -1,10 +1,9 @@
 """Energy consumption API schemas"""
 import marshmallow as ma
 
-from bemserver_core.input_output.timeseries_data_io import INTERVAL_UNITS
-
 from bemserver_api import Schema
 from bemserver_api.extensions.ma_fields import Timezone
+from bemserver_api.resources.timeseries_data.schemas import TimeseriesBucketWidthSchema
 
 
 class EnergyConsumptionSchema(Schema):
@@ -25,7 +24,7 @@ class EnergyConsumptionSchema(Schema):
     )
 
 
-class EnergyConsumptionQueryArgsSchema(Schema):
+class EnergyConsumptionQueryArgsSchema(TimeseriesBucketWidthSchema):
     start_time = ma.fields.AwareDateTime(
         required=True,
         metadata={
@@ -37,14 +36,6 @@ class EnergyConsumptionQueryArgsSchema(Schema):
         metadata={
             "description": "End datetime (excluded from the interval)",
         },
-    )
-    bucket_width_value = ma.fields.Int(
-        validate=ma.validate.Range(min=1),
-        required=True,
-    )
-    bucket_width_unit = ma.fields.String(
-        validate=ma.validate.OneOf(INTERVAL_UNITS),
-        required=True,
     )
     timezone = Timezone(
         load_default="UTC",

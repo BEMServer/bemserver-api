@@ -199,6 +199,36 @@ class TestTimeseriesDataApi:
                 assert ret_csv_lines[0] == ret_line_1
                 assert len(ret_csv_lines) > 1
 
+            # Set a bucket width value != 1 for a fixed size period
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+                ret_line_1 = "Datetime,1"
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ret_line_1 = "Datetime,Timeseries 0"
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width_value": 4,
+                    "bucket_width_unit": "hour",
+                    "timezone": "UTC",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                assert ret_csv_lines[0] == ret_line_1
+                assert len(ret_csv_lines) > 1
+
             # User not in Timeseries group
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
@@ -768,6 +798,50 @@ class TestTimeseriesDataApi:
                     "bucket_width_value": 1,
                     "bucket_width_unit": "day",
                     "timezone": "DTC",
+                },
+            )
+            assert ret.status_code == 422
+
+            # Unknown bucket width unit
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "dummy",
+                    "aggregation": "avg",
+                },
+            )
+            assert ret.status_code == 422
+
+            # Invalid bucket width valid for non fixed size periods
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width_value": 2,
+                    "bucket_width_unit": "week",
+                    "aggregation": "avg",
                 },
             )
             assert ret.status_code == 422
