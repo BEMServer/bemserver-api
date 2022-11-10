@@ -1,10 +1,9 @@
 """Completeness API schemas"""
 import marshmallow as ma
 
-from bemserver_core.input_output.timeseries_data_io import INTERVAL_UNITS
-
 from bemserver_api import Schema
 from bemserver_api.extensions.ma_fields import Timezone
+from bemserver_api.resources.timeseries_data.schemas import TimeseriesBucketWidthSchema
 
 
 class TimeseriesCompletenessSchema(Schema):
@@ -73,7 +72,7 @@ class CompletenessSchema(Schema):
     )
 
 
-class CompletenessQueryArgsSchema(Schema):
+class CompletenessQueryArgsSchema(TimeseriesBucketWidthSchema):
     start_time = ma.fields.AwareDateTime(
         required=True,
         metadata={
@@ -98,14 +97,6 @@ class CompletenessQueryArgsSchema(Schema):
         metadata={
             "description": "Data state ID",
         },
-    )
-    bucket_width_value = ma.fields.Int(
-        validate=ma.validate.Range(min=1),
-        required=True,
-    )
-    bucket_width_unit = ma.fields.String(
-        validate=ma.validate.OneOf(INTERVAL_UNITS),
-        required=True,
     )
     timezone = Timezone(
         load_default="UTC",

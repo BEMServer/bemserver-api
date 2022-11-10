@@ -16,7 +16,7 @@ argon2-cffi-bindings==21.2.0
     # via argon2-cffi
 async-timeout==4.0.2
     # via redis
-bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/0562cfd.tar.gz
+bemserver-core @ https://github.com/BEMServer/bemserver-core/archive/d27b80f.tar.gz
     # via bemserver-api (setup.py)
 billiard==3.6.4.0
     # via celery

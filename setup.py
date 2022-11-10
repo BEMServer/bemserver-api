@@ -39,7 +39,7 @@ setup(
         (
             # https://github.com/jazzband/pip-tools/issues/1359
             "bemserver-core @ "
-            "https://github.com/BEMServer/bemserver-core/archive/0562cfd.tar.gz"
+            "https://github.com/BEMServer/bemserver-core/archive/d27b80f.tar.gz"
         ),
     ],
     packages=find_packages(exclude=["tests*"]),
