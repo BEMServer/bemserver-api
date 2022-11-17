@@ -8,7 +8,7 @@ alembic==1.8.1
     # via bemserver-core
 amqp==5.1.1
     # via kombu
-apispec[marshmallow]==5.2.2
+apispec[marshmallow]==6.0.2
     # via flask-smorest
 argon2-cffi==21.3.0
     # via bemserver-core
@@ -49,7 +49,7 @@ flask==2.2.2
     #   flask-smorest
 flask-httpauth==4.7.0
     # via bemserver-api (setup.py)
-flask-smorest==0.39.0
+flask-smorest==0.40.0
     # via bemserver-api (setup.py)
 greenlet==1.1.3
     # via sqlalchemy
@@ -83,6 +83,7 @@ oso==0.26.2
     # via bemserver-core
 packaging==21.3
     # via
+    #   apispec
     #   marshmallow
     #   marshmallow-sqlalchemy
     #   redis
