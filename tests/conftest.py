@@ -264,6 +264,60 @@ def timeseries_data(request, app, timeseries_by_data_states):
 
 
 @pytest.fixture
+def event_categories(app):
+    with OpenBar():
+        ec_1 = model.EventCategory.new(name="Custom event category 1")
+        ec_2 = model.EventCategory.new(name="Custom event category 2")
+        db.session.commit()
+    return (ec_1.id, ec_2.id)
+
+
+@pytest.fixture
+def event_levels(app):
+    with OpenBar():
+        el_1 = model.EventLevel.get(name="WARNING").first()
+        el_2 = model.EventLevel.get(name="INFO").first()
+        db.session.commit()
+    return (el_1.id, el_2.id)
+
+
+@pytest.fixture
+def events(app, campaigns, campaign_scopes, event_categories, event_levels):
+    with OpenBar():
+        tse_1 = model.Event.new(
+            campaign_scope_id=campaign_scopes[0],
+            timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
+            source="Event source",
+            category_id=event_categories[0],
+            level_id=event_levels[0],
+        )
+        tse_2 = model.Event.new(
+            campaign_scope_id=campaign_scopes[1],
+            timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
+            source="Another event source",
+            category_id=event_categories[1],
+            level_id=event_levels[1],
+        )
+        db.session.commit()
+    return (tse_1.id, tse_2.id)
+
+
+@pytest.fixture
+def timeseries_by_events(app, events, timeseries):
+    with OpenBar():
+        tbs_1 = model.TimeseriesByEvent.new(
+            event_id=events[0],
+            timeseries_id=timeseries[0],
+        )
+        tbs_2 = model.TimeseriesByEvent.new(
+            event_id=events[1],
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (tbs_1.id, tbs_2.id)
+
+
+@pytest.fixture
 def sites(app, campaigns):
     with OpenBar():
         site_1 = model.Site.new(
