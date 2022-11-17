@@ -7,7 +7,6 @@ from bemserver_core.model import StructuralElementProperty
 from bemserver_core.common import PropertyType
 
 from bemserver_api import AutoSchema, Schema, SortField
-from bemserver_api.extensions.ma_fields import EnumField
 
 
 class StructuralElementPropertySchema(AutoSchema):
@@ -16,7 +15,7 @@ class StructuralElementPropertySchema(AutoSchema):
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
-    value_type = EnumField(PropertyType, metadata={"default": "string"})
+    value_type = ma.fields.Enum(PropertyType, metadata={"default": "string"})
 
 
 class StructuralElementPropertyPutSchema(StructuralElementPropertySchema):
@@ -27,5 +26,5 @@ class StructuralElementPropertyPutSchema(StructuralElementPropertySchema):
 class StructuralElementPropertyQueryArgsSchema(Schema):
     sort = SortField(("name",))
     name = ma.fields.Str()
-    value_type = EnumField(PropertyType)
+    value_type = ma.fields.Enum(PropertyType)
     unit_symbol = ma.fields.Str()
