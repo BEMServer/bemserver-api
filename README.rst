@@ -10,7 +10,7 @@ BEMServer API
     :target: https://pypi.org/project/bemserver-api/
     :alt: Python versions
 
-.. image:: https://github.com/BEMServer/bemserver-api/actions/workflows/tests.yaml/badge.svg
+.. image:: https://github.com/BEMServer/bemserver-api/actions/workflows/build-release.yaml/badge.svg
     :target: https://github.com/bemserver/bemserver-api/actions?query=workflow%3ATests
     :alt: Build status
 
