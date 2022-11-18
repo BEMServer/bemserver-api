@@ -36,11 +36,7 @@ setup(
         "marshmallow-sqlalchemy>=0.24.0",
         "flask_smorest>=0.40.0,<0.41",
         "flask-httpauth>=0.5.0",
-        (
-            # https://github.com/jazzband/pip-tools/issues/1359
-            "bemserver-core @ "
-            "https://github.com/BEMServer/bemserver-core/archive/d27b80f.tar.gz"
-        ),
+        "bemserver-core>=0.1.0,<0.2",
     ],
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
