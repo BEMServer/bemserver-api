@@ -1,12 +1,9 @@
 """Timeseries data resources"""
-import io
-import textwrap
-
-from flask import Response
+import flask
 from flask_smorest import abort
 
 from bemserver_core.model import Timeseries, TimeseriesDataState, Campaign
-from bemserver_core.input_output import tsdcsvio
+from bemserver_core.input_output import tsdcsvio, tsdjsonio
 from bemserver_core.exceptions import (
     TimeseriesNotFoundError,
     TimeseriesDataIOError,
@@ -22,26 +19,7 @@ from .schemas import (
     TimeseriesDataGetByIDAggregateQueryArgsSchema,
     TimeseriesDataGetByNameAggregateQueryArgsSchema,
     TimeseriesDataPostQueryArgsSchema,
-    TimeseriesDataPostFileSchema,
-)
-
-
-EXAMPLE_CSV_IN_OUT_FILE_TS_ID = textwrap.dedent(
-    """\
-    Datetime,1,2,3
-    2020-01-01T00:00:00+00:00,0.1,1.1,2.1
-    2020-01-01T00:10:00+00:00,0.2,1.2,2.2
-    2020-01-01T00:20:00+00:00,0.3,1.3,2.3
-    """
-)
-
-EXAMPLE_CSV_IN_OUT_FILE_TS_NAME = textwrap.dedent(
-    """\
-    Datetime,Timeseries 1,Timeseries 2,Timeseries 3
-    2020-01-01T00:00:00+00:00,0.1,1.1,2.1
-    2020-01-01T00:10:00+00:00,0.2,1.2,2.2
-    2020-01-01T00:20:00+00:00,0.3,1.3,2.3
-    """
+    TimeseriesDataGetAcceptHeader,
 )
 
 
@@ -84,18 +62,38 @@ blp4c = Blueprint(
 @blp.route("/", methods=("GET",))
 @blp.login_required
 @blp.arguments(TimeseriesDataGetByIDQueryArgsSchema, location="query")
-@blp.response(
-    200,
-    {"format": "binary", "type": "string"},
-    content_type="application/csv",
-    example=EXAMPLE_CSV_IN_OUT_FILE_TS_ID,
-)
-def get_csv(args):
-    """Get timeseries data as CSV file
+@blp.arguments(TimeseriesDataGetAcceptHeader, location="headers", error_status_code=406)
+@blp.response(200, content_type="application/json")
+@blp.alt_response(200, content_type="application/csv")
+def get(args, headers):
+    """Get timeseries data
 
-    Returns a CSV file where the first column is the timestamp as timezone aware
-    datetime and each other column is a timeseries data. Column headers are
-    timeseries IDs.
+    Returns data in either JSON or CSV format.
+
+    JSON: each key is a timestamp ID as string. For each timeseries, values are
+    passed a {timestamp: value} mappings.
+
+    ```
+    {
+        "1": {
+            "2020-01-01T00:00:00+00:00": 0.1,
+            "2020-01-01T10:00:00+00:00": 0.2,
+            "2020-01-01T20:00:00+00:00": 0.3,
+        },
+        "2": {
+            "2020-01-01T00:00:00+00:00": 1.1,
+            "2020-01-01T10:00:00+00:00": 1.2,
+            "2020-01-01T20:00:00+00:00": 1.3,
+        },
+        "3": {
+            "2020-01-01T00:00:00+00:00": 2.1,
+            "2020-01-01T10:00:00+00:00": 2.2,
+            "2020-01-01T20:00:00+00:00": 2.3,
+        },
+    }
+    ```
+    CSV: the first column is the timestamp as timezone aware datetime and each
+    other column is a timeseries data. Column headers are timeseries IDs.
 
     ```
     Datetime,1,2,3
@@ -104,37 +102,68 @@ def get_csv(args):
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
+    mime_type = headers["accept"]
+
     timeseries = _get_many_timeseries_by_id(args["timeseries"])
     data_state = _get_data_state(args["data_state"])
 
-    csv_str = tsdcsvio.export_csv(
-        args["start_time"],
-        args["end_time"],
-        timeseries,
-        data_state,
-        timezone=args["timezone"],
-        col_label="id",
-    )
-    response = Response(csv_str, mimetype="text/csv")
-    response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
-    return response
+    if mime_type == "application/csv":
+        resp = tsdcsvio.export_csv(
+            args["start_time"],
+            args["end_time"],
+            timeseries,
+            data_state,
+            timezone=args["timezone"],
+            col_label="id",
+        )
+    else:
+        resp = tsdjsonio.export_json(
+            args["start_time"],
+            args["end_time"],
+            timeseries,
+            data_state,
+            timezone=args["timezone"],
+            col_label="id",
+        )
+
+    return flask.Response(resp, mimetype=mime_type)
 
 
 @blp.route("/aggregate", methods=("GET",))
 @blp.login_required
 @blp.arguments(TimeseriesDataGetByIDAggregateQueryArgsSchema, location="query")
-@blp.response(
-    200,
-    {"format": "binary", "type": "string"},
-    content_type="application/csv",
-    example=EXAMPLE_CSV_IN_OUT_FILE_TS_ID,
-)
-def get_aggregate_csv(args):
+@blp.arguments(TimeseriesDataGetAcceptHeader, location="headers", error_status_code=406)
+@blp.response(200, content_type="application/csv")
+def get_aggregate(args, headers):
     """Get aggregated timeseries data as CSV file
 
-    Returns a CSV file where the first column is the timestamp as timezone aware
-    datetime and each other column is a timeseries data. Column headers are
-    timeseries IDs.
+    Returns data in either JSON or CSV format.
+
+    JSON: each key is a timestamp ID as string. For each timeseries, values are
+    passed a {timestamp: value} mappings.
+
+    ```
+    {
+        "1": {
+            "2020-01-01T00:00:00+00:00": 0.1,
+            "2020-01-01T10:00:00+00:00": 0.2,
+            "2020-01-01T20:00:00+00:00": 0.3,
+        },
+        "2": {
+            "2020-01-01T00:00:00+00:00": 1.1,
+            "2020-01-01T10:00:00+00:00": 1.2,
+            "2020-01-01T20:00:00+00:00": 1.3,
+        },
+        "3": {
+            "2020-01-01T00:00:00+00:00": 2.1,
+            "2020-01-01T10:00:00+00:00": 2.2,
+            "2020-01-01T20:00:00+00:00": 2.3,
+        },
+    }
+    ```
+
+    CSV: the first column is the timestamp as timezone aware datetime and each
+    other column is a timeseries data. Column headers are timeseries IDs.
 
     ```
     Datetime,1,2,3
@@ -143,36 +172,74 @@ def get_aggregate_csv(args):
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
+    mime_type = headers["accept"]
+
     timeseries = _get_many_timeseries_by_id(args["timeseries"])
     data_state = _get_data_state(args["data_state"])
 
-    csv_str = tsdcsvio.export_csv_bucket(
-        args["start_time"],
-        args["end_time"],
-        timeseries,
-        data_state,
-        args["bucket_width_value"],
-        args["bucket_width_unit"],
-        args["aggregation"],
-        timezone=args["timezone"],
-        col_label="id",
-    )
-    response = Response(csv_str, mimetype="text/csv")
-    response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
-    return response
+    if mime_type == "application/csv":
+        resp = tsdcsvio.export_csv_bucket(
+            args["start_time"],
+            args["end_time"],
+            timeseries,
+            data_state,
+            args["bucket_width_value"],
+            args["bucket_width_unit"],
+            args["aggregation"],
+            timezone=args["timezone"],
+            col_label="id",
+        )
+    else:
+        resp = tsdjsonio.export_json_bucket(
+            args["start_time"],
+            args["end_time"],
+            timeseries,
+            data_state,
+            args["bucket_width_value"],
+            args["bucket_width_unit"],
+            args["aggregation"],
+            timezone=args["timezone"],
+            col_label="id",
+        )
+
+    return flask.Response(resp, mimetype=mime_type)
 
 
 @blp.route("/", methods=("POST",))
 @blp.login_required
-@blp.arguments(TimeseriesDataPostFileSchema, location="files")
 @blp.arguments(TimeseriesDataPostQueryArgsSchema, location="query")
+@blp.arguments(TimeseriesDataGetAcceptHeader, location="headers", error_status_code=406)
 @blp.response(201)
-def post_csv(files, args):
-    """Post timeseries data as CSV file
+def post(args, headers):
+    """Post timeseries data
 
-    Loads a CSV file where the first column is the timestamp as timezone aware
-    datetime and each other column is a timeseries data. Column headers are
-    timeseries ID.
+    Loads data in either JSON or CSV format.
+
+    JSON: each key is a timestamp ID as string. For each timeseries, values are
+    passed a {timestamp: value} mappings.
+
+    ```
+    {
+        "1": {
+            "2020-01-01T00:00:00+00:00": 0.1,
+            "2020-01-01T10:00:00+00:00": 0.2,
+            "2020-01-01T20:00:00+00:00": 0.3,
+        },
+        "2": {
+            "2020-01-01T00:00:00+00:00": 1.1,
+            "2020-01-01T10:00:00+00:00": 1.2,
+            "2020-01-01T20:00:00+00:00": 1.3,
+        },
+        "3": {
+            "2020-01-01T00:00:00+00:00": 2.1,
+            "2020-01-01T10:00:00+00:00": 2.2,
+            "2020-01-01T20:00:00+00:00": 2.3,
+        },
+    }
+    ```
+
+    CSV: the first column is the timestamp as timezone aware datetime and each
+    other column is a timeseries data. Column headers are timeseries IDs.
 
     ```
     Datetime,1,2,3
@@ -181,13 +248,22 @@ def post_csv(files, args):
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
+    mime_type = headers["accept"]
+
     data_state = _get_data_state(args["data_state"])
 
-    with io.TextIOWrapper(files["csv_file"], encoding="utf-8") as csv_file_txt:
-        try:
-            tsdcsvio.import_csv(csv_file_txt, data_state)
-        except (TimeseriesNotFoundError, TimeseriesDataIOError) as exc:
-            abort(422, message=f"Invalid CSV file content: {exc}")
+    try:
+        data = flask.request.get_data(cache=True).decode("utf-8")
+    except UnicodeDecodeError as exc:
+        abort(422, message=str(exc))
+
+    try:
+        if mime_type == "application/csv":
+            tsdcsvio.import_csv(data, data_state)
+        else:
+            tsdjsonio.import_json(data, data_state)
+    except (TimeseriesNotFoundError, TimeseriesDataIOError) as exc:
+        abort(422, message=str(exc))
 
 
 @blp.route("/", methods=("DELETE",))
@@ -210,18 +286,40 @@ def delete(args):
 @blp4c.route("/", methods=("GET",))
 @blp4c.login_required
 @blp4c.arguments(TimeseriesDataGetByNameQueryArgsSchema, location="query")
-@blp4c.response(
-    200,
-    {"format": "binary", "type": "string"},
-    content_type="application/csv",
-    example=EXAMPLE_CSV_IN_OUT_FILE_TS_NAME,
+@blp4c.arguments(
+    TimeseriesDataGetAcceptHeader, location="headers", error_status_code=406
 )
-def get_csv_for_campaign(args, campaign_id):
-    """Get timeseries data as CSV file for a given campaign
+@blp4c.response(200, content_type="application/csv")
+def get_for_campaign(args, headers, campaign_id):
+    """Get timeseries data for a given campaign
 
-    Returns a CSV file where the first column is the timestamp as timezone aware
-    datetime and each other column is a timeseries data. Column headers are
-    timeseries IDs.
+    Returns data in either JSON or CSV format.
+
+    JSON: each key is a timestamp name as string. For each timeseries, values
+    are passed a {timestamp: value} mappings.
+
+    ```
+    {
+        "Timeseries 1": {
+            "2020-01-01T00:00:00+00:00": 0.1,
+            "2020-01-01T10:00:00+00:00": 0.2,
+            "2020-01-01T20:00:00+00:00": 0.3,
+        },
+        "Timeseries 2": {
+            "2020-01-01T00:00:00+00:00": 1.1,
+            "2020-01-01T10:00:00+00:00": 1.2,
+            "2020-01-01T20:00:00+00:00": 1.3,
+        },
+        "Timeseries 3": {
+            "2020-01-01T00:00:00+00:00": 2.1,
+            "2020-01-01T10:00:00+00:00": 2.2,
+            "2020-01-01T20:00:00+00:00": 2.3,
+        },
+    }
+    ```
+
+    CSV: the first column is the timestamp as timezone aware datetime and each
+    other column is a timeseries data. Column headers are timeseries names.
 
     ```
     Datetime,Timeseries 1,Timeseries 2,Timeseries 3
@@ -230,38 +328,71 @@ def get_csv_for_campaign(args, campaign_id):
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
+    mime_type = headers["accept"]
+
     campaign = Campaign.get_by_id(campaign_id) or abort(404)
     timeseries = _get_many_timeseries_by_name(campaign, args["timeseries"])
     data_state = _get_data_state(args["data_state"])
 
-    csv_str = tsdcsvio.export_csv(
-        args["start_time"],
-        args["end_time"],
-        timeseries,
-        data_state,
-        timezone=args["timezone"],
-        col_label="name",
-    )
-    response = Response(csv_str, mimetype="text/csv")
-    response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
-    return response
+    if mime_type == "application/csv":
+        resp = tsdcsvio.export_csv(
+            args["start_time"],
+            args["end_time"],
+            timeseries,
+            data_state,
+            timezone=args["timezone"],
+            col_label="name",
+        )
+    else:
+        resp = tsdjsonio.export_json(
+            args["start_time"],
+            args["end_time"],
+            timeseries,
+            data_state,
+            timezone=args["timezone"],
+            col_label="name",
+        )
+
+    return flask.Response(resp, mimetype=mime_type)
 
 
 @blp4c.route("/aggregate", methods=("GET",))
 @blp4c.login_required
 @blp4c.arguments(TimeseriesDataGetByNameAggregateQueryArgsSchema, location="query")
-@blp4c.response(
-    200,
-    {"format": "binary", "type": "string"},
-    content_type="application/csv",
-    example=EXAMPLE_CSV_IN_OUT_FILE_TS_NAME,
+@blp4c.arguments(
+    TimeseriesDataGetAcceptHeader, location="headers", error_status_code=406
 )
-def get_aggregate_csv_for_campaign(args, campaign_id):
-    """Get aggregated timeseries data as CSV file for a given campaign
+@blp4c.response(200, content_type="application/csv")
+def get_aggregate_for_campaign(args, headers, campaign_id):
+    """Get aggregated timeseries data for a given campaign
 
-    Returns a CSV file where the first column is the timestamp as timezone aware
-    datetime and each other column is a timeseries data. Column headers are
-    timeseries IDs.
+    Returns data in either JSON or CSV format.
+
+    JSON: each key is a timestamp name as string. For each timeseries, values
+    are passed a {timestamp: value} mappings.
+
+    ```
+    {
+        "Timeseries 1": {
+            "2020-01-01T00:00:00+00:00": 0.1,
+            "2020-01-01T10:00:00+00:00": 0.2,
+            "2020-01-01T20:00:00+00:00": 0.3,
+        },
+        "Timeseries 2": {
+            "2020-01-01T00:00:00+00:00": 1.1,
+            "2020-01-01T10:00:00+00:00": 1.2,
+            "2020-01-01T20:00:00+00:00": 1.3,
+        },
+        "Timeseries 3": {
+            "2020-01-01T00:00:00+00:00": 2.1,
+            "2020-01-01T10:00:00+00:00": 2.2,
+            "2020-01-01T20:00:00+00:00": 2.3,
+        },
+    }
+    ```
+
+    CSV: the first column is the timestamp as timezone aware datetime and each
+    other column is a timeseries data. Column headers are timeseries names.
 
     ```
     Datetime,Timeseries 1,Timeseries 2,Timeseries 3
@@ -270,53 +401,102 @@ def get_aggregate_csv_for_campaign(args, campaign_id):
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
+    mime_type = headers["accept"]
+
     campaign = Campaign.get_by_id(campaign_id) or abort(404)
     timeseries = _get_many_timeseries_by_name(campaign, args["timeseries"])
     data_state = _get_data_state(args["data_state"])
 
-    csv_str = tsdcsvio.export_csv_bucket(
-        args["start_time"],
-        args["end_time"],
-        timeseries,
-        data_state,
-        args["bucket_width_value"],
-        args["bucket_width_unit"],
-        args["aggregation"],
-        timezone=args["timezone"],
-        col_label="name",
-    )
-    response = Response(csv_str, mimetype="text/csv")
-    response.headers.set("Content-Disposition", "attachment", filename="timeseries.csv")
-    return response
+    if mime_type == "application/csv":
+        resp = tsdcsvio.export_csv_bucket(
+            args["start_time"],
+            args["end_time"],
+            timeseries,
+            data_state,
+            args["bucket_width_value"],
+            args["bucket_width_unit"],
+            args["aggregation"],
+            timezone=args["timezone"],
+            col_label="name",
+        )
+    else:
+        resp = tsdjsonio.export_json_bucket(
+            args["start_time"],
+            args["end_time"],
+            timeseries,
+            data_state,
+            args["bucket_width_value"],
+            args["bucket_width_unit"],
+            args["aggregation"],
+            timezone=args["timezone"],
+            col_label="name",
+        )
+
+    return flask.Response(resp, mimetype=mime_type)
 
 
 @blp4c.route("/", methods=("POST",))
 @blp4c.login_required
-@blp4c.arguments(TimeseriesDataPostFileSchema, location="files")
 @blp4c.arguments(TimeseriesDataPostQueryArgsSchema, location="query")
+@blp4c.arguments(
+    TimeseriesDataGetAcceptHeader, location="headers", error_status_code=406
+)
 @blp4c.response(201)
-def post_csv_for_campaign(files, args, campaign_id):
-    """Post timeseries data as CSV file for a given campaign
+def post_for_campaign(args, headers, campaign_id):
+    """Post timeseries data for a given campaign
 
-    Loads a CSV file where the first column is the timestamp as timezone aware
-    datetime and each other column is a timeseries data. Column headers are
-    timeseries ID.
+    Loads data in either JSON or CSV format.
+
+    JSON: each key is a timestamp ID as string. For each timeseries, values are
+    passed a {timestamp: value} mappings.
 
     ```
-    Datetime,Timeseries 1,Timeseries 2,Timeseries 3
+    {
+        "1": {
+            "2020-01-01T00:00:00+00:00": 0.1,
+            "2020-01-01T10:00:00+00:00": 0.2,
+            "2020-01-01T20:00:00+00:00": 0.3,
+        },
+        "2": {
+            "2020-01-01T00:00:00+00:00": 1.1,
+            "2020-01-01T10:00:00+00:00": 1.2,
+            "2020-01-01T20:00:00+00:00": 1.3,
+        },
+        "3": {
+            "2020-01-01T00:00:00+00:00": 2.1,
+            "2020-01-01T10:00:00+00:00": 2.2,
+            "2020-01-01T20:00:00+00:00": 2.3,
+        },
+    }
+    ```
+
+    CSV: the first column is the timestamp as timezone aware datetime and each
+    other column is a timeseries data. Column headers are timeseries IDs.
+
+    ```
+    Datetime,1,2,3
     2020-01-01T00:00:00+00:00,0.1,1.1,2.1
     2020-01-01T00:10:00+00:00,0.2,1.2,2.2
     2020-01-01T00:20:00+00:00,0.3,1.3,2.3
     ```
     """
+    mime_type = headers["accept"]
+
     campaign = Campaign.get_by_id(campaign_id) or abort(404)
     data_state = _get_data_state(args["data_state"])
 
-    with io.TextIOWrapper(files["csv_file"], encoding="utf-8") as csv_file_txt:
-        try:
-            tsdcsvio.import_csv(csv_file_txt, data_state, campaign=campaign)
-        except (TimeseriesNotFoundError, TimeseriesDataIOError) as exc:
-            abort(422, message=f"Invalid CSV file content: {exc}")
+    try:
+        data = flask.request.get_data(cache=True).decode("utf-8")
+    except UnicodeDecodeError as exc:
+        abort(422, message=str(exc))
+
+    try:
+        if mime_type == "application/csv":
+            tsdcsvio.import_csv(data, data_state, campaign=campaign)
+        else:
+            tsdjsonio.import_json(data, data_state, campaign=campaign)
+    except (TimeseriesNotFoundError, TimeseriesDataIOError) as exc:
+        abort(422, message=str(exc))
 
 
 @blp4c.route("/", methods=("DELETE",))
