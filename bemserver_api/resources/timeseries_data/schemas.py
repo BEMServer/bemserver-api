@@ -159,5 +159,5 @@ class TimeseriesDataGetAcceptHeader(Schema):
     accept = ma.fields.String(
         validate=ma.validate.OneOf(["application/json", "application/csv"]),
         data_key="Accept",
-        load_default="application/csv",
+        load_default="application/json",
     )

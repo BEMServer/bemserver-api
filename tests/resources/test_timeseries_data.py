@@ -578,8 +578,7 @@ class TestTimeseriesDataApi:
                         "data_state": ds_id,
                     },
                 )
-                ret_csv_lines = ret.data.decode("utf-8").splitlines()
-                assert len(ret_csv_lines) > 1
+                assert ret.json
 
             # User not in Timeseries group
             if not for_campaign:
@@ -635,8 +634,7 @@ class TestTimeseriesDataApi:
                         "data_state": ds_id,
                     },
                 )
-                ret_csv_lines = ret.data.decode("utf-8").splitlines()
-                assert len(ret_csv_lines) > 1
+                assert ret.json
 
     @pytest.mark.parametrize("for_campaign", (True, False))
     @pytest.mark.parametrize("format_", ("json", "csv"))
@@ -854,8 +852,7 @@ class TestTimeseriesDataApi:
                         "data_state": ds_id,
                     },
                 )
-                ret_csv_lines = ret.data.decode("utf-8").splitlines()
-                assert len(ret_csv_lines) > 1
+                assert ret.json
 
             # Delete
             ret = client.delete(
@@ -881,8 +878,7 @@ class TestTimeseriesDataApi:
                         "data_state": ds_id,
                     },
                 )
-                ret_csv_lines = ret.data.decode("utf-8").splitlines()
-                assert len(ret_csv_lines) == 1
+                assert not ret.json
 
             # User not in Timeseries group
             if not for_campaign:
@@ -903,8 +899,7 @@ class TestTimeseriesDataApi:
                         "data_state": ds_id,
                     },
                 )
-                ret_csv_lines = ret.data.decode("utf-8").splitlines()
-                assert len(ret_csv_lines) > 1
+                assert ret.json
 
             # Delete
             ret = client.delete(
@@ -932,8 +927,7 @@ class TestTimeseriesDataApi:
                         "data_state": ds_id,
                     },
                 )
-                ret_csv_lines = ret.data.decode("utf-8").splitlines()
-                assert len(ret_csv_lines) == 1
+                assert not ret.json
 
     @pytest.mark.parametrize("method", ("get", "delete"))
     @pytest.mark.parametrize("for_campaign", (True, False))
