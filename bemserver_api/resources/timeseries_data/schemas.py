@@ -1,6 +1,5 @@
 """Timeseries data API schemas"""
 import marshmallow as ma
-from flask_smorest.fields import Upload
 
 from bemserver_core.input_output.timeseries_data_io import AGGREGATION_FUNCTIONS
 from bemserver_core.time_utils import PERIODS, FIXED_SIZE_PERIODS
@@ -156,7 +155,9 @@ class TimeseriesDataPostQueryArgsSchema(Schema):
     )
 
 
-class TimeseriesDataPostFileSchema(Schema):
-    csv_file = Upload(
-        required=True,
+class TimeseriesDataGetAcceptHeader(Schema):
+    accept = ma.fields.String(
+        validate=ma.validate.OneOf(["application/json", "application/csv"]),
+        data_key="Accept",
+        load_default="application/json",
     )
