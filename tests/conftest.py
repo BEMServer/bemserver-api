@@ -711,3 +711,16 @@ def st_cleanups_by_timeseries(app, st_cleanups_by_campaigns, timeseries):
         )
         db.session.commit()
     return (st_cbt_1.id, st_cbt_2.id)
+
+
+@pytest.fixture
+def st_check_missings_by_campaigns(app, campaigns):
+    with OpenBar():
+        st_cbc_1 = scheduled_tasks.ST_CheckMissingByCampaign.new(
+            campaign_id=campaigns[0]
+        )
+        st_cbc_2 = scheduled_tasks.ST_CheckMissingByCampaign.new(
+            campaign_id=campaigns[1]
+        )
+        db.session.commit()
+    return (st_cbc_1.id, st_cbc_2.id)
