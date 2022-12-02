@@ -18,6 +18,9 @@ from .resources import register_blueprints
 
 __version__ = "0.2.0"
 
+API_VERSION = __version__
+OPENAPI_VERSION = "3.1.0"
+
 
 def create_app(config_override=None):
     """Create application
@@ -31,7 +34,12 @@ def create_app(config_override=None):
     app.config.from_object(config_override)
 
     database.init_app(app)
-    api = Api()
+    api = Api(
+        spec_kwargs={
+            "version": API_VERSION,
+            "openapi_version": OPENAPI_VERSION,
+        }
+    )
     api.init_app(app)
     register_blueprints(api)
 
