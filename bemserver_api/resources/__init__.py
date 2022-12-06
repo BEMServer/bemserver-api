@@ -46,6 +46,7 @@ from . import input_output
 from . import analysis
 from . import st_cleanups_by_campaigns
 from . import st_cleanups_by_timeseries
+from . import st_check_missings_by_campaigns
 
 
 MODULES = (
@@ -95,6 +96,7 @@ MODULES = (
     analysis,
     st_cleanups_by_campaigns,
     st_cleanups_by_timeseries,
+    st_check_missings_by_campaigns,
 )
 
 
