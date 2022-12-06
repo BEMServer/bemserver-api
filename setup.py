@@ -36,7 +36,7 @@ setup(
         "marshmallow-sqlalchemy>=0.24.0",
         "flask_smorest>=0.40.0,<0.41",
         "flask-httpauth>=0.5.0",
-        "bemserver-core>=0.2.0,<0.3",
+        "bemserver-core>=0.2.1,<0.3",
     ],
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,

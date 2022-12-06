@@ -13,6 +13,10 @@ from . import timeseries_data_states
 from . import timeseries
 from . import timeseries_property_data
 from . import timeseries_data
+from . import event_levels
+from . import event_categories
+from . import events
+from . import timeseries_by_events
 from . import sites
 from . import buildings
 from . import storeys
@@ -58,6 +62,10 @@ MODULES = (
     timeseries,
     timeseries_property_data,
     timeseries_data,
+    event_levels,
+    event_categories,
+    events,
+    timeseries_by_events,
     sites,
     buildings,
     storeys,
