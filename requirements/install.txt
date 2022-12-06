@@ -79,7 +79,7 @@ marshmallow-sqlalchemy==0.28.1
     # via bemserver-api (setup.py)
 numpy==1.23.4
     # via pandas
-oso==0.26.3
+oso==0.26.4
     # via bemserver-core
 packaging==21.3
     # via
