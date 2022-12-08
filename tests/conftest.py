@@ -318,6 +318,81 @@ def timeseries_by_events(app, events, timeseries):
 
 
 @pytest.fixture
+def events_by_sites(app, sites, events):
+    with OpenBar():
+        ebs_1 = model.EventBySite.new(
+            event_id=events[0],
+            site_id=sites[0],
+        )
+        ebs_2 = model.EventBySite.new(
+            event_id=events[1],
+            site_id=sites[1],
+        )
+        db.session.commit()
+    return (ebs_1.id, ebs_2.id)
+
+
+@pytest.fixture
+def events_by_buildings(app, buildings, events):
+    with OpenBar():
+        ebb_1 = model.EventByBuilding.new(
+            event_id=events[0],
+            building_id=buildings[0],
+        )
+        ebb_2 = model.EventByBuilding.new(
+            event_id=events[1],
+            building_id=buildings[1],
+        )
+        db.session.commit()
+    return (ebb_1.id, ebb_2.id)
+
+
+@pytest.fixture
+def events_by_storeys(app, storeys, events):
+    with OpenBar():
+        ebs_1 = model.EventByStorey.new(
+            event_id=events[0],
+            storey_id=storeys[0],
+        )
+        ebs_2 = model.EventByStorey.new(
+            event_id=events[1],
+            storey_id=storeys[1],
+        )
+        db.session.commit()
+    return (ebs_1.id, ebs_2.id)
+
+
+@pytest.fixture
+def events_by_spaces(app, spaces, events):
+    with OpenBar():
+        ebs_1 = model.EventBySpace.new(
+            event_id=events[0],
+            space_id=spaces[0],
+        )
+        ebs_2 = model.EventBySpace.new(
+            event_id=events[1],
+            space_id=spaces[1],
+        )
+        db.session.commit()
+    return (ebs_1.id, ebs_2.id)
+
+
+@pytest.fixture
+def events_by_zones(app, zones, events):
+    with OpenBar():
+        ebz_1 = model.EventByZone.new(
+            event_id=events[0],
+            zone_id=zones[0],
+        )
+        ebz_2 = model.EventByZone.new(
+            event_id=events[1],
+            zone_id=zones[1],
+        )
+        db.session.commit()
+    return (ebz_1.id, ebz_2.id)
+
+
+@pytest.fixture
 def sites(app, campaigns):
     with OpenBar():
         site_1 = model.Site.new(
