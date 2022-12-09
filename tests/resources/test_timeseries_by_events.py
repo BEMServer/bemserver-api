@@ -19,7 +19,6 @@ class TestTimeseriesByEventApi:
         event_2_id = events[1]
         ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
-        ts_3_id = timeseries[2]
 
         client = app.test_client()
 
@@ -73,40 +72,6 @@ class TestTimeseriesByEventApi:
             ret_val.pop("id")
             assert ret_val == tbs_1
 
-            # PUT
-            tbs_1["timeseries_id"] = ts_3_id
-            ret = client.put(
-                f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}",
-                json=tbs_1,
-                headers={"If-Match": tbs_1_etag},
-            )
-            assert ret.status_code == 200
-            ret_val = ret.json
-            ret_val.pop("id")
-            tbs_1_etag = ret.headers["ETag"]
-            assert ret_val == tbs_1
-
-            # PUT event + TS from different campaign scopes
-            tbs_1["timeseries_id"] = ts_2_id
-            ret = client.put(
-                f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}",
-                json=tbs_1,
-                headers={"If-Match": tbs_1_etag},
-            )
-            assert ret.status_code == 422
-            ret_val = ret.json
-            assert ret_val["errors"]["json"]["_schema"] == (
-                "Event and timeseries must be in same campaign scope"
-            )
-
-            # PUT wrong ID -> 404
-            ret = client.put(
-                f"{TIMESERIES_BY_EVENTS_URL}{DUMMY_ID}",
-                json=tbs_1,
-                headers={"If-Match": tbs_1_etag},
-            )
-            assert ret.status_code == 404
-
             # POST
             tbs_2 = {
                 "event_id": event_2_id,
@@ -115,17 +80,6 @@ class TestTimeseriesByEventApi:
             ret = client.post(TIMESERIES_BY_EVENTS_URL, json=tbs_2)
             ret_val = ret.json
             tbs_2_id = ret_val.pop("id")
-            tbs_2_etag = ret.headers["ETag"]
-
-            # PUT violating unique constraint
-            tbs_1["event_id"] = tbs_2["event_id"]
-            tbs_1["timeseries_id"] = tbs_2["timeseries_id"]
-            ret = client.put(
-                f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}",
-                json=tbs_1,
-                headers={"If-Match": tbs_1_etag},
-            )
-            assert ret.status_code == 409
 
             # GET list
             ret = client.get(TIMESERIES_BY_EVENTS_URL)
@@ -144,10 +98,7 @@ class TestTimeseriesByEventApi:
             assert ret_val[0]["id"] == tbs_1_id
 
             # DELETE wrong ID -> 404
-            ret = client.delete(
-                f"{TIMESERIES_BY_EVENTS_URL}{DUMMY_ID}",
-                headers={"If-Match": tbs_1_etag},
-            )
+            ret = client.delete(f"{TIMESERIES_BY_EVENTS_URL}{DUMMY_ID}")
             assert ret.status_code == 404
 
             # DELETE event cascade
@@ -159,15 +110,9 @@ class TestTimeseriesByEventApi:
             assert ret.status_code == 204
 
             # DELETE
-            ret = client.delete(
-                f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}",
-                headers={"If-Match": tbs_1_etag},
-            )
+            ret = client.delete(f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}")
             assert ret.status_code == 404
-            ret = client.delete(
-                f"{TIMESERIES_BY_EVENTS_URL}{tbs_2_id}",
-                headers={"If-Match": tbs_2_etag},
-            )
+            ret = client.delete(f"{TIMESERIES_BY_EVENTS_URL}{tbs_2_id}")
             assert ret.status_code == 204
 
             # GET list
@@ -191,10 +136,8 @@ class TestTimeseriesByEventApi:
         user_creds = users["Active"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
-        ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
         ts_3_id = timeseries[2]
-        ts_4_id = timeseries[3]
         tbs_1_id = timeseries_by_events[0]
         tbs_2_id = timeseries_by_events[1]
 
@@ -218,8 +161,6 @@ class TestTimeseriesByEventApi:
             ret = client.post(TIMESERIES_BY_EVENTS_URL, json=tbs_3)
             assert ret.status_code == 201
             ret_val = ret.json
-            tbs_3_id = ret_val["id"]
-            tbs_3_etag = ret.headers["ETag"]
 
             # POST not in campaign scope
             tbs = {
@@ -245,33 +186,10 @@ class TestTimeseriesByEventApi:
             )
             assert ret.status_code == 204
 
-            # PUT
-            tbs_3["timeseries_id"] = ts_1_id
-            ret = client.put(
-                f"{TIMESERIES_BY_EVENTS_URL}{tbs_3_id}",
-                json=tbs_3,
-                headers={"If-Match": tbs_3_etag},
-            )
-            assert ret.status_code == 200
-            tbs_3_etag = ret.headers["ETag"]
-
-            # PUT not in campaign scope
-            tbs = {
-                "event_id": event_2_id,
-                "timeseries_id": ts_4_id,
-            }
-            ret = client.put(
-                f"{TIMESERIES_BY_EVENTS_URL}{tbs_3_id}",
-                json=tbs,
-                headers={"If-Match": tbs_3_etag},
-            )
-            assert ret.status_code == 403
-
     def test_timeseries_by_events_as_anonym_api(
         self, app, events, timeseries, timeseries_by_events
     ):
         event_1_id = events[0]
-        ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
         tbs_1_id = timeseries_by_events[0]
 
@@ -293,23 +211,7 @@ class TestTimeseriesByEventApi:
         ret = client.get(f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}")
         assert ret.status_code == 401
 
-        # PUT
-        tbs_1 = {
-            "event_id": event_1_id,
-            "timeseries_id": ts_1_id,
-        }
-        ret = client.put(
-            f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}",
-            json=tbs_1,
-            headers={"If-Match": "Dummy-ETag"},
-        )
-        # ETag is wrong but we get rejected before ETag check anyway
-        assert ret.status_code == 401
-
         # DELETE
-        ret = client.delete(
-            f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}",
-            headers={"If-Match": "Dummy-Etag"},
-        )
+        ret = client.delete(f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}")
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401
