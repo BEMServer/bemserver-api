@@ -60,31 +60,11 @@ class EventBySpaceByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
-    @blp.arguments(EventBySpaceSchema)
-    @blp.response(200, EventBySpaceSchema)
-    @blp.catch_integrity_error
-    def put(self, new_item, item_id):
-        """Update an existing event x space association"""
-        item = EventBySpace.get_by_id(item_id)
-        if item is None:
-            abort(404)
-        blp.check_etag(item, EventBySpaceSchema)
-        item.update(**new_item)
-        try:
-            db.session.commit()
-        except BEMServerCoreCampaignError as exc:
-            abort(422, errors={"json": {"_schema": str(exc)}})
-        return item
-
-    @blp.login_required
-    @blp.etag
     @blp.response(204)
     def delete(self, item_id):
         """Delete an event x space association"""
         item = EventBySpace.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, EventBySpaceSchema)
         item.delete()
         db.session.commit()

@@ -71,40 +71,6 @@ class TestEventByStoreyApi:
             ret_val.pop("id")
             assert ret_val == ebs_1
 
-            # PUT
-            ebs_1["storey_id"] = storey_1_id
-            ret = client.put(
-                f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}",
-                json=ebs_1,
-                headers={"If-Match": ebs_1_etag},
-            )
-            assert ret.status_code == 200
-            ret_val = ret.json
-            ret_val.pop("id")
-            ebs_1_etag = ret.headers["ETag"]
-            assert ret_val == ebs_1
-
-            # PUT event + storey from different campaigns
-            ebs_1["storey_id"] = storey_2_id
-            ret = client.put(
-                f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}",
-                json=ebs_1,
-                headers={"If-Match": ebs_1_etag},
-            )
-            assert ret.status_code == 422
-            ret_val = ret.json
-            assert ret_val["errors"]["json"]["_schema"] == (
-                "Event and storey must be in same campaign"
-            )
-
-            # PUT wrong ID -> 404
-            ret = client.put(
-                f"{EVENTS_BY_STOREZS_URL}{DUMMY_ID}",
-                json=ebs_1,
-                headers={"If-Match": ebs_1_etag},
-            )
-            assert ret.status_code == 404
-
             # POST
             ebs_2 = {
                 "event_id": event_2_id,
@@ -113,17 +79,6 @@ class TestEventByStoreyApi:
             ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs_2)
             ret_val = ret.json
             ebs_2_id = ret_val.pop("id")
-            ebs_2_etag = ret.headers["ETag"]
-
-            # PUT violating unique constraint
-            ebs_1["event_id"] = ebs_2["event_id"]
-            ebs_1["storey_id"] = ebs_2["storey_id"]
-            ret = client.put(
-                f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}",
-                json=ebs_1,
-                headers={"If-Match": ebs_1_etag},
-            )
-            assert ret.status_code == 409
 
             # GET list
             ret = client.get(EVENTS_BY_STOREZS_URL)
@@ -142,10 +97,7 @@ class TestEventByStoreyApi:
             assert ret_val[0]["id"] == ebs_1_id
 
             # DELETE wrong ID -> 404
-            ret = client.delete(
-                f"{EVENTS_BY_STOREZS_URL}{DUMMY_ID}",
-                headers={"If-Match": ebs_1_etag},
-            )
+            ret = client.delete(f"{EVENTS_BY_STOREZS_URL}{DUMMY_ID}")
             assert ret.status_code == 404
 
             # DELETE event cascade
@@ -157,15 +109,9 @@ class TestEventByStoreyApi:
             assert ret.status_code == 204
 
             # DELETE
-            ret = client.delete(
-                f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}",
-                headers={"If-Match": ebs_1_etag},
-            )
+            ret = client.delete(f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}")
             assert ret.status_code == 404
-            ret = client.delete(
-                f"{EVENTS_BY_STOREZS_URL}{ebs_2_id}",
-                headers={"If-Match": ebs_2_etag},
-            )
+            ret = client.delete(f"{EVENTS_BY_STOREZS_URL}{ebs_2_id}")
             assert ret.status_code == 204
 
             # GET list
@@ -229,8 +175,6 @@ class TestEventByStoreyApi:
             ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs_3)
             assert ret.status_code == 201
             ret_val = ret.json
-            ebs_3_id = ret_val["id"]
-            ebs_3_etag = ret.headers["ETag"]
 
             # POST not in campaign scope
             ebs = {
@@ -240,33 +184,10 @@ class TestEventByStoreyApi:
             ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs)
             assert ret.status_code == 403
 
-            # PUT
-            ebs_3["storey_id"] = storey_1_id
-            ret = client.put(
-                f"{EVENTS_BY_STOREZS_URL}{ebs_3_id}",
-                json=ebs_3,
-                headers={"If-Match": ebs_3_etag},
-            )
-            assert ret.status_code == 200
-            ebs_3_etag = ret.headers["ETag"]
-
-            # PUT not in campaign scope
-            ebs = {
-                "event_id": event_2_id,
-                "storey_id": storey_1_id,
-            }
-            ret = client.put(
-                f"{EVENTS_BY_STOREZS_URL}{ebs_3_id}",
-                json=ebs,
-                headers={"If-Match": ebs_3_etag},
-            )
-            assert ret.status_code == 403
-
     def test_events_by_storeys_as_anonym_api(
         self, app, storeys, events, events_by_storeys
     ):
         event_1_id = events[0]
-        storey_1_id = storeys[0]
         storey_2_id = storeys[1]
         ebs_1_id = events_by_storeys[0]
 
@@ -288,23 +209,7 @@ class TestEventByStoreyApi:
         ret = client.get(f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}")
         assert ret.status_code == 401
 
-        # PUT
-        ebs_1 = {
-            "event_id": event_1_id,
-            "storey_id": storey_1_id,
-        }
-        ret = client.put(
-            f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}",
-            json=ebs_1,
-            headers={"If-Match": "Dummy-ETag"},
-        )
-        # ETag is wrong but we get rejected before ETag check anyway
-        assert ret.status_code == 401
-
         # DELETE
-        ret = client.delete(
-            f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}",
-            headers={"If-Match": "Dummy-Etag"},
-        )
+        ret = client.delete(f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}")
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401
