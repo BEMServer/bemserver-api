@@ -60,31 +60,11 @@ class TimeseriesByEventByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
-    @blp.arguments(TimeseriesByEventSchema)
-    @blp.response(200, TimeseriesByEventSchema)
-    @blp.catch_integrity_error
-    def put(self, new_item, item_id):
-        """Update an existing timeseries x event association"""
-        item = TimeseriesByEvent.get_by_id(item_id)
-        if item is None:
-            abort(404)
-        blp.check_etag(item, TimeseriesByEventSchema)
-        item.update(**new_item)
-        try:
-            db.session.commit()
-        except BEMServerCoreCampaignScopeError as exc:
-            abort(422, errors={"json": {"_schema": str(exc)}})
-        return item
-
-    @blp.login_required
-    @blp.etag
     @blp.response(204)
     def delete(self, item_id):
         """Delete a timeseries x event association"""
         item = TimeseriesByEvent.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, TimeseriesByEventSchema)
         item.delete()
         db.session.commit()
