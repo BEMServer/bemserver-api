@@ -1,12 +1,24 @@
 Changelog
 ---------
 
+0.4.0 (2022-12-09)
+++++++++++++++++++
+
+Features:
+
+- EventBySite, EventByBuilding,... resources.
+- Remove PUT endpoint in TimeseriesByEvent resources.
+
+Other changes:
+
+- Require bemserver-core 0.3.0.
+
 0.3.0 (2022-12-06)
 ++++++++++++++++++
 
 Features:
 
-- Events.
+- Event resources.
 - Check missing data scheduled task.
 - Hardcode ``API_VERSION`` and ``OPENAPI_VERSION``.
 - Set ``API_VERSION`` as ``bemserver_api.__version__``.
