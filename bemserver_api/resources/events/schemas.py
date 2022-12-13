@@ -14,7 +14,6 @@ class EventSchema(AutoSchema):
 
     id = msa.auto_field(dump_only=True)
     timestamp = ma.fields.AwareDateTime()
-    campaign_scope_id = ma.fields.Int(required=True)
     level = ma.fields.Enum(EventLevelEnum)
 
 
