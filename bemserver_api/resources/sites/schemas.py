@@ -13,7 +13,6 @@ class SiteSchema(AutoSchema):
 
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
-    campaign_id = ma.fields.Int(required=True)
 
 
 class SitePutSchema(SiteSchema):
