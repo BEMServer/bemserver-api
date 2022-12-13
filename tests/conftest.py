@@ -273,30 +273,21 @@ def event_categories(app):
 
 
 @pytest.fixture
-def event_levels(app):
-    with OpenBar():
-        el_1 = model.EventLevel.get(name="WARNING").first()
-        el_2 = model.EventLevel.get(name="INFO").first()
-        db.session.commit()
-    return (el_1.id, el_2.id)
-
-
-@pytest.fixture
-def events(app, campaigns, campaign_scopes, event_categories, event_levels):
+def events(app, campaigns, campaign_scopes, event_categories):
     with OpenBar():
         tse_1 = model.Event.new(
             campaign_scope_id=campaign_scopes[0],
             timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
             source="Event source",
             category_id=event_categories[0],
-            level_id=event_levels[0],
+            level=model.EventLevelEnum.WARNING,
         )
         tse_2 = model.Event.new(
             campaign_scope_id=campaign_scopes[1],
             timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
             source="Another event source",
             category_id=event_categories[1],
-            level_id=event_levels[1],
+            level=model.EventLevelEnum.DEBUG,
         )
         db.session.commit()
     return (tse_1.id, tse_2.id)
