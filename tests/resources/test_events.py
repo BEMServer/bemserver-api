@@ -130,10 +130,17 @@ class TestEventsApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
+            assert ret_val[0]["id"] == event_2_id
             ret = client.get(EVENTS_URL, query_string={"timestamp_max": c1_st})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
+            assert ret_val[0]["id"] == event_1_id
+            ret = client.get(EVENTS_URL, query_string={"in_source": "other"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == event_2_id
 
             # GET sorted list
             ret = client.get(EVENTS_URL, query_string={"sort": "timestamp"})

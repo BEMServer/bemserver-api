@@ -26,6 +26,7 @@ class EventQueryArgsSchema(Schema):
     sort = SortField(("timestamp", "level"))
     campaign_scope_id = ma.fields.Integer()
     source = ma.fields.String()
+    in_source = ma.fields.String()
     category_id = ma.fields.Int()
     level = ma.fields.Enum(EventLevelEnum)
     level_min = ma.fields.Enum(EventLevelEnum)
