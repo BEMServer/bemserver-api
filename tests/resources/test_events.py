@@ -111,6 +111,11 @@ class TestEventsApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == event_2_id
+            ret = client.get(EVENTS_URL, query_string={"level_min": "INFO"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == event_1_id
             ret = client.get(
                 EVENTS_URL,
                 query_string={

@@ -28,5 +28,6 @@ class EventQueryArgsSchema(Schema):
     source = ma.fields.String()
     category_id = ma.fields.Int()
     level = ma.fields.Enum(EventLevelEnum)
+    level_min = ma.fields.Enum(EventLevelEnum)
     timestamp_min = ma.fields.AwareDateTime()
     timestamp_max = ma.fields.AwareDateTime()
