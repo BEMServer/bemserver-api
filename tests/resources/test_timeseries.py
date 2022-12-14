@@ -120,6 +120,10 @@ class TestTimeseriesApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 0
+            ret = client.get(TIMESERIES_URL, query_string={"event_id": DUMMY_ID})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
 
             # DELETE
             timeseries_3 = {
