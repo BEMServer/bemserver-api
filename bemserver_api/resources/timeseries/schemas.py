@@ -33,3 +33,4 @@ class TimeseriesQueryArgsSchema(Schema):
     storey_id = ma.fields.Int()
     space_id = ma.fields.Int()
     zone_id = ma.fields.Int()
+    event_id = ma.fields.Int()
