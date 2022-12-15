@@ -1,6 +1,19 @@
 Changelog
 ---------
 
+0.5.0 (2022-12-15)
+++++++++++++++++++
+
+Features:
+
+- Event API: replace level_id foreign key with level enum
+- Event API: add level_min and in_source query args
+- Timeseries API: add event_id query arg
+
+Other changes:
+
+- Require bemserver-core 0.4.0.
+
 0.4.0 (2022-12-09)
 ++++++++++++++++++
 
