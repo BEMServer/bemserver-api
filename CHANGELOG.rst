@@ -1,6 +1,18 @@
 Changelog
 ---------
 
+0.6.0 (2022-12-22)
+++++++++++++++++++
+
+Features:
+
+- Split Timeseries site_id/... and event_id filters into separate routes
+- Add Event campaign_id, user_id, timeseries_id and site_id/... filters
+
+Other changes:
+
+- Require bemserver-core 0.5.0.
+
 0.5.0 (2022-12-15)
 ++++++++++++++++++
 
