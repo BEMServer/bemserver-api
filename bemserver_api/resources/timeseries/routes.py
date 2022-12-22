@@ -7,7 +7,12 @@ from bemserver_core.model import Timeseries
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
-from .schemas import TimeseriesSchema, TimeseriesPutSchema, TimeseriesQueryArgsSchema
+from .schemas import (
+    TimeseriesSchema,
+    TimeseriesPutSchema,
+    TimeseriesQueryArgsSchema,
+    TimeseriesRecurseArgsSchema,
+)
 
 
 blp = Blueprint(
@@ -39,6 +44,69 @@ class TimeseriesViews(MethodView):
         item = Timeseries.new(**new_item)
         db.session.commit()
         return item
+
+
+@blp.route("/by_site/<int:item_id>")
+@blp.login_required
+@blp.etag
+@blp.arguments(TimeseriesRecurseArgsSchema, location="query")
+@blp.response(200, TimeseriesSchema(many=True))
+@blp.paginate(SQLCursorPage)
+def get_by_site(args, item_id):
+    """Get timeseries for a given site"""
+    return Timeseries.get_by_site(item_id, **args)
+
+
+@blp.route("/by_building/<int:item_id>")
+@blp.login_required
+@blp.etag
+@blp.arguments(TimeseriesRecurseArgsSchema, location="query")
+@blp.response(200, TimeseriesSchema(many=True))
+@blp.paginate(SQLCursorPage)
+def get_by_building(args, item_id):
+    """Get timeseries for a given building"""
+    return Timeseries.get_by_building(item_id, **args)
+
+
+@blp.route("/by_storey/<int:item_id>")
+@blp.login_required
+@blp.etag
+@blp.arguments(TimeseriesRecurseArgsSchema, location="query")
+@blp.response(200, TimeseriesSchema(many=True))
+@blp.paginate(SQLCursorPage)
+def get_by_storey(args, item_id):
+    """Get timeseries for a given storey"""
+    return Timeseries.get_by_storey(item_id, **args)
+
+
+@blp.route("/by_space/<int:item_id>")
+@blp.login_required
+@blp.etag
+@blp.response(200, TimeseriesSchema(many=True))
+@blp.paginate(SQLCursorPage)
+def get_by_space(item_id):
+    """Get timeseries for a given space"""
+    return Timeseries.get_by_space(item_id)
+
+
+@blp.route("/by_zone/<int:item_id>")
+@blp.login_required
+@blp.etag
+@blp.response(200, TimeseriesSchema(many=True))
+@blp.paginate(SQLCursorPage)
+def get_by_zone(item_id):
+    """Get timeseries for a given zone"""
+    return Timeseries.get_by_zone(item_id)
+
+
+@blp.route("/by_event/<int:item_id>")
+@blp.login_required
+@blp.etag
+@blp.response(200, TimeseriesSchema(many=True))
+@blp.paginate(SQLCursorPage)
+def get_by_event(item_id):
+    """Get timeseries for a given event"""
+    return Timeseries.get_by_event(item_id)
 
 
 @blp.route("/<int:item_id>")

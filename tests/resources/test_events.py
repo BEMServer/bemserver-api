@@ -12,12 +12,16 @@ EVENTS_URL = "/events/"
 
 
 class TestEventsApi:
-    def test_events_api(self, app, users, campaign_scopes, event_categories):
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    def test_events_api(self, app, users, campaigns, campaign_scopes, event_categories):
+        campaign_1_id = campaigns[0]
         cs_1_id = campaign_scopes[0]
         cs_2_id = campaign_scopes[1]
         ec_1_id = event_categories[0]
         c1_st = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
         c2_et = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
+        user_1_id = users["Active"]["id"]
 
         creds = users["Chuck"]["creds"]
 
@@ -101,10 +105,20 @@ class TestEventsApi:
             event_2_etag = ret.headers["ETag"]
 
             # GET list (filtered)
+            ret = client.get(EVENTS_URL, query_string={"campaign_id": campaign_1_id})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == event_1_id
             ret = client.get(EVENTS_URL, query_string={"campaign_scope_id": cs_1_id})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
+            ret = client.get(EVENTS_URL, query_string={"user_id": user_1_id})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == event_1_id
             assert ret_val[0]["id"] == event_1_id
             ret = client.get(EVENTS_URL, query_string={"level": "DEBUG"})
             assert ret.status_code == 200
@@ -194,6 +208,83 @@ class TestEventsApi:
             # GET by id -> 404
             ret = client.get(f"{EVENTS_URL}{event_1_id}")
             assert ret.status_code == 404
+
+    @pytest.mark.usefixtures("events_by_spaces")
+    @pytest.mark.usefixtures("events_by_zones")
+    @pytest.mark.usefixtures("timeseries_by_events")
+    def test_events_filters_api(
+        self,
+        app,
+        users,
+        sites,
+        buildings,
+        storeys,
+        spaces,
+        zones,
+        timeseries,
+    ):
+
+        creds = users["Chuck"]["creds"]
+        site_1_id = sites[0]
+        building_1_id = buildings[0]
+        storey_1_id = storeys[0]
+        space_1_id = spaces[0]
+        zone_1_id = zones[0]
+        ts_1_id = timeseries[0]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+            ret = client.get(EVENTS_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            ret = client.get(f"{EVENTS_URL}by_site/{site_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(
+                f"{EVENTS_URL}by_site/{site_1_id}",
+                query_string={"recurse": True},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(f"{EVENTS_URL}by_building/{building_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(
+                f"{EVENTS_URL}by_building/{building_1_id}",
+                query_string={"recurse": True},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(f"{EVENTS_URL}by_storey/{storey_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(
+                f"{EVENTS_URL}by_storey/{storey_1_id}",
+                query_string={"recurse": True},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(f"{EVENTS_URL}by_space/{space_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(f"{EVENTS_URL}by_zone/{zone_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+
+            ret = client.get(EVENTS_URL, query_string={"timeseries_id": ts_1_id})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
 
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")

@@ -24,7 +24,9 @@ class EventPutSchema(EventSchema):
 
 class EventQueryArgsSchema(Schema):
     sort = SortField(("timestamp", "level"))
+    campaign_id = ma.fields.Integer()
     campaign_scope_id = ma.fields.Integer()
+    user_id = ma.fields.Integer()
     source = ma.fields.String()
     in_source = ma.fields.String()
     category_id = ma.fields.Int()
@@ -32,3 +34,8 @@ class EventQueryArgsSchema(Schema):
     level_min = ma.fields.Enum(EventLevelEnum)
     timestamp_min = ma.fields.AwareDateTime()
     timestamp_max = ma.fields.AwareDateTime()
+    timeseries_id = ma.fields.Integer()
+
+
+class EventRecurseArgsSchema(Schema):
+    recurse = ma.fields.Boolean()

@@ -22,15 +22,13 @@ class TimeseriesPutSchema(TimeseriesSchema):
 
 class TimeseriesQueryArgsSchema(Schema):
     sort = SortField(("name",))
-    name = ma.fields.Str()
-    in_name = ma.fields.Str()
-    unit_symbol = ma.fields.Str()
-    campaign_id = ma.fields.Int()
-    campaign_scope_id = ma.fields.Int()
-    user_id = ma.fields.Int()
-    site_id = ma.fields.Int()
-    building_id = ma.fields.Int()
-    storey_id = ma.fields.Int()
-    space_id = ma.fields.Int()
-    zone_id = ma.fields.Int()
-    event_id = ma.fields.Int()
+    name = ma.fields.String()
+    in_name = ma.fields.String()
+    unit_symbol = ma.fields.String()
+    campaign_id = ma.fields.Integer()
+    campaign_scope_id = ma.fields.Integer()
+    user_id = ma.fields.Integer()
+
+
+class TimeseriesRecurseArgsSchema(Schema):
+    recurse = ma.fields.Boolean()
