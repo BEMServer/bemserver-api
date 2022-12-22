@@ -120,10 +120,6 @@ class TestTimeseriesApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 0
-            ret = client.get(TIMESERIES_URL, query_string={"event_id": DUMMY_ID})
-            assert ret.status_code == 200
-            ret_val = ret.json
-            assert len(ret_val) == 0
 
             # DELETE
             timeseries_3 = {
@@ -168,26 +164,87 @@ class TestTimeseriesApi:
             ret = client.get(f"{TIMESERIES_URL}{timeseries_1_id}")
             assert ret.status_code == 404
 
-    @pytest.mark.usefixtures("users_by_user_groups")
-    @pytest.mark.usefixtures("user_groups_by_campaigns")
-    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
-    def test_timeseries_as_user_api(
+    @pytest.mark.usefixtures("timeseries_by_spaces")
+    @pytest.mark.usefixtures("timeseries_by_zones")
+    @pytest.mark.usefixtures("timeseries_by_events")
+    def test_timeseries_filters_api(
         self,
         app,
         users,
-        timeseries,
-        campaigns,
-        campaign_scopes,
         sites,
         buildings,
         storeys,
         spaces,
         zones,
-        timeseries_by_sites,
-        timeseries_by_buildings,
-        timeseries_by_storeys,
-        timeseries_by_spaces,
-        timeseries_by_zones,
+        events,
+    ):
+
+        creds = users["Chuck"]["creds"]
+        site_1_id = sites[0]
+        building_1_id = buildings[0]
+        storey_1_id = storeys[0]
+        space_1_id = spaces[0]
+        zone_1_id = zones[0]
+        event_1_id = events[0]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+            ret = client.get(TIMESERIES_URL)
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            ret = client.get(f"{TIMESERIES_URL}by_site/{site_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(
+                f"{TIMESERIES_URL}by_site/{site_1_id}",
+                query_string={"recurse": True},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(f"{TIMESERIES_URL}by_building/{building_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(
+                f"{TIMESERIES_URL}by_building/{building_1_id}",
+                query_string={"recurse": True},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(f"{TIMESERIES_URL}by_storey/{storey_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 0
+            ret = client.get(
+                f"{TIMESERIES_URL}by_storey/{storey_1_id}",
+                query_string={"recurse": True},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(f"{TIMESERIES_URL}by_space/{space_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(f"{TIMESERIES_URL}by_zone/{zone_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            ret = client.get(f"{TIMESERIES_URL}by_event/{event_1_id}")
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaigns")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    def test_timeseries_as_user_api(
+        self, app, users, timeseries, campaigns, campaign_scopes
     ):
 
         campaign_1_id = campaigns[0]
@@ -209,26 +266,6 @@ class TestTimeseriesApi:
             assert ret_val[0]["campaign_id"] == campaign_1_id
             assert ret_val[0]["campaign_scope_id"] == cs_1_id
             assert ret_val[0]["id"] == timeseries_1_id
-
-            # GET list for a structural element
-            for struct_elmt_type in ["site", "building", "storey", "space", "zone"]:
-                ret = client.get(
-                    TIMESERIES_URL,
-                    query_string={f"{struct_elmt_type}_id": 666},
-                )
-                assert ret.status_code == 200
-                ret_val = ret.json
-                assert len(ret_val) == 0
-                ret = client.get(
-                    TIMESERIES_URL,
-                    query_string={f"{struct_elmt_type}_id": 1},
-                )
-                assert ret.status_code == 200
-                ret_val = ret.json
-                assert len(ret_val) == 1
-                assert ret_val[0]["campaign_id"] == campaign_1_id
-                assert ret_val[0]["campaign_scope_id"] == cs_1_id
-                assert ret_val[0]["id"] == timeseries_1_id
 
             # GET list using "in_name"
             ret = client.get(TIMESERIES_URL, query_string={"in_name": "Toto"})
