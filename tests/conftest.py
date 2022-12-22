@@ -692,14 +692,14 @@ def timeseries_by_spaces(app, spaces, timeseries):
 
 
 @pytest.fixture
-def timeseries_by_zones(app, spaces, timeseries):
+def timeseries_by_zones(app, zones, timeseries):
     with OpenBar():
         tbz_1 = model.TimeseriesByZone.new(
-            zone_id=spaces[0],
+            zone_id=zones[0],
             timeseries_id=timeseries[0],
         )
         tbz_2 = model.TimeseriesByZone.new(
-            zone_id=spaces[1],
+            zone_id=zones[1],
             timeseries_id=timeseries[1],
         )
         db.session.commit()
