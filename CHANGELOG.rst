@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.6.1 (unreleased)
+++++++++++++++++++
+
+Features:
+
+- Manage invalid UTF-8 files in sites/timeseries IO
+
 0.6.0 (2022-12-22)
 ++++++++++++++++++
 
