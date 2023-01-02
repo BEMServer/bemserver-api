@@ -137,6 +137,28 @@ class TestInputOutputSites:
             assert ret.status_code == 200
             assert len(ret.json) == 2
 
+    def test_sites_csv_post_invalid_encoding(self, app, users, campaigns):
+
+        campaign_1_id = campaigns[0]
+
+        creds = users["Chuck"]["creds"]
+        auth_context = AuthHeader(creds)
+
+        client = app.test_client()
+
+        with auth_context:
+
+            ret = client.post(
+                INPUT_OUTPUT_SITES_URL,
+                query_string={
+                    "campaign_id": campaign_1_id,
+                },
+                data={
+                    "sites_csv": (io.BytesIO(bytes.fromhex("2Ef0")), "sites.csv"),
+                },
+            )
+            assert ret.status_code == 422
+
     @pytest.mark.parametrize(
         "buildings_csv",
         (
@@ -261,6 +283,32 @@ class TestInputOutputTimeseries:
                 ret = client.get(TIMESERIES_URL)
                 assert ret.status_code == 200
                 assert len(ret.json) == 2
+
+    @pytest.mark.usefixtures("campaign_scopes")
+    def test_timeseries_csv_post_invalid_encoding(self, app, users, campaigns):
+
+        campaign_1_id = campaigns[0]
+
+        creds = users["Chuck"]["creds"]
+        auth_context = AuthHeader(creds)
+
+        client = app.test_client()
+
+        with auth_context:
+
+            ret = client.post(
+                INPUT_OUTPUT_TIMESERIES_URL,
+                query_string={
+                    "campaign_id": campaign_1_id,
+                },
+                data={
+                    "timeseries_csv": (
+                        io.BytesIO(bytes.fromhex("2Ef0")),
+                        "timeseries.csv",
+                    ),
+                },
+            )
+            assert ret.status_code == 422
 
     @pytest.mark.parametrize(
         "timeseries_csv",
