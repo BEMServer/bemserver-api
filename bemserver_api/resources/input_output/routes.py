@@ -43,6 +43,8 @@ def sites_csv_io_post(args, files):
         sites_csv_io.import_csv(campaign=campaign, **csv_files)
     except BEMServerCoreIOError as exc:
         abort(422, message=f"Invalid CSV file content: {exc}")
+    except UnicodeDecodeError as exc:
+        abort(422, message=str(exc))
 
 
 @blp.post("/timeseries")
@@ -62,3 +64,5 @@ def timeseries_csv_io_post(args, files):
         timeseries_csv_io.import_csv(campaign=campaign, timeseries_csv=timeseries_csv)
     except BEMServerCoreIOError as exc:
         abort(422, message=f"Invalid CSV file content: {exc}")
+    except UnicodeDecodeError as exc:
+        abort(422, message=str(exc))
