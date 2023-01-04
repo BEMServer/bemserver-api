@@ -34,7 +34,7 @@ class EventCategoriesViews(MethodView):
     @blp.response(201, EventCategorySchema)
     @blp.catch_integrity_error
     def post(self, new_item):
-        """Add a new event"""
+        """Add a new event category"""
         item = EventCategory.new(**new_item)
         db.session.commit()
         return item
@@ -46,7 +46,7 @@ class EventCategoriesByIdViews(MethodView):
     @blp.etag
     @blp.response(200, EventCategorySchema)
     def get(self, item_id):
-        """Get en event by its ID"""
+        """Get an event category by its ID"""
         item = EventCategory.get_by_id(item_id)
         if item is None:
             abort(404)
@@ -58,7 +58,7 @@ class EventCategoriesByIdViews(MethodView):
     @blp.response(200, EventCategorySchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
-        """Update an existing timeseries"""
+        """Update an existing event category"""
         item = EventCategory.get_by_id(item_id)
         if item is None:
             abort(404)
@@ -71,7 +71,7 @@ class EventCategoriesByIdViews(MethodView):
     @blp.etag
     @blp.response(204)
     def delete(self, item_id):
-        """Delete an event"""
+        """Delete an event category"""
         item = EventCategory.get_by_id(item_id)
         if item is None:
             abort(404)
