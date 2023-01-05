@@ -61,7 +61,7 @@ class TestEventByZoneApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]["id"] == zone_1_id
+            assert ret_val[0]["id"] == ebz_1_id
 
             # GET by id
             ret = client.get(f"{EVENTS_BY_ZONES_URL}{ebz_1_id}")

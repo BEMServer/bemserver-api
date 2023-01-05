@@ -6,7 +6,7 @@ from tests.common import AuthHeader
 
 DUMMY_ID = "69"
 
-EVENTS_BY_STOREZS_URL = "/events_by_storeys/"
+EVENTS_BY_STOREYS_URL = "/events_by_storeys/"
 EVENTS_URL = "/events/"
 
 
@@ -24,7 +24,7 @@ class TestEventByStoreyApi:
         with AuthHeader(creds):
 
             # GET list
-            ret = client.get(EVENTS_BY_STOREZS_URL)
+            ret = client.get(EVENTS_BY_STOREYS_URL)
             assert ret.status_code == 200
             assert ret.json == []
 
@@ -33,7 +33,7 @@ class TestEventByStoreyApi:
                 "event_id": event_1_id,
                 "storey_id": storey_1_id,
             }
-            ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs_1)
+            ret = client.post(EVENTS_BY_STOREYS_URL, json=ebs_1)
             assert ret.status_code == 201
             ret_val = ret.json
             ebs_1_id = ret_val.pop("id")
@@ -41,7 +41,7 @@ class TestEventByStoreyApi:
             assert ret_val == ebs_1
 
             # POST violating unique constraint
-            ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs_1)
+            ret = client.post(EVENTS_BY_STOREYS_URL, json=ebs_1)
             assert ret.status_code == 409
 
             # POST event + storey from different campaigns
@@ -49,7 +49,7 @@ class TestEventByStoreyApi:
                 "event_id": event_2_id,
                 "storey_id": storey_1_id,
             }
-            ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs)
+            ret = client.post(EVENTS_BY_STOREYS_URL, json=ebs)
             assert ret.status_code == 422
             ret_val = ret.json
             assert ret_val["errors"]["json"]["_schema"] == (
@@ -57,14 +57,14 @@ class TestEventByStoreyApi:
             )
 
             # GET list
-            ret = client.get(EVENTS_BY_STOREZS_URL)
+            ret = client.get(EVENTS_BY_STOREYS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]["id"] == storey_1_id
+            assert ret_val[0]["id"] == ebs_1_id
 
             # GET by id
-            ret = client.get(f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}")
+            ret = client.get(f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}")
             assert ret.status_code == 200
             assert ret.headers["ETag"] == ebs_1_etag
             ret_val = ret.json
@@ -76,19 +76,19 @@ class TestEventByStoreyApi:
                 "event_id": event_2_id,
                 "storey_id": storey_2_id,
             }
-            ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs_2)
+            ret = client.post(EVENTS_BY_STOREYS_URL, json=ebs_2)
             ret_val = ret.json
             ebs_2_id = ret_val.pop("id")
 
             # GET list
-            ret = client.get(EVENTS_BY_STOREZS_URL)
+            ret = client.get(EVENTS_BY_STOREYS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 2
 
             # GET list with filters
             ret = client.get(
-                EVENTS_BY_STOREZS_URL,
+                EVENTS_BY_STOREYS_URL,
                 query_string={"event_id": event_1_id},
             )
             assert ret.status_code == 200
@@ -97,7 +97,7 @@ class TestEventByStoreyApi:
             assert ret_val[0]["id"] == ebs_1_id
 
             # DELETE wrong ID -> 404
-            ret = client.delete(f"{EVENTS_BY_STOREZS_URL}{DUMMY_ID}")
+            ret = client.delete(f"{EVENTS_BY_STOREYS_URL}{DUMMY_ID}")
             assert ret.status_code == 404
 
             # DELETE event cascade
@@ -109,19 +109,19 @@ class TestEventByStoreyApi:
             assert ret.status_code == 204
 
             # DELETE
-            ret = client.delete(f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}")
+            ret = client.delete(f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}")
             assert ret.status_code == 404
-            ret = client.delete(f"{EVENTS_BY_STOREZS_URL}{ebs_2_id}")
+            ret = client.delete(f"{EVENTS_BY_STOREYS_URL}{ebs_2_id}")
             assert ret.status_code == 204
 
             # GET list
-            ret = client.get(EVENTS_BY_STOREZS_URL)
+            ret = client.get(EVENTS_BY_STOREYS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 0
 
             # GET by id -> 404
-            ret = client.get(f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}")
+            ret = client.get(f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}")
             assert ret.status_code == 404
 
     @pytest.mark.usefixtures("users_by_user_groups")
@@ -144,7 +144,7 @@ class TestEventByStoreyApi:
         with AuthHeader(user_creds):
 
             # GET list
-            ret = client.get(EVENTS_BY_STOREZS_URL)
+            ret = client.get(EVENTS_BY_STOREYS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
@@ -152,17 +152,17 @@ class TestEventByStoreyApi:
             assert ebs_1.pop("id") == ebs_1_id
 
             # GET by id
-            ret = client.get(f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}")
+            ret = client.get(f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}")
             assert ret.status_code == 200
             ebs_1_etag = ret.headers["ETag"]
 
             # GET by id not in campaign scope
-            ret = client.get(f"{EVENTS_BY_STOREZS_URL}{ebs_2_id}")
+            ret = client.get(f"{EVENTS_BY_STOREYS_URL}{ebs_2_id}")
             assert ret.status_code == 403
 
             # DELETE
             ret = client.delete(
-                f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}",
+                f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}",
                 headers={"If-Match": ebs_1_etag},
             )
             assert ret.status_code == 204
@@ -172,7 +172,7 @@ class TestEventByStoreyApi:
                 "event_id": event_1_id,
                 "storey_id": storey_1_id,
             }
-            ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs_3)
+            ret = client.post(EVENTS_BY_STOREYS_URL, json=ebs_3)
             assert ret.status_code == 201
             ret_val = ret.json
 
@@ -181,7 +181,7 @@ class TestEventByStoreyApi:
                 "event_id": event_2_id,
                 "storey_id": storey_2_id,
             }
-            ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs)
+            ret = client.post(EVENTS_BY_STOREYS_URL, json=ebs)
             assert ret.status_code == 403
 
     def test_events_by_storeys_as_anonym_api(
@@ -194,7 +194,7 @@ class TestEventByStoreyApi:
         client = app.test_client()
 
         # GET list
-        ret = client.get(EVENTS_BY_STOREZS_URL)
+        ret = client.get(EVENTS_BY_STOREYS_URL)
         assert ret.status_code == 401
 
         # POST
@@ -202,14 +202,14 @@ class TestEventByStoreyApi:
             "event_id": event_1_id,
             "storey_id": storey_2_id,
         }
-        ret = client.post(EVENTS_BY_STOREZS_URL, json=ebs_3)
+        ret = client.post(EVENTS_BY_STOREYS_URL, json=ebs_3)
         assert ret.status_code == 401
 
         # GET by id
-        ret = client.get(f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}")
+        ret = client.get(f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}")
         assert ret.status_code == 401
 
         # DELETE
-        ret = client.delete(f"{EVENTS_BY_STOREZS_URL}{ebs_1_id}")
+        ret = client.delete(f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}")
         # ETag is wrong but we get rejected before ETag check anyway
         assert ret.status_code == 401

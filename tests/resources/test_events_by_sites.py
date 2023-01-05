@@ -61,7 +61,7 @@ class TestEventBySiteApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            assert ret_val[0]["id"] == site_1_id
+            assert ret_val[0]["id"] == ebs_1_id
 
             # GET by id
             ret = client.get(f"{EVENTS_BY_SITES_URL}{ebs_1_id}")
