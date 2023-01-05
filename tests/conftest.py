@@ -1,6 +1,7 @@
 """Global conftest"""
 import base64
 import datetime as dt
+from unittest import mock
 
 import sqlalchemy as sqla
 import flask.testing
@@ -16,6 +17,13 @@ from pytest_postgresql import factories as ppf
 from bemserver_api import create_app
 
 from tests.common import TestConfig, AUTH_HEADER
+
+
+@pytest.fixture(scope="session", autouse=True)
+def inhibit_celery():
+    """Inhibit celery tasks by mocking the method launching tasks"""
+    with mock.patch("bemserver_core.celery.BEMServerCoreTask.apply_async"):
+        yield
 
 
 postgresql_proc = ppf.postgresql_proc(
