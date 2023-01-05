@@ -21,6 +21,7 @@ from . import events_by_buildings
 from . import events_by_storeys
 from . import events_by_spaces
 from . import events_by_zones
+from . import notifications
 from . import sites
 from . import buildings
 from . import storeys
@@ -75,6 +76,7 @@ MODULES = (
     events_by_storeys,
     events_by_spaces,
     events_by_zones,
+    notifications,
     sites,
     buildings,
     storeys,
