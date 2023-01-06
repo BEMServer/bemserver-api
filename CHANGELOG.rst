@@ -1,12 +1,18 @@
 Changelog
 ---------
 
-0.6.1 (unreleased)
+0.7.0 (2023-01-06)
 ++++++++++++++++++
 
 Features:
 
 - Manage invalid UTF-8 files in sites/timeseries IO
+- Notification API
+- EventCategoryByUser API
+
+Other changes:
+
+- Require bemserver-core 0.6.0.
 
 0.6.0 (2022-12-22)
 ++++++++++++++++++
