@@ -15,6 +15,7 @@ from . import timeseries_property_data
 from . import timeseries_data
 from . import event_categories
 from . import events
+from . import event_categories_by_users
 from . import timeseries_by_events
 from . import events_by_sites
 from . import events_by_buildings
@@ -69,6 +70,7 @@ MODULES = (
     timeseries_property_data,
     timeseries_data,
     event_categories,
+    event_categories_by_users,
     events,
     timeseries_by_events,
     events_by_sites,

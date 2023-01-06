@@ -281,6 +281,23 @@ def event_categories(app):
 
 
 @pytest.fixture
+def event_categories_by_users(app, event_categories, users):
+    with OpenBar():
+        ecbu_1 = model.EventCategoryByUser.new(
+            category_id=event_categories[0],
+            user_id=users["Active"]["id"],
+            notification_level=model.EventLevelEnum.WARNING,
+        )
+        ecbu_2 = model.EventCategoryByUser.new(
+            category_id=event_categories[1],
+            user_id=users["Inactive"]["id"],
+            notification_level=model.EventLevelEnum.DEBUG,
+        )
+        db.session.commit()
+    return (ecbu_1.id, ecbu_2.id)
+
+
+@pytest.fixture
 def events(app, campaigns, campaign_scopes, event_categories):
     with OpenBar():
         tse_1 = model.Event.new(
