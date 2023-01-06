@@ -1,6 +1,7 @@
 """Global conftest"""
 import base64
 import datetime as dt
+from unittest import mock
 
 import sqlalchemy as sqla
 import flask.testing
@@ -16,6 +17,13 @@ from pytest_postgresql import factories as ppf
 from bemserver_api import create_app
 
 from tests.common import TestConfig, AUTH_HEADER
+
+
+@pytest.fixture(scope="session", autouse=True)
+def inhibit_celery():
+    """Inhibit celery tasks by mocking the method launching tasks"""
+    with mock.patch("bemserver_core.celery.BEMServerCoreTask.apply_async"):
+        yield
 
 
 postgresql_proc = ppf.postgresql_proc(
@@ -273,6 +281,23 @@ def event_categories(app):
 
 
 @pytest.fixture
+def event_categories_by_users(app, event_categories, users):
+    with OpenBar():
+        ecbu_1 = model.EventCategoryByUser.new(
+            category_id=event_categories[0],
+            user_id=users["Active"]["id"],
+            notification_level=model.EventLevelEnum.WARNING,
+        )
+        ecbu_2 = model.EventCategoryByUser.new(
+            category_id=event_categories[1],
+            user_id=users["Inactive"]["id"],
+            notification_level=model.EventLevelEnum.DEBUG,
+        )
+        db.session.commit()
+    return (ecbu_1.id, ecbu_2.id)
+
+
+@pytest.fixture
 def events(app, campaigns, campaign_scopes, event_categories):
     with OpenBar():
         tse_1 = model.Event.new(
@@ -381,6 +406,25 @@ def events_by_zones(app, zones, events):
         )
         db.session.commit()
     return (ebz_1.id, ebz_2.id)
+
+
+@pytest.fixture
+def notifications(app, events, users):
+    with OpenBar():
+        notif_1 = model.Notification.new(
+            event_id=events[0],
+            user_id=users["Active"]["id"],
+            timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
+            read=False,
+        )
+        notif_2 = model.Notification.new(
+            event_id=events[1],
+            user_id=users["Inactive"]["id"],
+            timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
+            read=True,
+        )
+        db.session.commit()
+    return (notif_1.id, notif_2.id)
 
 
 @pytest.fixture
