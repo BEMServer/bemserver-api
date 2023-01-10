@@ -46,7 +46,7 @@ class NotificationsByIdViews(MethodView):
     @blp.etag
     @blp.response(200, NotificationSchema)
     def get(self, item_id):
-        """Get a notification by its ID"""
+        """Get a notification by its by ID"""
         item = Notification.get_by_id(item_id)
         if item is None:
             abort(404)

@@ -53,7 +53,7 @@ class EventBySpaceByIdViews(MethodView):
     @blp.etag
     @blp.response(200, EventBySpaceSchema)
     def get(self, item_id):
-        """Get event x space association ID"""
+        """Get event x space association by ID"""
         item = EventBySpace.get_by_id(item_id)
         if item is None:
             abort(404)

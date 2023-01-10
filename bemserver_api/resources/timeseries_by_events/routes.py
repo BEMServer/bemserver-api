@@ -53,7 +53,7 @@ class TimeseriesByEventByIdViews(MethodView):
     @blp.etag
     @blp.response(200, TimeseriesByEventSchema)
     def get(self, item_id):
-        """Get timeseries x event association ID"""
+        """Get timeseries x event association by ID"""
         item = TimeseriesByEvent.get_by_id(item_id)
         if item is None:
             abort(404)

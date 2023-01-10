@@ -49,7 +49,7 @@ class TimeseriesByZoneByIdViews(MethodView):
     @blp.etag
     @blp.response(200, TimeseriesByZoneSchema)
     def get(self, item_id):
-        """Get timeseries x zone association ID"""
+        """Get timeseries x zone association by ID"""
         item = TimeseriesByZone.get_by_id(item_id)
         if item is None:
             abort(404)

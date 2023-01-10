@@ -53,7 +53,7 @@ class EventBySiteByIdViews(MethodView):
     @blp.etag
     @blp.response(200, EventBySiteSchema)
     def get(self, item_id):
-        """Get event x site association ID"""
+        """Get event x site association by ID"""
         item = EventBySite.get_by_id(item_id)
         if item is None:
             abort(404)

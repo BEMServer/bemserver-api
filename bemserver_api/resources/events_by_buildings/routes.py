@@ -53,7 +53,7 @@ class EventByBuildingByIdViews(MethodView):
     @blp.etag
     @blp.response(200, EventByBuildingSchema)
     def get(self, item_id):
-        """Get event x building association ID"""
+        """Get event x building association by ID"""
         item = EventByBuilding.get_by_id(item_id)
         if item is None:
             abort(404)

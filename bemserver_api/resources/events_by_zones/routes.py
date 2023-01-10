@@ -53,7 +53,7 @@ class EventByZoneByIdViews(MethodView):
     @blp.etag
     @blp.response(200, EventByZoneSchema)
     def get(self, item_id):
-        """Get event x zone association ID"""
+        """Get event x zone association by ID"""
         item = EventByZone.get_by_id(item_id)
         if item is None:
             abort(404)

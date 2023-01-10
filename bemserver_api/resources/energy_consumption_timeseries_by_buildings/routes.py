@@ -51,7 +51,7 @@ class EnergyConsumptionTimeseriesByBuildingByIdViews(MethodView):
     @blp.etag
     @blp.response(200, EnergyConsumptionTimeseriesByBuildingSchema)
     def get(self, item_id):
-        """Get energy consumption timeseries x building association ID"""
+        """Get energy consumption timeseries x building association by ID"""
         item = EnergyConsumptionTimeseriesByBuilding.get_by_id(item_id)
         if item is None:
             abort(404)

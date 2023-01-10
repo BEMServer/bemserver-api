@@ -49,7 +49,7 @@ class TimeseriesBySpaceByIdViews(MethodView):
     @blp.etag
     @blp.response(200, TimeseriesBySpaceSchema)
     def get(self, item_id):
-        """Get timeseries x space association ID"""
+        """Get timeseries x space association by ID"""
         item = TimeseriesBySpace.get_by_id(item_id)
         if item is None:
             abort(404)

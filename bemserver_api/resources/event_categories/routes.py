@@ -46,7 +46,7 @@ class EventCategoriesByIdViews(MethodView):
     @blp.etag
     @blp.response(200, EventCategorySchema)
     def get(self, item_id):
-        """Get an event category by its ID"""
+        """Get an event category by its by ID"""
         item = EventCategory.get_by_id(item_id)
         if item is None:
             abort(404)
