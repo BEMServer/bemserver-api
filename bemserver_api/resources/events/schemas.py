@@ -35,7 +35,32 @@ class EventQueryArgsSchema(Schema):
     timestamp_min = ma.fields.AwareDateTime()
     timestamp_max = ma.fields.AwareDateTime()
     timeseries_id = ma.fields.Integer()
+    site_id = ma.fields.Int()
+    recurse_site_id = ma.fields.Int()
+    building_id = ma.fields.Int()
+    recurse_building_id = ma.fields.Int()
+    storey_id = ma.fields.Int()
+    recurse_storey_id = ma.fields.Int()
+    space_id = ma.fields.Int()
+    zone_id = ma.fields.Int()
 
-
-class EventRecurseArgsSchema(Schema):
-    recurse = ma.fields.Boolean()
+    @ma.validates_schema
+    def validate_conflicting_fields(self, data, **kwargs):
+        if data.get("site_id") is not None and data.get("recurse_site_id") is not None:
+            raise ma.ValidationError(
+                "site_id and recurse_site_id are mutually exclusive arguments"
+            )
+        if (
+            data.get("building_id") is not None
+            and data.get("recurse_building_id") is not None
+        ):
+            raise ma.ValidationError(
+                "building_id and recurse_building_id are mutually exclusive arguments"
+            )
+        if (
+            data.get("storey_id") is not None
+            and data.get("recurse_storey_id") is not None
+        ):
+            raise ma.ValidationError(
+                "storey_id and recurse_storey_id are mutually exclusive arguments"
+            )

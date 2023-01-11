@@ -8,12 +8,7 @@ from bemserver_core.model import Event
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
-from .schemas import (
-    EventSchema,
-    EventPutSchema,
-    EventQueryArgsSchema,
-    EventRecurseArgsSchema,
-)
+from .schemas import EventSchema, EventPutSchema, EventQueryArgsSchema
 
 
 blp = Blueprint(
@@ -42,59 +37,6 @@ class EventsViews(MethodView):
         item = Event.new(**new_item)
         db.session.commit()
         return item
-
-
-@blp.route("/by_site/<int:item_id>")
-@blp.login_required
-@blp.etag
-@blp.arguments(EventRecurseArgsSchema, location="query")
-@blp.response(200, EventSchema(many=True))
-@blp.paginate(SQLCursorPage)
-def get_by_site(args, item_id):
-    """Get events for a given site"""
-    return Event.get_by_site(item_id, **args)
-
-
-@blp.route("/by_building/<int:item_id>")
-@blp.login_required
-@blp.etag
-@blp.arguments(EventRecurseArgsSchema, location="query")
-@blp.response(200, EventSchema(many=True))
-@blp.paginate(SQLCursorPage)
-def get_by_building(args, item_id):
-    """Get events for a given building"""
-    return Event.get_by_building(item_id, **args)
-
-
-@blp.route("/by_storey/<int:item_id>")
-@blp.login_required
-@blp.etag
-@blp.arguments(EventRecurseArgsSchema, location="query")
-@blp.response(200, EventSchema(many=True))
-@blp.paginate(SQLCursorPage)
-def get_by_storey(args, item_id):
-    """Get events for a given storey"""
-    return Event.get_by_storey(item_id, **args)
-
-
-@blp.route("/by_space/<int:item_id>")
-@blp.login_required
-@blp.etag
-@blp.response(200, EventSchema(many=True))
-@blp.paginate(SQLCursorPage)
-def get_by_space(item_id):
-    """Get events for a given space"""
-    return Event.get_by_space(item_id)
-
-
-@blp.route("/by_zone/<int:item_id>")
-@blp.login_required
-@blp.etag
-@blp.response(200, EventSchema(many=True))
-@blp.paginate(SQLCursorPage)
-def get_by_zone(item_id):
-    """Get events for a given zone"""
-    return Event.get_by_zone(item_id)
 
 
 @blp.route("/<int:item_id>")
