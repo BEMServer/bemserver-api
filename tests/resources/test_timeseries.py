@@ -194,48 +194,68 @@ class TestTimeseriesApi:
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 2
-            ret = client.get(f"{TIMESERIES_URL}by_site/{site_1_id}")
+            ret = client.get(TIMESERIES_URL, query_string={"site_id": site_1_id})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 0
             ret = client.get(
-                f"{TIMESERIES_URL}by_site/{site_1_id}",
-                query_string={"recurse": True},
+                TIMESERIES_URL, query_string={"recurse_site_id": site_1_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            ret = client.get(f"{TIMESERIES_URL}by_building/{building_1_id}")
+            ret = client.get(
+                TIMESERIES_URL,
+                query_string={"site_id": site_1_id, "recurse_site_id": site_1_id},
+            )
+            assert ret.status_code == 422
+            ret = client.get(
+                TIMESERIES_URL, query_string={"building_id": building_1_id}
+            )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 0
             ret = client.get(
-                f"{TIMESERIES_URL}by_building/{building_1_id}",
-                query_string={"recurse": True},
+                TIMESERIES_URL, query_string={"recurse_building_id": building_1_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            ret = client.get(f"{TIMESERIES_URL}by_storey/{storey_1_id}")
+            ret = client.get(
+                TIMESERIES_URL,
+                query_string={
+                    "building_id": building_1_id,
+                    "recurse_building_id": building_1_id,
+                },
+            )
+            assert ret.status_code == 422
+            ret = client.get(TIMESERIES_URL, query_string={"storey_id": storey_1_id})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 0
             ret = client.get(
-                f"{TIMESERIES_URL}by_storey/{storey_1_id}",
-                query_string={"recurse": True},
+                TIMESERIES_URL, query_string={"recurse_storey_id": storey_1_id}
             )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            ret = client.get(f"{TIMESERIES_URL}by_space/{space_1_id}")
+            ret = client.get(
+                TIMESERIES_URL,
+                query_string={
+                    "storey_id": storey_1_id,
+                    "recurse_storey_id": storey_1_id,
+                },
+            )
+            assert ret.status_code == 422
+            ret = client.get(TIMESERIES_URL, query_string={"space_id": space_1_id})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            ret = client.get(f"{TIMESERIES_URL}by_zone/{zone_1_id}")
+            ret = client.get(TIMESERIES_URL, query_string={"zone_id": zone_1_id})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
-            ret = client.get(f"{TIMESERIES_URL}by_event/{event_1_id}")
+            ret = client.get(TIMESERIES_URL, query_string={"event_id": event_1_id})
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
