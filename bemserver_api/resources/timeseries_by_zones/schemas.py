@@ -6,6 +6,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.model import TimeseriesByZone
 
 from bemserver_api import AutoSchema, Schema
+from ..zones.schemas import ZoneSchema
 
 
 class TimeseriesByZoneSchema(AutoSchema):
@@ -13,6 +14,7 @@ class TimeseriesByZoneSchema(AutoSchema):
         model = TimeseriesByZone
 
     id = msa.auto_field(dump_only=True)
+    zone = ma.fields.Nested(ZoneSchema(exclude=("id",)), dump_only=True)
 
 
 class TimeseriesByZoneQueryArgsSchema(Schema):

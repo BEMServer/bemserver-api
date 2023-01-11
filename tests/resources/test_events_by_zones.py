@@ -37,6 +37,7 @@ class TestEventByZoneApi:
             assert ret.status_code == 201
             ret_val = ret.json
             ebz_1_id = ret_val.pop("id")
+            assert ret_val.pop("zone")["name"] == "Zone 1"
             assert ret_val == ebz_1
 
             # POST violating unique constraint
@@ -67,6 +68,7 @@ class TestEventByZoneApi:
             assert ret.status_code == 200
             ret_val = ret.json
             ret_val.pop("id")
+            assert ret_val.pop("zone")["name"] == "Zone 1"
             assert ret_val == ebz_1
 
             # POST

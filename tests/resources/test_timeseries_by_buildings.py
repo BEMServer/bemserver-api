@@ -37,6 +37,8 @@ class TestTimeseriesByBuildingApi:
             assert ret.status_code == 201
             ret_val = ret.json
             tbb_1_id = ret_val.pop("id")
+            assert ret_val.pop("site")["name"] == "Site 1"
+            assert ret_val.pop("building")["name"] == "Building 1"
             assert ret_val == tbb_1
 
             # POST violating unique constraint
@@ -55,6 +57,8 @@ class TestTimeseriesByBuildingApi:
             assert ret.status_code == 200
             ret_val = ret.json
             ret_val.pop("id")
+            assert ret_val.pop("site")["name"] == "Site 1"
+            assert ret_val.pop("building")["name"] == "Building 1"
             assert ret_val == tbb_1
 
             # POST sep 2
