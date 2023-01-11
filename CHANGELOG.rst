@@ -1,6 +1,20 @@
 Changelog
 ---------
 
+0.8.0 (2023-01-11)
+++++++++++++++++++
+
+Features:
+
+- Rework Timeseries event filter
+- Rework Timeseries site,... filters
+- Rework Event site,... filters
+- Add Notifications query arguments
+
+Other changes:
+
+- Require bemserver-core 0.7.0.
+
 0.7.0 (2023-01-06)
 ++++++++++++++++++
 
