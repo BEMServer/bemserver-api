@@ -24,7 +24,6 @@ blp = Blueprint(
 @blp.route("/")
 class TimeseriesBySiteViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(TimeseriesBySiteQueryArgsSchema, location="query")
     @blp.response(200, TimeseriesBySiteSchema(many=True))
     def get(self, args):
@@ -32,7 +31,6 @@ class TimeseriesBySiteViews(MethodView):
         return TimeseriesBySite.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(TimeseriesBySiteSchema)
     @blp.response(201, TimeseriesBySiteSchema)
     @blp.catch_integrity_error
@@ -46,7 +44,6 @@ class TimeseriesBySiteViews(MethodView):
 @blp.route("/<int:item_id>")
 class TimeseriesBySiteByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, TimeseriesBySiteSchema)
     def get(self, item_id):
         """Get timeseries x site association by ID"""
@@ -56,28 +53,11 @@ class TimeseriesBySiteByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
-    @blp.arguments(TimeseriesBySiteSchema)
-    @blp.response(200, TimeseriesBySiteSchema)
-    @blp.catch_integrity_error
-    def put(self, new_item, item_id):
-        """Update an existing timeseries x site association"""
-        item = TimeseriesBySite.get_by_id(item_id)
-        if item is None:
-            abort(404)
-        blp.check_etag(item, TimeseriesBySiteSchema)
-        item.update(**new_item)
-        db.session.commit()
-        return item
-
-    @blp.login_required
-    @blp.etag
     @blp.response(204)
     def delete(self, item_id):
         """Delete a timeseries x site association"""
         item = TimeseriesBySite.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, TimeseriesBySiteSchema)
         item.delete()
         db.session.commit()

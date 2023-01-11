@@ -31,7 +31,6 @@ class TestCampaignsApi:
             assert ret.status_code == 201
             ret_val = ret.json
             building_p_1_id = ret_val.pop("id")
-            building_p_1_etag = ret.headers["ETag"]
             sep = ret_val.pop("structural_element_property")
             assert sep == {"name": "Area", "value_type": "integer"}
             assert ret_val == building_p_1
@@ -50,7 +49,6 @@ class TestCampaignsApi:
             # GET by id
             ret = client.get(f"{BUILDING_PROPERTIES_URL}{building_p_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == building_p_1_etag
             ret_val = ret.json
             ret_val.pop("id")
             ret_val.pop("structural_element_property")

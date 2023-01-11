@@ -37,7 +37,6 @@ class TestEventByStoreyApi:
             assert ret.status_code == 201
             ret_val = ret.json
             ebs_1_id = ret_val.pop("id")
-            ebs_1_etag = ret.headers["ETag"]
             assert ret_val == ebs_1
 
             # POST violating unique constraint
@@ -66,7 +65,6 @@ class TestEventByStoreyApi:
             # GET by id
             ret = client.get(f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == ebs_1_etag
             ret_val = ret.json
             ret_val.pop("id")
             assert ret_val == ebs_1
@@ -154,17 +152,13 @@ class TestEventByStoreyApi:
             # GET by id
             ret = client.get(f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}")
             assert ret.status_code == 200
-            ebs_1_etag = ret.headers["ETag"]
 
             # GET by id not in campaign scope
             ret = client.get(f"{EVENTS_BY_STOREYS_URL}{ebs_2_id}")
             assert ret.status_code == 403
 
             # DELETE
-            ret = client.delete(
-                f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}",
-                headers={"If-Match": ebs_1_etag},
-            )
+            ret = client.delete(f"{EVENTS_BY_STOREYS_URL}{ebs_1_id}")
             assert ret.status_code == 204
 
             # POST

@@ -40,7 +40,6 @@ class TestNotificationsApi:
             assert ret.status_code == 201
             ret_val = ret.json
             notif_1_id = ret_val.pop("id")
-            notif_1_etag = ret.headers["ETag"]
 
             # GET list
             ret = client.get(NOTIFICATIONS_URL)
@@ -51,7 +50,6 @@ class TestNotificationsApi:
             # GET by id
             ret = client.get(f"{NOTIFICATIONS_URL}{notif_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == notif_1_etag
             ret_val = ret.json
             ret_val.pop("id")
             assert ret_val.pop("read") is False
@@ -61,11 +59,7 @@ class TestNotificationsApi:
             notif_1_put = {
                 "read": True,
             }
-            ret = client.put(
-                f"{NOTIFICATIONS_URL}{DUMMY_ID}",
-                json=notif_1_put,
-                headers={"If-Match": notif_1_etag},
-            )
+            ret = client.put(f"{NOTIFICATIONS_URL}{DUMMY_ID}", json=notif_1_put)
             assert ret.status_code == 404
 
             # PUT
@@ -73,11 +67,9 @@ class TestNotificationsApi:
             ret = client.put(
                 f"{NOTIFICATIONS_URL}{notif_1_id}",
                 json=notif_1_put,
-                headers={"If-Match": notif_1_etag},
             )
             assert ret.status_code == 200
             ret_val = ret.json
-            notif_1_etag = ret.headers["ETag"]
 
             # POST
             notif_2 = {
@@ -130,17 +122,11 @@ class TestNotificationsApi:
             assert ret_val[1]["id"] == notif_1_id
 
             # DELETE wrong ID -> 404
-            ret = client.delete(
-                f"{NOTIFICATIONS_URL}{DUMMY_ID}",
-                headers={"If-Match": notif_1_etag},
-            )
+            ret = client.delete(f"{NOTIFICATIONS_URL}{DUMMY_ID}")
             assert ret.status_code == 404
 
             # DELETE
-            ret = client.delete(
-                f"{NOTIFICATIONS_URL}{notif_1_id}",
-                headers={"If-Match": notif_1_etag},
-            )
+            ret = client.delete(f"{NOTIFICATIONS_URL}{notif_1_id}")
             assert ret.status_code == 204
 
             # GET list
@@ -187,7 +173,6 @@ class TestNotificationsApi:
             ret_val.pop("id")
             notif_1 = ret_val
             assert notif_1["read"] is False
-            notif_1_etag = ret.headers["ETag"]
 
             ret = client.get(f"{NOTIFICATIONS_URL}{notif_2_id}")
             assert ret.status_code == 403
@@ -196,19 +181,11 @@ class TestNotificationsApi:
             notif_1_put = {
                 "read": True,
             }
-            ret = client.put(
-                f"{NOTIFICATIONS_URL}{notif_1_id}",
-                json=notif_1_put,
-                headers={"If-Match": notif_1_etag},
-            )
+            ret = client.put(f"{NOTIFICATIONS_URL}{notif_1_id}", json=notif_1_put)
             assert ret.status_code == 200
-            notif_1_etag = ret.headers["ETag"]
 
             # DELETE
-            ret = client.delete(
-                f"{NOTIFICATIONS_URL}{notif_1_id}",
-                headers={"If-Match": notif_1_etag},
-            )
+            ret = client.delete(f"{NOTIFICATIONS_URL}{notif_1_id}")
             assert ret.status_code == 403
 
     def test_notifications_as_anonym_api(self, app, users, events, notifications):

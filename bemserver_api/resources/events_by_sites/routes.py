@@ -25,7 +25,6 @@ blp = Blueprint(
 @blp.route("/")
 class EventBySiteViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventBySiteQueryArgsSchema, location="query")
     @blp.response(200, EventBySiteSchema(many=True))
     def get(self, args):
@@ -33,7 +32,6 @@ class EventBySiteViews(MethodView):
         return EventBySite.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventBySiteSchema)
     @blp.response(201, EventBySiteSchema)
     @blp.catch_integrity_error
@@ -50,7 +48,6 @@ class EventBySiteViews(MethodView):
 @blp.route("/<int:item_id>")
 class EventBySiteByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, EventBySiteSchema)
     def get(self, item_id):
         """Get event x site association by ID"""

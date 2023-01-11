@@ -25,7 +25,6 @@ blp = Blueprint(
 @blp.route("/")
 class EventByStoreyViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventByStoreyQueryArgsSchema, location="query")
     @blp.response(200, EventByStoreySchema(many=True))
     def get(self, args):
@@ -33,7 +32,6 @@ class EventByStoreyViews(MethodView):
         return EventByStorey.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventByStoreySchema)
     @blp.response(201, EventByStoreySchema)
     @blp.catch_integrity_error
@@ -50,7 +48,6 @@ class EventByStoreyViews(MethodView):
 @blp.route("/<int:item_id>")
 class EventByStoreyByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, EventByStoreySchema)
     def get(self, item_id):
         """Get event x storey association by ID"""

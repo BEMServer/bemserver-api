@@ -24,7 +24,6 @@ blp = Blueprint(
 @blp.route("/")
 class TimeseriesByZoneViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(TimeseriesByZoneQueryArgsSchema, location="query")
     @blp.response(200, TimeseriesByZoneSchema(many=True))
     def get(self, args):
@@ -32,7 +31,6 @@ class TimeseriesByZoneViews(MethodView):
         return TimeseriesByZone.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(TimeseriesByZoneSchema)
     @blp.response(201, TimeseriesByZoneSchema)
     @blp.catch_integrity_error
@@ -46,7 +44,6 @@ class TimeseriesByZoneViews(MethodView):
 @blp.route("/<int:item_id>")
 class TimeseriesByZoneByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, TimeseriesByZoneSchema)
     def get(self, item_id):
         """Get timeseries x zone association by ID"""
@@ -56,28 +53,11 @@ class TimeseriesByZoneByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
-    @blp.arguments(TimeseriesByZoneSchema)
-    @blp.response(200, TimeseriesByZoneSchema)
-    @blp.catch_integrity_error
-    def put(self, new_item, item_id):
-        """Update an existing timeseries x zone association"""
-        item = TimeseriesByZone.get_by_id(item_id)
-        if item is None:
-            abort(404)
-        blp.check_etag(item, TimeseriesByZoneSchema)
-        item.update(**new_item)
-        db.session.commit()
-        return item
-
-    @blp.login_required
-    @blp.etag
     @blp.response(204)
     def delete(self, item_id):
         """Delete a timeseries x zone association"""
         item = TimeseriesByZone.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, TimeseriesByZoneSchema)
         item.delete()
         db.session.commit()

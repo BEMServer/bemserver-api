@@ -31,7 +31,6 @@ class TestSpacePropertiesApi:
             assert ret.status_code == 201
             ret_val = ret.json
             space_p_1_id = ret_val.pop("id")
-            space_p_1_etag = ret.headers["ETag"]
             sep = ret_val.pop("structural_element_property")
             assert sep == {"name": "Area", "value_type": "integer"}
             assert ret_val == space_p_1
@@ -50,7 +49,6 @@ class TestSpacePropertiesApi:
             # GET by id
             ret = client.get(f"{SPACE_PROPERTIES_URL}{space_p_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == space_p_1_etag
             ret_val = ret.json
             ret_val.pop("id")
             ret_val.pop("structural_element_property")

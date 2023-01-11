@@ -25,7 +25,6 @@ blp = Blueprint(
 @blp.route("/")
 class TimeseriesByEventViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(TimeseriesByEventQueryArgsSchema, location="query")
     @blp.response(200, TimeseriesByEventSchema(many=True))
     def get(self, args):
@@ -33,7 +32,6 @@ class TimeseriesByEventViews(MethodView):
         return TimeseriesByEvent.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(TimeseriesByEventSchema)
     @blp.response(201, TimeseriesByEventSchema)
     @blp.catch_integrity_error
@@ -50,7 +48,6 @@ class TimeseriesByEventViews(MethodView):
 @blp.route("/<int:item_id>")
 class TimeseriesByEventByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, TimeseriesByEventSchema)
     def get(self, item_id):
         """Get timeseries x event association by ID"""
