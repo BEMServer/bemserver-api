@@ -5,7 +5,7 @@ from flask_smorest import abort
 from bemserver_core.model import EventByStorey
 from bemserver_core.exceptions import BEMServerCoreCampaignError
 
-from bemserver_api import Blueprint
+from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
 from .schemas import (
@@ -27,6 +27,7 @@ class EventByStoreyViews(MethodView):
     @blp.login_required
     @blp.arguments(EventByStoreyQueryArgsSchema, location="query")
     @blp.response(200, EventByStoreySchema(many=True))
+    @blp.paginate(SQLCursorPage)
     def get(self, args):
         """List event x storey associations"""
         return EventByStorey.get(**args)
