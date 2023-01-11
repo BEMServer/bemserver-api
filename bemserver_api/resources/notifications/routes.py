@@ -5,7 +5,7 @@ from flask_smorest import abort
 
 from bemserver_core.model import Notification
 
-from bemserver_api import Blueprint
+from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
 from .schemas import (
@@ -29,6 +29,7 @@ class NotificationsViews(MethodView):
     @blp.etag
     @blp.arguments(NotificationsQueryArgsSchema, location="query")
     @blp.response(200, NotificationSchema(many=True))
+    @blp.paginate(SQLCursorPage)
     def get(self, args):
         """List notifications"""
         return Notification.get(**args)

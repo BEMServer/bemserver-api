@@ -4,7 +4,7 @@ from flask_smorest import abort
 
 from bemserver_core.model import TimeseriesBySite
 
-from bemserver_api import Blueprint
+from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
 from .schemas import (
@@ -26,6 +26,7 @@ class TimeseriesBySiteViews(MethodView):
     @blp.login_required
     @blp.arguments(TimeseriesBySiteQueryArgsSchema, location="query")
     @blp.response(200, TimeseriesBySiteSchema(many=True))
+    @blp.paginate(SQLCursorPage)
     def get(self, args):
         """List timeseries x site associations"""
         return TimeseriesBySite.get(**args)

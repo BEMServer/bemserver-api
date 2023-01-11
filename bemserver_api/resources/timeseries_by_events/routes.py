@@ -5,7 +5,7 @@ from flask_smorest import abort
 from bemserver_core.model import TimeseriesByEvent
 from bemserver_core.exceptions import BEMServerCoreCampaignScopeError
 
-from bemserver_api import Blueprint
+from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
 from .schemas import (
@@ -27,6 +27,7 @@ class TimeseriesByEventViews(MethodView):
     @blp.login_required
     @blp.arguments(TimeseriesByEventQueryArgsSchema, location="query")
     @blp.response(200, TimeseriesByEventSchema(many=True))
+    @blp.paginate(SQLCursorPage)
     def get(self, args):
         """List timeseries x event associations"""
         return TimeseriesByEvent.get(**args)
