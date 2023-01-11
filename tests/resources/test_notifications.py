@@ -17,7 +17,8 @@ class TestNotificationsApi:
         user_2_id = users["Inactive"]["id"]
         event_1_id = events[0]
 
-        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
+        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
+        dt_2 = dt.datetime(2020, 1, 2, tzinfo=dt.timezone.utc).isoformat()
 
         client = app.test_client()
 
@@ -27,12 +28,13 @@ class TestNotificationsApi:
             ret = client.get(NOTIFICATIONS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
+            assert not ret_val
 
             # POST
             notif_1 = {
                 "event_id": event_1_id,
                 "user_id": user_1_id,
-                "timestamp": dt_1.isoformat(),
+                "timestamp": dt_1,
             }
             ret = client.post(NOTIFICATIONS_URL, json=notif_1)
             assert ret.status_code == 201
@@ -81,16 +83,51 @@ class TestNotificationsApi:
             notif_2 = {
                 "event_id": event_1_id,
                 "user_id": user_2_id,
-                "timestamp": dt_1.isoformat(),
+                "timestamp": dt_2,
             }
             ret = client.post(NOTIFICATIONS_URL, json=notif_2)
             ret_val = ret.json
+            notif_2_id = ret_val["id"]
 
             # GET list
             ret = client.get(NOTIFICATIONS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 2
+
+            # GET list with filters
+            ret = client.get(NOTIFICATIONS_URL, query_string={"user_id": user_1_id})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == notif_1_id
+            ret = client.get(NOTIFICATIONS_URL, query_string={"read": True})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == notif_1_id
+            ret = client.get(NOTIFICATIONS_URL, query_string={"timestamp_min": dt_2})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == notif_2_id
+            ret = client.get(NOTIFICATIONS_URL, query_string={"timestamp_max": dt_1})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == notif_1_id
+
+            # GET sorted list
+            ret = client.get(NOTIFICATIONS_URL, query_string={"sort": "timestamp"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            assert ret_val[0]["id"] == notif_1_id
+            ret = client.get(NOTIFICATIONS_URL, query_string={"sort": "-timestamp"})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 2
+            assert ret_val[1]["id"] == notif_1_id
 
             # DELETE wrong ID -> 404
             ret = client.delete(
@@ -124,7 +161,7 @@ class TestNotificationsApi:
         notif_1_id = notifications[0]
         notif_2_id = notifications[1]
 
-        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
+        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
 
         client = app.test_client()
 
@@ -138,7 +175,7 @@ class TestNotificationsApi:
             notif = {
                 "event_id": event_1_id,
                 "user_id": user_1_id,
-                "timestamp": dt_1.isoformat(),
+                "timestamp": dt_1,
             }
             ret = client.post(NOTIFICATIONS_URL, json=notif)
             assert ret.status_code == 403
@@ -180,7 +217,7 @@ class TestNotificationsApi:
         event_1_id = events[0]
         notif_1_id = notifications[0]
 
-        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
+        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
 
         client = app.test_client()
 
@@ -192,7 +229,7 @@ class TestNotificationsApi:
         notif = {
             "event_id": event_1_id,
             "user_id": user_1_id,
-            "timestamp": dt_1.isoformat(),
+            "timestamp": dt_1,
         }
         ret = client.post(NOTIFICATIONS_URL, json=notif)
         assert ret.status_code == 401
