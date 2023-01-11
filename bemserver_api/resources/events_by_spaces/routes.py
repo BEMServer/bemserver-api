@@ -25,7 +25,6 @@ blp = Blueprint(
 @blp.route("/")
 class EventBySpaceViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventBySpaceQueryArgsSchema, location="query")
     @blp.response(200, EventBySpaceSchema(many=True))
     def get(self, args):
@@ -33,7 +32,6 @@ class EventBySpaceViews(MethodView):
         return EventBySpace.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventBySpaceSchema)
     @blp.response(201, EventBySpaceSchema)
     @blp.catch_integrity_error
@@ -50,7 +48,6 @@ class EventBySpaceViews(MethodView):
 @blp.route("/<int:item_id>")
 class EventBySpaceByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, EventBySpaceSchema)
     def get(self, item_id):
         """Get event x space association by ID"""

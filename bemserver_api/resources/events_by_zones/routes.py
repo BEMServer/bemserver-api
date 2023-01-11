@@ -25,7 +25,6 @@ blp = Blueprint(
 @blp.route("/")
 class EventByZoneViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventByZoneQueryArgsSchema, location="query")
     @blp.response(200, EventByZoneSchema(many=True))
     def get(self, args):
@@ -33,7 +32,6 @@ class EventByZoneViews(MethodView):
         return EventByZone.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventByZoneSchema)
     @blp.response(201, EventByZoneSchema)
     @blp.catch_integrity_error
@@ -50,7 +48,6 @@ class EventByZoneViews(MethodView):
 @blp.route("/<int:item_id>")
 class EventByZoneByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, EventByZoneSchema)
     def get(self, item_id):
         """Get event x zone association by ID"""

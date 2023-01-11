@@ -37,7 +37,6 @@ class TestEventByZoneApi:
             assert ret.status_code == 201
             ret_val = ret.json
             ebz_1_id = ret_val.pop("id")
-            ebz_1_etag = ret.headers["ETag"]
             assert ret_val == ebz_1
 
             # POST violating unique constraint
@@ -66,7 +65,6 @@ class TestEventByZoneApi:
             # GET by id
             ret = client.get(f"{EVENTS_BY_ZONES_URL}{ebz_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == ebz_1_etag
             ret_val = ret.json
             ret_val.pop("id")
             assert ret_val == ebz_1
@@ -79,7 +77,6 @@ class TestEventByZoneApi:
             ret = client.post(EVENTS_BY_ZONES_URL, json=ebz_2)
             ret_val = ret.json
             ebz_2_id = ret_val.pop("id")
-            ebz_2_etag = ret.headers["ETag"]
 
             # GET list
             ret = client.get(EVENTS_BY_ZONES_URL)
@@ -112,10 +109,7 @@ class TestEventByZoneApi:
             # DELETE
             ret = client.delete(f"{EVENTS_BY_ZONES_URL}{ebz_1_id}")
             assert ret.status_code == 404
-            ret = client.delete(
-                f"{EVENTS_BY_ZONES_URL}{ebz_2_id}",
-                headers={"If-Match": ebz_2_etag},
-            )
+            ret = client.delete(f"{EVENTS_BY_ZONES_URL}{ebz_2_id}")
             assert ret.status_code == 204
 
             # GET list

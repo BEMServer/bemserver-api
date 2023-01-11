@@ -24,7 +24,6 @@ blp = Blueprint(
 @blp.route("/")
 class SpacePropertyViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(SpacePropertyQueryArgsSchema, location="query")
     @blp.response(200, SpacePropertySchema(many=True))
     def get(self, args):
@@ -32,7 +31,6 @@ class SpacePropertyViews(MethodView):
         return SpaceProperty.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(SpacePropertySchema)
     @blp.response(201, SpacePropertySchema)
     @blp.catch_integrity_error
@@ -46,7 +44,6 @@ class SpacePropertyViews(MethodView):
 @blp.route("/<int:item_id>")
 class SpacePropertyByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, SpacePropertySchema)
     def get(self, item_id):
         """Get space property by ID"""

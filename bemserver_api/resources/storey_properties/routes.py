@@ -24,7 +24,6 @@ blp = Blueprint(
 @blp.route("/")
 class StoreyPropertyViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(StoreyPropertyQueryArgsSchema, location="query")
     @blp.response(200, StoreyPropertySchema(many=True))
     def get(self, args):
@@ -32,7 +31,6 @@ class StoreyPropertyViews(MethodView):
         return StoreyProperty.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(StoreyPropertySchema)
     @blp.response(201, StoreyPropertySchema)
     @blp.catch_integrity_error
@@ -46,7 +44,6 @@ class StoreyPropertyViews(MethodView):
 @blp.route("/<int:item_id>")
 class StoreyPropertyByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, StoreyPropertySchema)
     def get(self, item_id):
         """Get storey property by ID"""

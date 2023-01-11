@@ -31,7 +31,6 @@ class TestStoreyPropertiesApi:
             assert ret.status_code == 201
             ret_val = ret.json
             storey_p_1_id = ret_val.pop("id")
-            storey_p_1_etag = ret.headers["ETag"]
             sep = ret_val.pop("structural_element_property")
             assert sep == {"name": "Area", "value_type": "integer"}
             assert ret_val == storey_p_1
@@ -50,7 +49,6 @@ class TestStoreyPropertiesApi:
             # GET by id
             ret = client.get(f"{STOREY_PROPERTIES_URL}{storey_p_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == storey_p_1_etag
             ret_val = ret.json
             ret_val.pop("id")
             ret_val.pop("structural_element_property")

@@ -21,7 +21,6 @@ blp = Blueprint(
 @blp.route("/")
 class UserGroupByCampaignViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(UserGroupByCampaignQueryArgsSchema, location="query")
     @blp.response(200, UserGroupByCampaignSchema(many=True))
     def get(self, args):
@@ -29,7 +28,6 @@ class UserGroupByCampaignViews(MethodView):
         return UserGroupByCampaign.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(UserGroupByCampaignSchema)
     @blp.response(201, UserGroupByCampaignSchema)
     @blp.catch_integrity_error
@@ -43,7 +41,6 @@ class UserGroupByCampaignViews(MethodView):
 @blp.route("/<int:item_id>")
 class UserGroupByCampaignByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, UserGroupByCampaignSchema)
     def get(self, item_id):
         """Get user group x campaign association by ID"""

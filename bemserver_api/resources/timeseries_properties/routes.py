@@ -26,6 +26,7 @@ blp = Blueprint(
 @blp.route("/")
 class TimeseriesPropertiesViews(MethodView):
     @blp.login_required
+    @blp.etag
     @blp.arguments(TimeseriesPropertyQueryArgsSchema, location="query")
     @blp.response(200, TimeseriesPropertySchema(many=True))
     def get(self, args):

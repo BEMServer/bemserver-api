@@ -24,7 +24,6 @@ blp = Blueprint(
 @blp.route("/")
 class ZonePropertyViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(ZonePropertyQueryArgsSchema, location="query")
     @blp.response(200, ZonePropertySchema(many=True))
     def get(self, args):
@@ -32,7 +31,6 @@ class ZonePropertyViews(MethodView):
         return ZoneProperty.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(ZonePropertySchema)
     @blp.response(201, ZonePropertySchema)
     @blp.catch_integrity_error
@@ -46,7 +44,6 @@ class ZonePropertyViews(MethodView):
 @blp.route("/<int:item_id>")
 class ZonePropertyByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, ZonePropertySchema)
     def get(self, item_id):
         """Get zone property by ID"""

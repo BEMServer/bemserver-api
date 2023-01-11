@@ -37,7 +37,6 @@ class TestEventByBuildingApi:
             assert ret.status_code == 201
             ret_val = ret.json
             ebb_1_id = ret_val.pop("id")
-            ebb_1_etag = ret.headers["ETag"]
             assert ret_val == ebb_1
 
             # POST violating unique constraint
@@ -66,7 +65,6 @@ class TestEventByBuildingApi:
             # GET by id
             ret = client.get(f"{EVENTS_BY_BUILDINGS_URL}{ebb_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == ebb_1_etag
             ret_val = ret.json
             ret_val.pop("id")
             assert ret_val == ebb_1

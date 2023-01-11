@@ -58,7 +58,6 @@ class NotificationsByIdViews(MethodView):
         return item
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(NotificationPutSchema)
     @blp.response(200, NotificationSchema)
     @blp.catch_integrity_error
@@ -67,19 +66,16 @@ class NotificationsByIdViews(MethodView):
         item = Notification.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, NotificationSchema)
         item.update(**new_item)
         db.session.commit()
         return item
 
     @blp.login_required
-    @blp.etag
     @blp.response(204)
     def delete(self, item_id):
         """Delete a notification"""
         item = Notification.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, NotificationSchema)
         item.delete()
         db.session.commit()

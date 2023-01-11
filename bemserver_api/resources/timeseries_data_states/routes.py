@@ -22,6 +22,7 @@ blp = Blueprint(
 @blp.route("/")
 class TimeseriesDataStatesViews(MethodView):
     @blp.login_required
+    @blp.etag
     @blp.response(200, TimeseriesDataStateSchema(many=True))
     def get(self):
         """List timeseries data states"""

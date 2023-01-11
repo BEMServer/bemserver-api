@@ -21,7 +21,6 @@ blp = Blueprint(
 @blp.route("/")
 class UserByUserGroupViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(UserByUserGroupQueryArgsSchema, location="query")
     @blp.response(200, UserByUserGroupSchema(many=True))
     def get(self, args):
@@ -29,7 +28,6 @@ class UserByUserGroupViews(MethodView):
         return UserByUserGroup.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(UserByUserGroupSchema)
     @blp.response(201, UserByUserGroupSchema)
     @blp.catch_integrity_error
@@ -43,7 +41,6 @@ class UserByUserGroupViews(MethodView):
 @blp.route("/<int:item_id>")
 class UserByUserGroupByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, UserByUserGroupSchema)
     def get(self, item_id):
         """Get user x user group association by ID"""

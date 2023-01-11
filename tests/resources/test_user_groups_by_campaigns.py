@@ -36,7 +36,6 @@ class TestUsersByCampaignsApi:
             assert ret.status_code == 201
             ret_val = ret.json
             ugbc_1_id = ret_val.pop("id")
-            ugbc_1_etag = ret.headers["ETag"]
 
             # POST violating unique constraint
             ret = client.post(USER_GROUPS_BY_CAMPAIGNS_URL, json=ugbc_1)
@@ -52,7 +51,6 @@ class TestUsersByCampaignsApi:
             # GET by id
             ret = client.get(f"{USER_GROUPS_BY_CAMPAIGNS_URL}{ugbc_1_id}")
             assert ret.status_code == 200
-            assert ret.headers["ETag"] == ugbc_1_etag
 
             # POST
             ugbc_2 = {"campaign_id": campaign_2_id, "user_group_id": ug_2_id}

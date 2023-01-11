@@ -24,7 +24,6 @@ blp = Blueprint(
 @blp.route("/")
 class SitePropertyViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(SitePropertyQueryArgsSchema, location="query")
     @blp.response(200, SitePropertySchema(many=True))
     def get(self, args):
@@ -32,7 +31,6 @@ class SitePropertyViews(MethodView):
         return SiteProperty.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(SitePropertySchema)
     @blp.response(201, SitePropertySchema)
     @blp.catch_integrity_error
@@ -46,7 +44,6 @@ class SitePropertyViews(MethodView):
 @blp.route("/<int:item_id>")
 class SitePropertyByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, SitePropertySchema)
     def get(self, item_id):
         """Get site property by ID"""

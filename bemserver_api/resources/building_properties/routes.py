@@ -24,7 +24,6 @@ blp = Blueprint(
 @blp.route("/")
 class BuildingPropertyViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(BuildingPropertyQueryArgsSchema, location="query")
     @blp.response(200, BuildingPropertySchema(many=True))
     def get(self, args):
@@ -32,7 +31,6 @@ class BuildingPropertyViews(MethodView):
         return BuildingProperty.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(BuildingPropertySchema)
     @blp.response(201, BuildingPropertySchema)
     @blp.catch_integrity_error
@@ -46,7 +44,6 @@ class BuildingPropertyViews(MethodView):
 @blp.route("/<int:item_id>")
 class BuildingPropertyByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, BuildingPropertySchema)
     def get(self, item_id):
         """Get building property by ID"""

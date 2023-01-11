@@ -25,7 +25,6 @@ blp = Blueprint(
 @blp.route("/")
 class EventByBuildingViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventByBuildingQueryArgsSchema, location="query")
     @blp.response(200, EventByBuildingSchema(many=True))
     def get(self, args):
@@ -33,7 +32,6 @@ class EventByBuildingViews(MethodView):
         return EventByBuilding.get(**args)
 
     @blp.login_required
-    @blp.etag
     @blp.arguments(EventByBuildingSchema)
     @blp.response(201, EventByBuildingSchema)
     @blp.catch_integrity_error
@@ -50,7 +48,6 @@ class EventByBuildingViews(MethodView):
 @blp.route("/<int:item_id>")
 class EventByBuildingByIdViews(MethodView):
     @blp.login_required
-    @blp.etag
     @blp.response(200, EventByBuildingSchema)
     def get(self, item_id):
         """Get event x building association by ID"""
