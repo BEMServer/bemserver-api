@@ -8,7 +8,11 @@ from bemserver_core.model import Notification
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import NotificationSchema, NotificationPutSchema
+from .schemas import (
+    NotificationSchema,
+    NotificationPutSchema,
+    NotificationsQueryArgsSchema,
+)
 
 
 blp = Blueprint(
@@ -23,10 +27,11 @@ blp = Blueprint(
 class NotificationsViews(MethodView):
     @blp.login_required
     @blp.etag
+    @blp.arguments(NotificationsQueryArgsSchema, location="query")
     @blp.response(200, NotificationSchema(many=True))
-    def get(self):
+    def get(self, args):
         """List notifications"""
-        return Notification.get()
+        return Notification.get(**args)
 
     @blp.login_required
     @blp.etag
