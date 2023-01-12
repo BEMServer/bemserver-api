@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+0.9.0 (2023-01-12)
+++++++++++++++++++
+
+Features:
+
+- Remove PUT and ETag for association tables
+- Add pagination in lists involving timeseries or events
+- Add Site,... hierarchy to Site,... associations
+
 0.8.0 (2023-01-11)
 ++++++++++++++++++
 
