@@ -37,6 +37,10 @@ class TestEventBySpaceApi:
             assert ret.status_code == 201
             ret_val = ret.json
             ebs_1_id = ret_val.pop("id")
+            assert ret_val.pop("site")["name"] == "Site 1"
+            assert ret_val.pop("building")["name"] == "Building 1"
+            assert ret_val.pop("storey")["name"] == "Storey 1"
+            assert ret_val.pop("space")["name"] == "Space 1"
             assert ret_val == ebs_1
 
             # POST violating unique constraint
@@ -67,6 +71,10 @@ class TestEventBySpaceApi:
             assert ret.status_code == 200
             ret_val = ret.json
             ret_val.pop("id")
+            assert ret_val.pop("site")["name"] == "Site 1"
+            assert ret_val.pop("building")["name"] == "Building 1"
+            assert ret_val.pop("storey")["name"] == "Storey 1"
+            assert ret_val.pop("space")["name"] == "Space 1"
             assert ret_val == ebs_1
 
             # POST
