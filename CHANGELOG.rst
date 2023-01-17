@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+0.10.0 (2023-01-17)
++++++++++++++++++++
+
+Features:
+
+- Check outliers data scheduled task
+
+Other changes:
+
+- Require bemserver-core 0.8.0.
+
 0.9.0 (2023-01-12)
 ++++++++++++++++++
 
