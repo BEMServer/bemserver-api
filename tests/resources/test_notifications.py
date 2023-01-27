@@ -10,12 +10,14 @@ NOTIFICATIONS_URL = "/notifications/"
 
 
 class TestNotificationsApi:
-    def test_notifications_api(self, app, users, events):
+    def test_notifications_api(self, app, users, campaigns, events):
 
         creds = users["Chuck"]["creds"]
         user_1_id = users["Active"]["id"]
         user_2_id = users["Inactive"]["id"]
+        campaign_1_id = campaigns[0]
         event_1_id = events[0]
+        event_2_id = events[1]
 
         dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
         dt_2 = dt.datetime(2020, 1, 2, tzinfo=dt.timezone.utc).isoformat()
@@ -73,7 +75,7 @@ class TestNotificationsApi:
 
             # POST
             notif_2 = {
-                "event_id": event_1_id,
+                "event_id": event_2_id,
                 "user_id": user_2_id,
                 "timestamp": dt_2,
             }
@@ -89,6 +91,13 @@ class TestNotificationsApi:
 
             # GET list with filters
             ret = client.get(NOTIFICATIONS_URL, query_string={"user_id": user_1_id})
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == notif_1_id
+            ret = client.get(
+                NOTIFICATIONS_URL, query_string={"campaign_id": campaign_1_id}
+            )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1

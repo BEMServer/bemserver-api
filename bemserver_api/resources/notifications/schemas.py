@@ -23,6 +23,7 @@ class NotificationsQueryArgsSchema(Schema):
     sort = SortField(("timestamp",))
     user_id = ma.fields.Integer()
     event_id = ma.fields.Integer()
+    campaign_id = ma.fields.Integer()
     timestamp_min = ma.fields.AwareDateTime()
     timestamp_max = ma.fields.AwareDateTime()
     read = ma.fields.Boolean()
