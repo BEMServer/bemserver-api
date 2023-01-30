@@ -12,6 +12,8 @@ from .schemas import (
     NotificationSchema,
     NotificationPutSchema,
     NotificationQueryArgsSchema,
+    NotificationCountByCampaignSchema,
+    NotificationCountByCampaignQueryArgsSchema,
 )
 
 
@@ -80,3 +82,13 @@ class NotificationsByIdViews(MethodView):
             abort(404)
         item.delete()
         db.session.commit()
+
+
+@blp.get("/count_by_campaign")
+@blp.login_required
+@blp.etag
+@blp.arguments(NotificationCountByCampaignQueryArgsSchema, location="query")
+@blp.response(200, NotificationCountByCampaignSchema)
+def count_by_campaign(args):
+    """Get notification count by campaign"""
+    return Notification.get_count_by_campaign(**args)

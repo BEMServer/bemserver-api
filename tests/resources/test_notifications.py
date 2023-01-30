@@ -130,6 +130,27 @@ class TestNotificationsApi:
             assert len(ret_val) == 2
             assert ret_val[1]["id"] == notif_1_id
 
+            # GET count by campaign
+            ret = client.get(
+                f"{NOTIFICATIONS_URL}count_by_campaign",
+                query_string={"user_id": user_1_id},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert ret_val == {
+                "campaigns": [
+                    {"campaign_id": 1, "campaign_name": "Campaign 1", "count": 1}
+                ],
+                "total": 1,
+            }
+            ret = client.get(
+                f"{NOTIFICATIONS_URL}count_by_campaign",
+                query_string={"user_id": user_1_id, "read": False},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert ret_val == {"campaigns": [], "total": 0}
+
             # DELETE wrong ID -> 404
             ret = client.delete(f"{NOTIFICATIONS_URL}{DUMMY_ID}")
             assert ret.status_code == 404
@@ -152,6 +173,7 @@ class TestNotificationsApi:
 
         user_creds = users["Active"]["creds"]
         user_1_id = users["Active"]["id"]
+        user_2_id = users["Inactive"]["id"]
         event_1_id = events[0]
         notif_1_id = notifications[0]
         notif_2_id = notifications[1]
@@ -193,6 +215,32 @@ class TestNotificationsApi:
             ret = client.put(f"{NOTIFICATIONS_URL}{notif_1_id}", json=notif_1_put)
             assert ret.status_code == 200
 
+            # GET count by campaign
+            ret = client.get(
+                f"{NOTIFICATIONS_URL}count_by_campaign",
+                query_string={"user_id": user_1_id},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert ret_val == {
+                "campaigns": [
+                    {"campaign_id": 1, "campaign_name": "Campaign 1", "count": 1}
+                ],
+                "total": 1,
+            }
+            ret = client.get(
+                f"{NOTIFICATIONS_URL}count_by_campaign",
+                query_string={"user_id": user_1_id, "read": False},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert ret_val == {"campaigns": [], "total": 0}
+            ret = client.get(
+                f"{NOTIFICATIONS_URL}count_by_campaign",
+                query_string={"user_id": user_2_id},
+            )
+            assert ret.status_code == 403
+
             # DELETE
             ret = client.delete(f"{NOTIFICATIONS_URL}{notif_1_id}")
             assert ret.status_code == 403
@@ -226,6 +274,13 @@ class TestNotificationsApi:
 
         # PUT
         ret = client.put(f"{NOTIFICATIONS_URL}{notif_1_id}", json=notif)
+
+        # GET count by campaign
+        ret = client.get(
+            f"{NOTIFICATIONS_URL}count_by_campaign",
+            query_string={"user_id": user_1_id},
+        )
+        assert ret.status_code == 401
 
         # DELETE
         ret = client.delete(f"{NOTIFICATIONS_URL}{notif_1_id}")

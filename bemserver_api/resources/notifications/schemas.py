@@ -27,3 +27,21 @@ class NotificationQueryArgsSchema(Schema):
     timestamp_min = ma.fields.AwareDateTime()
     timestamp_max = ma.fields.AwareDateTime()
     read = ma.fields.Boolean()
+
+
+class NotificationCountForCampaignSchema(Schema):
+    campaign_id = ma.fields.Integer()
+    campaign_name = ma.fields.String()
+    count = ma.fields.Integer()
+
+
+class NotificationCountByCampaignSchema(Schema):
+    total = ma.fields.Integer()
+    campaigns = ma.fields.List(ma.fields.Nested(NotificationCountForCampaignSchema))
+
+
+class NotificationCountByCampaignQueryArgsSchema(Schema):
+    user_id = ma.fields.Integer(required=True)
+    read = ma.fields.Boolean(
+        metadata={"description": "Count only read/unread. Leave empty to count all."}
+    )
