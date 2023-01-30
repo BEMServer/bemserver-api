@@ -11,7 +11,7 @@ from bemserver_api.database import db
 from .schemas import (
     NotificationSchema,
     NotificationPutSchema,
-    NotificationsQueryArgsSchema,
+    NotificationQueryArgsSchema,
 )
 
 
@@ -27,7 +27,7 @@ blp = Blueprint(
 class NotificationsViews(MethodView):
     @blp.login_required
     @blp.etag
-    @blp.arguments(NotificationsQueryArgsSchema, location="query")
+    @blp.arguments(NotificationQueryArgsSchema, location="query")
     @blp.response(200, NotificationSchema(many=True))
     @blp.paginate(SQLCursorPage)
     def get(self, args):

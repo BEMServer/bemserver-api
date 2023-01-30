@@ -19,7 +19,7 @@ class NotificationPutSchema(NotificationSchema):
         exclude = ("user_id", "event_id", "timestamp")
 
 
-class NotificationsQueryArgsSchema(Schema):
+class NotificationQueryArgsSchema(Schema):
     sort = SortField(("timestamp",))
     user_id = ma.fields.Integer()
     event_id = ma.fields.Integer()
