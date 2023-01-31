@@ -45,3 +45,8 @@ class NotificationCountByCampaignQueryArgsSchema(Schema):
     read = ma.fields.Boolean(
         metadata={"description": "Count only read/unread. Leave empty to count all."}
     )
+
+
+class NotificationMarkAllAsReadQueryArgsSchema(Schema):
+    user_id = ma.fields.Integer(required=True)
+    campaign_id = ma.fields.Integer()

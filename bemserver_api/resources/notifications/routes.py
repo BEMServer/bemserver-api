@@ -14,6 +14,7 @@ from .schemas import (
     NotificationQueryArgsSchema,
     NotificationCountByCampaignSchema,
     NotificationCountByCampaignQueryArgsSchema,
+    NotificationMarkAllAsReadQueryArgsSchema,
 )
 
 
@@ -92,3 +93,13 @@ class NotificationsByIdViews(MethodView):
 def count_by_campaign(args):
     """Get notification count by campaign"""
     return Notification.get_count_by_campaign(**args)
+
+
+@blp.get("/mark_all_as_read")
+@blp.login_required
+@blp.etag
+@blp.arguments(NotificationMarkAllAsReadQueryArgsSchema, location="query")
+@blp.response(200)
+def mark_all_as_read(args):
+    """Mark all notifications as read"""
+    return Notification.mark_all_as_read(**args)
