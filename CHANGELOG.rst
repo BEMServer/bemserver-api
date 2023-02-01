@@ -1,6 +1,22 @@
 Changelog
 ---------
 
+0.10.1 (2023-02-01)
++++++++++++++++++++
+
+Features:
+
+- Notification: add count_by_campaign and mark_all_as_read
+- Add Notification campaign_id filter
+
+Bug fixes:
+
+- Fix server error when loading timeseries as CSV with wrong datetimes
+
+Other changes:
+
+- Require bemserver-core 0.8.1.
+
 0.10.0 (2023-01-17)
 +++++++++++++++++++
 
