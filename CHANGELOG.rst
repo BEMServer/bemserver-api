@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.10.2 (2023-02-01)
++++++++++++++++++++
+
+Bug fixes:
+
+- Fix Notification mark_all_as_read: PUT, not GET
+
 0.10.1 (2023-02-01)
 +++++++++++++++++++
 
