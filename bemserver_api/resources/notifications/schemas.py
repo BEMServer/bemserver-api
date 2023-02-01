@@ -19,10 +19,34 @@ class NotificationPutSchema(NotificationSchema):
         exclude = ("user_id", "event_id", "timestamp")
 
 
-class NotificationsQueryArgsSchema(Schema):
+class NotificationQueryArgsSchema(Schema):
     sort = SortField(("timestamp",))
     user_id = ma.fields.Integer()
     event_id = ma.fields.Integer()
+    campaign_id = ma.fields.Integer()
     timestamp_min = ma.fields.AwareDateTime()
     timestamp_max = ma.fields.AwareDateTime()
     read = ma.fields.Boolean()
+
+
+class NotificationCountForCampaignSchema(Schema):
+    campaign_id = ma.fields.Integer()
+    campaign_name = ma.fields.String()
+    count = ma.fields.Integer()
+
+
+class NotificationCountByCampaignSchema(Schema):
+    total = ma.fields.Integer()
+    campaigns = ma.fields.List(ma.fields.Nested(NotificationCountForCampaignSchema))
+
+
+class NotificationCountByCampaignQueryArgsSchema(Schema):
+    user_id = ma.fields.Integer(required=True)
+    read = ma.fields.Boolean(
+        metadata={"description": "Count only read/unread. Leave empty to count all."}
+    )
+
+
+class NotificationMarkAllAsReadQueryArgsSchema(Schema):
+    user_id = ma.fields.Integer(required=True)
+    campaign_id = ma.fields.Integer()

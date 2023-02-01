@@ -11,7 +11,10 @@ from bemserver_api.database import db
 from .schemas import (
     NotificationSchema,
     NotificationPutSchema,
-    NotificationsQueryArgsSchema,
+    NotificationQueryArgsSchema,
+    NotificationCountByCampaignSchema,
+    NotificationCountByCampaignQueryArgsSchema,
+    NotificationMarkAllAsReadQueryArgsSchema,
 )
 
 
@@ -27,7 +30,7 @@ blp = Blueprint(
 class NotificationsViews(MethodView):
     @blp.login_required
     @blp.etag
-    @blp.arguments(NotificationsQueryArgsSchema, location="query")
+    @blp.arguments(NotificationQueryArgsSchema, location="query")
     @blp.response(200, NotificationSchema(many=True))
     @blp.paginate(SQLCursorPage)
     def get(self, args):
@@ -80,3 +83,23 @@ class NotificationsByIdViews(MethodView):
             abort(404)
         item.delete()
         db.session.commit()
+
+
+@blp.get("/count_by_campaign")
+@blp.login_required
+@blp.etag
+@blp.arguments(NotificationCountByCampaignQueryArgsSchema, location="query")
+@blp.response(200, NotificationCountByCampaignSchema)
+def count_by_campaign(args):
+    """Get notification count by campaign"""
+    return Notification.get_count_by_campaign(**args)
+
+
+@blp.get("/mark_all_as_read")
+@blp.login_required
+@blp.etag
+@blp.arguments(NotificationMarkAllAsReadQueryArgsSchema, location="query")
+@blp.response(200)
+def mark_all_as_read(args):
+    """Mark all notifications as read"""
+    return Notification.mark_all_as_read(**args)
