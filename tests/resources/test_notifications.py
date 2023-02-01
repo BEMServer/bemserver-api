@@ -166,7 +166,7 @@ class TestNotificationsApi:
             ret_val = ret.json
             assert len(ret_val) == 2
             # Mark all user 1 notif as read -> no unread notif for user 1
-            ret = client.get(
+            ret = client.put(
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_1_id},
             )
@@ -179,7 +179,7 @@ class TestNotificationsApi:
             assert not ret_val
             # Mark all user 2 notif as read for campaign 1 -> no change
             # (User 2 is not even part of campaign 1, they couldn't have a notif there)
-            ret = client.get(
+            ret = client.put(
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_2_id, "campaign_id": campaign_1_id},
             )
@@ -191,7 +191,7 @@ class TestNotificationsApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             # Mark all user 2 notif as read for campaign 2 -> no unread notif for user 2
-            ret = client.get(
+            ret = client.put(
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_2_id, "campaign_id": campaign_2_id},
             )
@@ -307,7 +307,7 @@ class TestNotificationsApi:
             # At this point, 1 notif
             # User 1, Campaign 1, unread
             # Mark all user 1 notif as read for campaign 2 -> no change
-            ret = client.get(
+            ret = client.put(
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_1_id, "campaign_id": campaign_2_id},
             )
@@ -319,7 +319,7 @@ class TestNotificationsApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             # Mark all user 1 notif as read for campaign 1 -> no unread notif for user 1
-            ret = client.get(
+            ret = client.put(
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_1_id, "campaign_id": campaign_1_id},
             )
