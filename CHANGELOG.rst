@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.10.3 (2023-02-03)
++++++++++++++++++++
+
+Features:
+
+- Embed Event in Notification response
+
 0.10.2 (2023-02-01)
 +++++++++++++++++++
 
