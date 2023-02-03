@@ -43,12 +43,15 @@ class TestNotificationsApi:
             assert ret.status_code == 201
             ret_val = ret.json
             notif_1_id = ret_val.pop("id")
+            assert "event" in ret_val
+            assert "id" not in ret_val["event"]
 
             # GET list
             ret = client.get(NOTIFICATIONS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
+            assert "id" not in ret_val[0]["event"]
 
             # GET by id
             ret = client.get(f"{NOTIFICATIONS_URL}{notif_1_id}")
@@ -56,6 +59,7 @@ class TestNotificationsApi:
             ret_val = ret.json
             ret_val.pop("id")
             assert ret_val.pop("read") is False
+            assert "id" not in ret_val.pop("event")
             assert ret_val == notif_1
 
             # PUT wrong ID -> 404
@@ -260,6 +264,7 @@ class TestNotificationsApi:
             ret_val.pop("id")
             notif_1 = ret_val
             assert notif_1["read"] is False
+            assert "id" not in ret_val.pop("event")
 
             ret = client.get(f"{NOTIFICATIONS_URL}{notif_2_id}")
             assert ret.status_code == 403
