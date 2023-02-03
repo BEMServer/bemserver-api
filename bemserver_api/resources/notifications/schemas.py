@@ -5,6 +5,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.model import Notification
 
 from bemserver_api import AutoSchema, Schema, SortField
+from ..events.schemas import EventSchema
 
 
 class NotificationSchema(AutoSchema):
@@ -12,6 +13,7 @@ class NotificationSchema(AutoSchema):
         model = Notification
 
     id = msa.auto_field(dump_only=True)
+    event = ma.fields.Nested(EventSchema(exclude=("id",)), dump_only=True)
 
 
 class NotificationPutSchema(NotificationSchema):
