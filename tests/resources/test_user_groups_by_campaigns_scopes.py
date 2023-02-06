@@ -15,7 +15,6 @@ class TestUsersByCampaignsApi:
     def test_user_groups_by_campaign_scopes_api(
         self, app, users, user_groups, campaign_scopes
     ):
-
         ug_1_id = user_groups[0]
         ug_2_id = user_groups[1]
         cs_1_id = campaign_scopes[0]
@@ -26,7 +25,6 @@ class TestUsersByCampaignsApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(USER_GROUPS_BY_CAMPAIGN_SCOPES_URL)
             assert ret.status_code == 200
@@ -133,7 +131,6 @@ class TestUsersByCampaignsApi:
     def test_user_groups_by_campaign_scopes_as_user_api(
         self, app, users, user_groups, campaign_scopes, user_groups_by_campaign_scopes
     ):
-
         user_creds = users["Active"]["creds"]
         ug_1_id = user_groups[0]
         ug_2_id = user_groups[1]
@@ -145,7 +142,6 @@ class TestUsersByCampaignsApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(USER_GROUPS_BY_CAMPAIGN_SCOPES_URL)
             assert ret.status_code == 200
@@ -198,7 +194,6 @@ class TestUsersByCampaignsApi:
     def test_user_groups_by_campaign_scopes_as_anonym_api(
         self, app, users, user_groups, campaign_scopes, user_groups_by_campaign_scopes
     ):
-
         ug_1_id = user_groups[0]
         cs_1_id = campaign_scopes[0]
         ugbc_1_id = user_groups_by_campaign_scopes[0]

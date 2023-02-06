@@ -12,14 +12,12 @@ CAMPAIGNS_URL = "/campaigns/"
 
 class TestCampaignScopesApi:
     def test_campaign_scopes_api(self, app, users, campaigns):
-
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
 
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(CAMPAIGN_SCOPES_URL)
             assert ret.status_code == 200
@@ -146,7 +144,6 @@ class TestCampaignScopesApi:
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
     def test_campaign_scopes_as_user_api(self, app, users, campaigns, campaign_scopes):
-
         user_creds = users["Active"]["creds"]
         campaign_1_id = campaigns[0]
         cs_1_id = campaign_scopes[0]
@@ -155,7 +152,6 @@ class TestCampaignScopesApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(CAMPAIGN_SCOPES_URL)
             assert ret.status_code == 200
@@ -212,7 +208,6 @@ class TestCampaignScopesApi:
             assert ret.status_code == 403
 
     def test_campaign_scopes_as_anonym_api(self, app, campaign_scopes):
-
         cs_1_id = campaign_scopes[0]
 
         client = app.test_client()

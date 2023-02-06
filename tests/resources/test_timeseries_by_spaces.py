@@ -12,7 +12,6 @@ SPACES_URL = "/spaces/"
 
 class TestTimeseriesBySpaceApi:
     def test_timeseries_by_spaces_api(self, app, users, spaces, timeseries):
-
         creds = users["Chuck"]["creds"]
         space_1_id = spaces[0]
         space_2_id = spaces[1]
@@ -22,7 +21,6 @@ class TestTimeseriesBySpaceApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_BY_SPACES_URL)
             assert ret.status_code == 200
@@ -124,7 +122,6 @@ class TestTimeseriesBySpaceApi:
     def test_timeseries_by_spaces_as_user_api(
         self, app, users, spaces, timeseries, timeseries_by_spaces
     ):
-
         user_creds = users["Active"]["creds"]
         space_1_id = spaces[0]
         ts_1_id = timeseries[0]
@@ -133,7 +130,6 @@ class TestTimeseriesBySpaceApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(TIMESERIES_BY_SPACES_URL)
             assert ret.status_code == 200

@@ -13,7 +13,6 @@ ENERGY_END_USES_URL = "/energy_end_uses/"
 class TestEnergySourcesApi:
     @pytest.mark.parametrize("user", ("user", "admin"))
     def test_energy_sources_api_as_admin_or_user(self, app, user, users):
-
         if user == "user":
             creds = users["Active"]["creds"]
         else:
@@ -27,7 +26,6 @@ class TestEnergySourcesApi:
             assert "all" in [e["name"] for e in ret.json]
 
     def test_enery_sources_api_as_anonym(self, app):
-
         client = app.test_client()
 
         ret = client.get(ENERGY_SOURCES_URL)
@@ -37,7 +35,6 @@ class TestEnergySourcesApi:
 class TestEnergyEndUsesApi:
     @pytest.mark.parametrize("user", ("user", "admin"))
     def test_energy_end_uses_api_as_admin_or_user(self, app, user, users):
-
         if user == "user":
             creds = users["Active"]["creds"]
         else:
@@ -51,7 +48,6 @@ class TestEnergyEndUsesApi:
             assert "all" in [e["name"] for e in ret.json]
 
     def test_enery_end_uses_api_as_anonym(self, app):
-
         client = app.test_client()
 
         ret = client.get(ENERGY_END_USES_URL)

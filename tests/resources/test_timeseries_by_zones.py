@@ -12,7 +12,6 @@ ZONES_URL = "/zones/"
 
 class TestTimeseriesByZoneApi:
     def test_timeseries_by_zones_api(self, app, users, zones, timeseries):
-
         creds = users["Chuck"]["creds"]
         zone_1_id = zones[0]
         zone_2_id = zones[1]
@@ -22,7 +21,6 @@ class TestTimeseriesByZoneApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_BY_ZONES_URL)
             assert ret.status_code == 200
@@ -118,7 +116,6 @@ class TestTimeseriesByZoneApi:
     def test_timeseries_by_zones_as_user_api(
         self, app, users, zones, timeseries, timeseries_by_zones
     ):
-
         user_creds = users["Active"]["creds"]
         zone_1_id = zones[0]
         ts_1_id = timeseries[0]
@@ -127,7 +124,6 @@ class TestTimeseriesByZoneApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(TIMESERIES_BY_ZONES_URL)
             assert ret.status_code == 200

@@ -12,7 +12,6 @@ EVENTS_URL = "/events/"
 
 class TestEventBySiteApi:
     def test_events_by_sites_api(self, app, users, sites, events):
-
         creds = users["Chuck"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -22,7 +21,6 @@ class TestEventBySiteApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(EVENTS_BY_SITES_URL)
             assert ret.status_code == 200
@@ -132,7 +130,6 @@ class TestEventBySiteApi:
     def test_events_by_sites_as_user_api(
         self, app, users, sites, events, events_by_sites
     ):
-
         user_creds = users["Active"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -144,7 +141,6 @@ class TestEventBySiteApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(EVENTS_BY_SITES_URL)
             assert ret.status_code == 200

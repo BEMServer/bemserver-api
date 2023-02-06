@@ -15,7 +15,6 @@ class TestBuildingPropertyDataApi:
     def test_building_property_data_api(
         self, app, users, buildings, building_properties
     ):
-
         creds = users["Chuck"]["creds"]
         building_1_id = buildings[0]
         building_2_id = buildings[1]
@@ -25,7 +24,6 @@ class TestBuildingPropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(BUILDING_PROPERTY_DATA_URL)
             assert ret.status_code == 200
@@ -182,7 +180,6 @@ class TestBuildingPropertyDataApi:
     def test_building_property_data_as_user_api(
         self, app, users, buildings, building_properties, building_property_data
     ):
-
         user_creds = users["Active"]["creds"]
         building_1_id = buildings[0]
         building_p_1_id = building_properties[0]
@@ -192,7 +189,6 @@ class TestBuildingPropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(BUILDING_PROPERTY_DATA_URL)
             assert ret.status_code == 200

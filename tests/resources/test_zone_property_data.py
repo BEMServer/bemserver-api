@@ -12,7 +12,6 @@ ZONE_PROPERTY_DATA_URL = "/zone_property_data/"
 
 class TestZonePropertyDataApi:
     def test_zone_property_data_api(self, app, users, zones, zone_properties):
-
         creds = users["Chuck"]["creds"]
         zone_1_id = zones[0]
         zone_2_id = zones[1]
@@ -22,7 +21,6 @@ class TestZonePropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(ZONE_PROPERTY_DATA_URL)
             assert ret.status_code == 200
@@ -171,7 +169,6 @@ class TestZonePropertyDataApi:
     def test_zone_property_data_as_user_api(
         self, app, users, zones, zone_properties, zone_property_data
     ):
-
         user_creds = users["Active"]["creds"]
         zone_1_id = zones[0]
         zone_p_1_id = zone_properties[0]
@@ -181,7 +178,6 @@ class TestZonePropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(ZONE_PROPERTY_DATA_URL)
             assert ret.status_code == 200

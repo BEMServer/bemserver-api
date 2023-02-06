@@ -11,13 +11,11 @@ STRUCTURAL_ELEMENT_PROPERTIES_URL = "/structural_element_properties/"
 
 class TestStructuralElementPropertiesApi:
     def test_structural_element_properties_api(self, app, users):
-
         creds = users["Chuck"]["creds"]
 
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(STRUCTURAL_ELEMENT_PROPERTIES_URL)
             assert ret.status_code == 200
@@ -175,14 +173,12 @@ class TestStructuralElementPropertiesApi:
     def test_structural_element_as_user_api(
         self, app, users, structural_element_properties
     ):
-
         user_creds = users["Active"]["creds"]
         sep_1_id = structural_element_properties[0]
 
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(STRUCTURAL_ELEMENT_PROPERTIES_URL)
             assert ret.status_code == 200
@@ -223,7 +219,6 @@ class TestStructuralElementPropertiesApi:
             assert ret.status_code == 403
 
     def test_structural_element_as_anonym_api(self, app, structural_element_properties):
-
         sep_1_id = structural_element_properties[0]
 
         client = app.test_client()

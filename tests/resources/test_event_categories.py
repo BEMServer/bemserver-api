@@ -9,13 +9,11 @@ EVENT_CATEGORIES_URL = "/event_categories/"
 
 class TestEventCategoriesApi:
     def test_event_categories_api(self, app, users):
-
         creds = users["Chuck"]["creds"]
 
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(EVENT_CATEGORIES_URL)
             assert ret.status_code == 200
@@ -108,14 +106,12 @@ class TestEventCategoriesApi:
             assert ret.status_code == 404
 
     def test_event_categories_as_user_api(self, app, users, event_categories):
-
         user_creds = users["Active"]["creds"]
         event_categ_1_id = event_categories[0]
 
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(EVENT_CATEGORIES_URL)
             assert ret.status_code == 200
@@ -152,7 +148,6 @@ class TestEventCategoriesApi:
             assert ret.status_code == 403
 
     def test_event_categories_as_anonym_api(self, app, event_categories):
-
         event_categ_1_id = event_categories[0]
 
         client = app.test_client()

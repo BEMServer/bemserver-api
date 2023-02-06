@@ -11,13 +11,11 @@ USER_GROUPS_URL = "/user_groups/"
 
 class TestUserGroupsApi:
     def test_user_groups_api(self, app, users):
-
         creds = users["Chuck"]["creds"]
 
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(USER_GROUPS_URL)
             assert ret.status_code == 200
@@ -123,7 +121,6 @@ class TestUserGroupsApi:
 
     @pytest.mark.usefixtures("users_by_user_groups")
     def test_user_groups_as_user_api(self, app, users, user_groups):
-
         creds = users["Active"]["creds"]
         ug_1_id = user_groups[0]
         ug_2_id = user_groups[1]
@@ -131,7 +128,6 @@ class TestUserGroupsApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(USER_GROUPS_URL)
             assert ret.status_code == 200
@@ -171,7 +167,6 @@ class TestUserGroupsApi:
             assert ret.status_code == 403
 
     def test_user_groups_as_anonym_api(self, app, users):
-
         ug_1_id = users["Active"]["id"]
 
         client = app.test_client()

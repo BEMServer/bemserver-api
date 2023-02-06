@@ -9,13 +9,11 @@ TIMESERIES_DATA_STATES_URL = "/timeseries_data_states/"
 
 class TestTimeseriesDataStatesApi:
     def test_timeseries_data_states_api(self, app, users):
-
         creds = users["Chuck"]["creds"]
 
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_DATA_STATES_URL)
             assert ret.status_code == 200
@@ -115,7 +113,6 @@ class TestTimeseriesDataStatesApi:
             assert ret.status_code == 404
 
     def test_timeseries_data_states_as_user_api(self, app, users, timeseries):
-
         tds_1_id = 1
 
         creds = users["Active"]["creds"]
@@ -123,7 +120,6 @@ class TestTimeseriesDataStatesApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_DATA_STATES_URL)
             assert ret.status_code == 200
@@ -163,7 +159,6 @@ class TestTimeseriesDataStatesApi:
             assert ret.status_code == 403
 
     def test_timeseries_data_states_as_anonym_api(self, app, users):
-
         tds_1_id = 1
 
         client = app.test_client()

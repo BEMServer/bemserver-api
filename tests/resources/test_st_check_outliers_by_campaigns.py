@@ -13,7 +13,6 @@ ST_CHECK_OUTLIERS_BY_CAMPAIGNS_URL = "/st_check_outliers_by_campaigns/"
 
 class TestST_CheckOutliersByCampaignsApi:
     def test_st_check_outliers_by_campaigns_api(self, app, users, campaigns):
-
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
         campaign_2_id = campaigns[1]
@@ -21,7 +20,6 @@ class TestST_CheckOutliersByCampaignsApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(ST_CHECK_OUTLIERS_BY_CAMPAIGNS_URL)
             assert ret.status_code == 200
@@ -162,7 +160,6 @@ class TestST_CheckOutliersByCampaignsApi:
     def test_st_check_outliers_by_campaigns_as_user_api(
         self, app, users, campaigns, st_check_outliers_by_campaigns
     ):
-
         user_creds = users["Active"]["creds"]
         campaign_1_id = campaigns[0]
         st_cbc_1_id = st_check_outliers_by_campaigns[0]
@@ -171,7 +168,6 @@ class TestST_CheckOutliersByCampaignsApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(ST_CHECK_OUTLIERS_BY_CAMPAIGNS_URL)
             assert ret.status_code == 200
@@ -227,7 +223,6 @@ class TestST_CheckOutliersByCampaignsApi:
     def test_st_check_outliers_by_campaigns_as_anonym_api(
         self, app, campaigns, st_check_outliers_by_campaigns
     ):
-
         campaign_1_id = campaigns[0]
         st_cbc_1_id = st_check_outliers_by_campaigns[0]
 

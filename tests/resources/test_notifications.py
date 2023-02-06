@@ -11,7 +11,6 @@ NOTIFICATIONS_URL = "/notifications/"
 
 class TestNotificationsApi:
     def test_notifications_api(self, app, users, campaigns, events):
-
         creds = users["Chuck"]["creds"]
         user_1_id = users["Active"]["id"]
         user_2_id = users["Inactive"]["id"]
@@ -26,7 +25,6 @@ class TestNotificationsApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(NOTIFICATIONS_URL)
             assert ret.status_code == 200
@@ -228,7 +226,6 @@ class TestNotificationsApi:
     def test_notifications_as_user_api(
         self, app, users, campaigns, events, notifications
     ):
-
         user_creds = users["Active"]["creds"]
         user_1_id = users["Active"]["id"]
         user_2_id = users["Inactive"]["id"]
@@ -243,7 +240,6 @@ class TestNotificationsApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(NOTIFICATIONS_URL)
             assert ret.status_code == 200
@@ -341,7 +337,6 @@ class TestNotificationsApi:
             assert ret.status_code == 403
 
     def test_notifications_as_anonym_api(self, app, users, events, notifications):
-
         user_1_id = users["Active"]["id"]
         event_1_id = events[0]
         notif_1_id = notifications[0]

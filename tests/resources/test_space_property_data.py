@@ -13,7 +13,6 @@ SPACES_URL = "/spaces/"
 
 class TestSpacePropertyDataApi:
     def test_space_property_data_api(self, app, users, spaces, space_properties):
-
         creds = users["Chuck"]["creds"]
         space_1_id = spaces[0]
         space_2_id = spaces[1]
@@ -23,7 +22,6 @@ class TestSpacePropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(SPACE_PROPERTY_DATA_URL)
             assert ret.status_code == 200
@@ -180,7 +178,6 @@ class TestSpacePropertyDataApi:
     def test_space_property_data_as_user_api(
         self, app, users, spaces, space_properties, space_property_data
     ):
-
         user_creds = users["Active"]["creds"]
         space_1_id = spaces[0]
         space_p_1_id = space_properties[0]
@@ -190,7 +187,6 @@ class TestSpacePropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(SPACE_PROPERTY_DATA_URL)
             assert ret.status_code == 200

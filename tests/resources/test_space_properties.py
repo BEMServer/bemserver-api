@@ -9,7 +9,6 @@ SPACE_PROPERTIES_URL = "/space_properties/"
 
 class TestSpacePropertiesApi:
     def test_space_properties_api(self, app, users, structural_element_properties):
-
         creds = users["Chuck"]["creds"]
         sep_1_id = structural_element_properties[0]
         sep_2_id = structural_element_properties[1]
@@ -17,7 +16,6 @@ class TestSpacePropertiesApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(SPACE_PROPERTIES_URL)
             assert ret.status_code == 200
@@ -101,7 +99,6 @@ class TestSpacePropertiesApi:
     def test_space_properties_as_user_api(
         self, app, users, structural_element_properties, space_properties
     ):
-
         user_creds = users["Active"]["creds"]
         sep_1_id = structural_element_properties[0]
         space_p_1_id = space_properties[0]
@@ -109,7 +106,6 @@ class TestSpacePropertiesApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(SPACE_PROPERTIES_URL)
             assert ret.status_code == 200
@@ -136,7 +132,6 @@ class TestSpacePropertiesApi:
     def test_space_properties_as_anonym_api(
         self, app, structural_element_properties, space_properties
     ):
-
         sep_1_id = structural_element_properties[0]
         space_p_1_id = space_properties[0]
 

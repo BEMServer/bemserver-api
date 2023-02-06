@@ -12,7 +12,6 @@ BUILDINGS_URL = "/buildings/"
 
 class TestTimeseriesByBuildingApi:
     def test_timeseries_by_buildings_api(self, app, users, buildings, timeseries):
-
         creds = users["Chuck"]["creds"]
         building_1_id = buildings[0]
         building_2_id = buildings[1]
@@ -22,7 +21,6 @@ class TestTimeseriesByBuildingApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_BY_BUILDINGS_URL)
             assert ret.status_code == 200
@@ -120,7 +118,6 @@ class TestTimeseriesByBuildingApi:
     def test_timeseries_by_buildings_as_user_api(
         self, app, users, buildings, timeseries, timeseries_by_buildings
     ):
-
         user_creds = users["Active"]["creds"]
         building_1_id = buildings[0]
         ts_1_id = timeseries[0]
@@ -129,7 +126,6 @@ class TestTimeseriesByBuildingApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(TIMESERIES_BY_BUILDINGS_URL)
             assert ret.status_code == 200

@@ -9,7 +9,6 @@ BUILDING_PROPERTIES_URL = "/building_properties/"
 
 class TestCampaignsApi:
     def test_building_properties_api(self, app, users, structural_element_properties):
-
         creds = users["Chuck"]["creds"]
         sep_1_id = structural_element_properties[0]
         sep_2_id = structural_element_properties[1]
@@ -17,7 +16,6 @@ class TestCampaignsApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(BUILDING_PROPERTIES_URL)
             assert ret.status_code == 200
@@ -101,7 +99,6 @@ class TestCampaignsApi:
     def test_building_properties_as_user_api(
         self, app, users, structural_element_properties, building_properties
     ):
-
         user_creds = users["Active"]["creds"]
         sep_1_id = structural_element_properties[0]
         building_p_1_id = building_properties[0]
@@ -109,7 +106,6 @@ class TestCampaignsApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(BUILDING_PROPERTIES_URL)
             assert ret.status_code == 200
@@ -136,7 +132,6 @@ class TestCampaignsApi:
     def test_building_properties_as_anonym_api(
         self, app, structural_element_properties, building_properties
     ):
-
         sep_1_id = structural_element_properties[0]
         building_p_1_id = building_properties[0]
 

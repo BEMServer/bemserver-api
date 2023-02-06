@@ -14,7 +14,6 @@ class TestST_CleanupByTimeseriessApi:
     def test_st_cleanups_by_timeseries_api(
         self, app, users, campaigns, timeseries, st_cleanups_by_timeseries
     ):
-
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
         ts_1_id = timeseries[0]
@@ -26,7 +25,6 @@ class TestST_CleanupByTimeseriessApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(ST_CLEANUPS_BY_TIMESERIES_URL)
             assert ret.status_code == 200
@@ -85,7 +83,6 @@ class TestST_CleanupByTimeseriessApi:
     def test_st_cleanups_by_timeseries_as_user_api(
         self, app, users, campaigns, timeseries, st_cleanups_by_timeseries
     ):
-
         user_creds = users["Active"]["creds"]
         campaign_1_id = campaigns[0]
         campaign_2_id = campaigns[1]
@@ -96,7 +93,6 @@ class TestST_CleanupByTimeseriessApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(ST_CLEANUPS_BY_TIMESERIES_URL)
             assert ret.status_code == 200
@@ -160,7 +156,6 @@ class TestST_CleanupByTimeseriessApi:
     def test_st_cleanups_by_timeseries_as_anonym_api(
         self, app, st_cleanups_by_timeseries
     ):
-
         st_cbt_1_id = st_cleanups_by_timeseries[0]
 
         client = app.test_client()

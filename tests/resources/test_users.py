@@ -9,13 +9,11 @@ USERS_URL = "/users/"
 
 class TestUsersApi:
     def test_users_api(self, app, users):
-
         creds = users["Chuck"]["creds"]
 
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(USERS_URL)
             assert ret.status_code == 200
@@ -177,7 +175,6 @@ class TestUsersApi:
             assert ret.status_code == 404
 
     def test_users_as_user_api(self, app, users):
-
         creds = users["Active"]["creds"]
         user_1_id = users["Active"]["id"]
         user_2_id = users["Inactive"]["id"]
@@ -185,7 +182,6 @@ class TestUsersApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(USERS_URL)
             assert ret.status_code == 200
@@ -253,7 +249,6 @@ class TestUsersApi:
             assert ret.status_code == 403
 
     def test_users_as_anonym_api(self, app, users):
-
         user_1_id = users["Active"]["id"]
 
         client = app.test_client()

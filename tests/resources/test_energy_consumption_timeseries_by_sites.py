@@ -14,7 +14,6 @@ class TestEnergyConsumptionTimeseriesBySiteApi:
     def test_energy_consumption_timeseries_by_sites_api(
         self, app, users, sites, timeseries, energy_sources, energy_end_uses
     ):
-
         creds = users["Chuck"]["creds"]
         site_1_id = sites[0]
         site_2_id = sites[1]
@@ -26,7 +25,6 @@ class TestEnergyConsumptionTimeseriesBySiteApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(ENERGY_CONSUMPTION_TIMESERIES_BY_SITES_URL)
             assert ret.status_code == 200
@@ -181,7 +179,6 @@ class TestEnergyConsumptionTimeseriesBySiteApi:
         energy_end_uses,
         energy_consumption_timeseries_by_sites,
     ):
-
         user_creds = users["Active"]["creds"]
         site_1_id = sites[0]
         ts_1_id = timeseries[0]
@@ -193,7 +190,6 @@ class TestEnergyConsumptionTimeseriesBySiteApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(ENERGY_CONSUMPTION_TIMESERIES_BY_SITES_URL)
             assert ret.status_code == 200

@@ -13,7 +13,6 @@ CAMPAIGN_SCOPES_URL = "/campaign_scopes/"
 
 class TestTimeseriesApi:
     def test_timeseries_api(self, app, users, campaigns, campaign_scopes):
-
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
         campaign_2_id = campaigns[1]
@@ -23,7 +22,6 @@ class TestTimeseriesApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_URL)
             assert ret.status_code == 200
@@ -178,7 +176,6 @@ class TestTimeseriesApi:
         zones,
         events,
     ):
-
         creds = users["Chuck"]["creds"]
         site_1_id = sites[0]
         building_1_id = buildings[0]
@@ -266,7 +263,6 @@ class TestTimeseriesApi:
     def test_timeseries_as_user_api(
         self, app, users, timeseries, campaigns, campaign_scopes
     ):
-
         campaign_1_id = campaigns[0]
         cs_1_id = campaign_scopes[0]
         timeseries_1_id = timeseries[0]
@@ -277,7 +273,6 @@ class TestTimeseriesApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_URL)
             assert ret.status_code == 200
@@ -342,7 +337,6 @@ class TestTimeseriesApi:
     def test_timeseries_as_anonym_api(
         self, app, users, timeseries, campaigns, campaign_scopes
     ):
-
         campaign_1_id = campaigns[0]
         cs_1_id = campaign_scopes[0]
         timeseries_1_id = timeseries[0]

@@ -8,7 +8,6 @@ from bemserver_core.authorization import get_current_user
 
 class TestAuthentication:
     def test_auth_login_required(self, app, users):
-
         active_user_creds = users["Active"]["creds"]
         active_user_invalid_creds = users["Active"]["invalid_creds"]
         inactive_user_creds = users["Inactive"]["creds"]
@@ -73,7 +72,6 @@ class TestAuthentication:
         assert "security" not in no_auth_spec["get"]
 
     def test_auth_current_user(self, app, users):
-
         active_user_creds = users["Active"]["creds"]
         api = app.extensions["flask-smorest"]["ext_obj"]
 

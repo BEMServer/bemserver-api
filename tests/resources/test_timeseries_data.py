@@ -46,7 +46,6 @@ class TestTimeseriesDataApi:
         client = app.test_client()
 
         with auth_context:
-
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 ts_l = (ts_1_id,)
@@ -213,7 +212,6 @@ class TestTimeseriesDataApi:
         client = app.test_client()
 
         with auth_context:
-
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 ts_l = (ts_1_id,)
@@ -354,7 +352,6 @@ class TestTimeseriesDataApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # Unknown campaign
             if for_campaign:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
@@ -507,7 +504,6 @@ class TestTimeseriesDataApi:
     def test_timeseries_data_post(
         self, app, user, users, campaigns, timeseries, for_campaign, format_
     ):
-
         ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
         campaign_1_id = campaigns[0]
@@ -526,7 +522,6 @@ class TestTimeseriesDataApi:
         client = app.test_client()
 
         with auth_context:
-
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 header = f"Datetime,{ts_1_id}\n"
@@ -650,7 +645,6 @@ class TestTimeseriesDataApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # Unknown campaign
             if for_campaign:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
@@ -833,7 +827,6 @@ class TestTimeseriesDataApi:
         client = app.test_client()
 
         with auth_context:
-
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
                 ts_l = (ts_1_id,)
@@ -952,7 +945,6 @@ class TestTimeseriesDataApi:
         client_method = getattr(client, method)
 
         with AuthHeader(creds):
-
             # Unknown campaign
             if for_campaign:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"

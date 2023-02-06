@@ -13,7 +13,6 @@ EVENTS_URL = "/events/"
 class TestTimeseriesByEventApi:
     @pytest.mark.parametrize("timeseries", (4,), indirect=True)
     def test_timeseries_by_events_api(self, app, users, events, timeseries):
-
         creds = users["Chuck"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -23,7 +22,6 @@ class TestTimeseriesByEventApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_BY_EVENTS_URL)
             assert ret.status_code == 200
@@ -130,7 +128,6 @@ class TestTimeseriesByEventApi:
     def test_timeseries_by_events_as_user_api(
         self, app, users, events, timeseries, timeseries_by_events
     ):
-
         user_creds = users["Active"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -142,7 +139,6 @@ class TestTimeseriesByEventApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(TIMESERIES_BY_EVENTS_URL)
             assert ret.status_code == 200
