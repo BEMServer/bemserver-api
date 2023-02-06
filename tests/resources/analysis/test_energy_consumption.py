@@ -112,7 +112,6 @@ class TestAnalysisApiEnergyConsumption:
         query_url = f"{ENERGY_CONSUMPTION_URL}site/{site_1_id}"
 
         with OpenBar():
-
             start_time, end_time, timeseries, expected = self._create_data(
                 campaign_1_id, cs_1_id
             )
@@ -197,7 +196,6 @@ class TestAnalysisApiEnergyConsumption:
             db.session.commit()
 
         with auth_context:
-
             ret = client.get(
                 query_url,
                 query_string={
@@ -222,7 +220,6 @@ class TestAnalysisApiEnergyConsumption:
             db.session.commit()
 
         with auth_context:
-
             ret = client.get(
                 query_url,
                 query_string={
@@ -278,7 +275,6 @@ class TestAnalysisApiEnergyConsumption:
         query_url = f"{ENERGY_CONSUMPTION_URL}building/{building_1_id}"
 
         with OpenBar():
-
             start_time, end_time, timeseries, expected = self._create_data(
                 campaign_1_id, cs_1_id
             )
@@ -363,7 +359,6 @@ class TestAnalysisApiEnergyConsumption:
             db.session.commit()
 
         with auth_context:
-
             ret = client.get(
                 query_url,
                 query_string={
@@ -388,7 +383,6 @@ class TestAnalysisApiEnergyConsumption:
             db.session.commit()
 
         with auth_context:
-
             ret = client.get(
                 query_url,
                 query_string={

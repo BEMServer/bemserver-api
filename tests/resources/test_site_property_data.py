@@ -13,7 +13,6 @@ SITES_URL = "/sites/"
 
 class TestSitePropertyDataApi:
     def test_site_property_data_api(self, app, users, sites, site_properties):
-
         creds = users["Chuck"]["creds"]
         site_1_id = sites[0]
         site_2_id = sites[1]
@@ -23,7 +22,6 @@ class TestSitePropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(SITE_PROPERTY_DATA_URL)
             assert ret.status_code == 200
@@ -180,7 +178,6 @@ class TestSitePropertyDataApi:
     def test_site_property_data_as_user_api(
         self, app, users, sites, site_properties, site_property_data
     ):
-
         user_creds = users["Active"]["creds"]
         site_1_id = sites[0]
         site_p_1_id = site_properties[0]
@@ -190,7 +187,6 @@ class TestSitePropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(SITE_PROPERTY_DATA_URL)
             assert ret.status_code == 200

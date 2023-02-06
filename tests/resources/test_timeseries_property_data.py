@@ -14,7 +14,6 @@ class TestTimeseriesPropertyDataApi:
     def test_timeseries_property_data_api(
         self, app, users, timeseries_properties, timeseries
     ):
-
         tsp_1_id = timeseries_properties[0]
         tsp_2_id = timeseries_properties[1]
         ts_1_id = timeseries[0]
@@ -24,7 +23,6 @@ class TestTimeseriesPropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_PROPERTY_DATA_URL)
             assert ret.status_code == 200
@@ -152,7 +150,6 @@ class TestTimeseriesPropertyDataApi:
         timeseries,
         timeseries_property_data,
     ):
-
         tsp_1_id = timeseries_properties[0]
         ts_1_id = timeseries[0]
         tspd_1_id = timeseries_property_data[0]
@@ -163,7 +160,6 @@ class TestTimeseriesPropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(TIMESERIES_PROPERTY_DATA_URL)
             assert ret.status_code == 200
@@ -220,7 +216,6 @@ class TestTimeseriesPropertyDataApi:
         timeseries,
         timeseries_property_data,
     ):
-
         tsp_1_id = timeseries_properties[0]
         ts_1_id = timeseries[0]
         tspd_1_id = timeseries_property_data[0]

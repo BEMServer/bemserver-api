@@ -13,7 +13,6 @@ STOREYS_URL = "/storeys/"
 
 class TestStoreyPropertyDataApi:
     def test_storey_property_data_api(self, app, users, storeys, storey_properties):
-
         creds = users["Chuck"]["creds"]
         storey_1_id = storeys[0]
         storey_2_id = storeys[1]
@@ -23,7 +22,6 @@ class TestStoreyPropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(STOREY_PROPERTY_DATA_URL)
             assert ret.status_code == 200
@@ -180,7 +178,6 @@ class TestStoreyPropertyDataApi:
     def test_storey_property_data_as_user_api(
         self, app, users, storeys, storey_properties, storey_property_data
     ):
-
         user_creds = users["Active"]["creds"]
         storey_1_id = storeys[0]
         storey_p_1_id = storey_properties[0]
@@ -190,7 +187,6 @@ class TestStoreyPropertyDataApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(STOREY_PROPERTY_DATA_URL)
             assert ret.status_code == 200

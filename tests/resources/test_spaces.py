@@ -11,7 +11,6 @@ SPACES_URL = "/spaces/"
 
 class TestSpacesApi:
     def test_spaces_api(self, app, users, campaigns, sites, buildings, storeys):
-
         creds = users["Chuck"]["creds"]
         campaign_2_id = campaigns[1]
         site_2_id = sites[1]
@@ -21,7 +20,6 @@ class TestSpacesApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(SPACES_URL)
             assert ret.status_code == 200
@@ -154,7 +152,6 @@ class TestSpacesApi:
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     def test_spaces_as_user_api(self, app, users, storeys, spaces):
-
         user_creds = users["Active"]["creds"]
         storey_2_id = storeys[1]
         space_1_id = spaces[0]
@@ -163,7 +160,6 @@ class TestSpacesApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(SPACES_URL)
             assert ret.status_code == 200
@@ -216,7 +212,6 @@ class TestSpacesApi:
             assert ret.status_code == 403
 
     def test_spaces_as_anonym_api(self, app, spaces, storeys):
-
         space_1_id = spaces[0]
         storey_1_id = storeys[0]
 

@@ -9,7 +9,6 @@ STOREY_PROPERTIES_URL = "/storey_properties/"
 
 class TestStoreyPropertiesApi:
     def test_storey_properties_api(self, app, users, structural_element_properties):
-
         creds = users["Chuck"]["creds"]
         sep_1_id = structural_element_properties[0]
         sep_2_id = structural_element_properties[1]
@@ -17,7 +16,6 @@ class TestStoreyPropertiesApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(STOREY_PROPERTIES_URL)
             assert ret.status_code == 200
@@ -101,7 +99,6 @@ class TestStoreyPropertiesApi:
     def test_storey_properties_as_user_api(
         self, app, users, structural_element_properties, storey_properties
     ):
-
         user_creds = users["Active"]["creds"]
         sep_1_id = structural_element_properties[0]
         storey_p_1_id = storey_properties[0]
@@ -109,7 +106,6 @@ class TestStoreyPropertiesApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(STOREY_PROPERTIES_URL)
             assert ret.status_code == 200
@@ -136,7 +132,6 @@ class TestStoreyPropertiesApi:
     def test_storey_properties_as_anonym_api(
         self, app, structural_element_properties, storey_properties
     ):
-
         sep_1_id = structural_element_properties[0]
         storey_p_1_id = storey_properties[0]
 

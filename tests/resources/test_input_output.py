@@ -25,7 +25,6 @@ class TestInputOutputSites:
     @pytest.mark.usefixtures("space_properties")
     @pytest.mark.usefixtures("zone_properties")
     def test_sites_csv_post(self, app, user, users, campaigns):
-
         campaign_1_id = campaigns[0]
 
         if user == "admin":
@@ -68,7 +67,6 @@ class TestInputOutputSites:
         )
 
         with auth_context:
-
             ret = client.post(
                 INPUT_OUTPUT_SITES_URL,
                 query_string={
@@ -98,7 +96,6 @@ class TestInputOutputSites:
     @pytest.mark.usefixtures("site_properties")
     @pytest.mark.usefixtures("building_properties")
     def test_sites_csv_post_sites_buildings(self, app, users, campaigns):
-
         campaign_1_id = campaigns[0]
 
         creds = users["Chuck"]["creds"]
@@ -118,7 +115,6 @@ class TestInputOutputSites:
         )
 
         with auth_context:
-
             ret = client.post(
                 INPUT_OUTPUT_SITES_URL,
                 query_string={
@@ -138,7 +134,6 @@ class TestInputOutputSites:
             assert len(ret.json) == 2
 
     def test_sites_csv_post_invalid_encoding(self, app, users, campaigns):
-
         campaign_1_id = campaigns[0]
 
         creds = users["Chuck"]["creds"]
@@ -147,7 +142,6 @@ class TestInputOutputSites:
         client = app.test_client()
 
         with auth_context:
-
             ret = client.post(
                 INPUT_OUTPUT_SITES_URL,
                 query_string={
@@ -174,7 +168,6 @@ class TestInputOutputSites:
     )
     @pytest.mark.usefixtures("sites")
     def test_sites_csv_post_errors(self, app, users, campaigns, buildings_csv):
-
         campaign_1_id = campaigns[0]
 
         creds = users["Chuck"]["creds"]
@@ -183,7 +176,6 @@ class TestInputOutputSites:
         client = app.test_client()
 
         with auth_context:
-
             ret = client.post(
                 INPUT_OUTPUT_SITES_URL,
                 query_string={
@@ -199,7 +191,6 @@ class TestInputOutputSites:
             assert ret.status_code == 422
 
     def test_sites_csv_post_unknown_campaign(self, app, users):
-
         creds = users["Chuck"]["creds"]
         auth_context = AuthHeader(creds)
 
@@ -212,7 +203,6 @@ class TestInputOutputSites:
         )
 
         with auth_context:
-
             ret = client.post(
                 INPUT_OUTPUT_SITES_URL,
                 query_string={
@@ -237,7 +227,6 @@ class TestInputOutputTimeseries:
     @pytest.mark.usefixtures("spaces")
     @pytest.mark.usefixtures("zones")
     def test_timeseries_csv_post(self, app, user, users, campaigns):
-
         campaign_1_id = campaigns[0]
 
         if user == "admin":
@@ -261,7 +250,6 @@ class TestInputOutputTimeseries:
         )
 
         with auth_context:
-
             ret = client.post(
                 INPUT_OUTPUT_TIMESERIES_URL,
                 query_string={
@@ -286,7 +274,6 @@ class TestInputOutputTimeseries:
 
     @pytest.mark.usefixtures("campaign_scopes")
     def test_timeseries_csv_post_invalid_encoding(self, app, users, campaigns):
-
         campaign_1_id = campaigns[0]
 
         creds = users["Chuck"]["creds"]
@@ -295,7 +282,6 @@ class TestInputOutputTimeseries:
         client = app.test_client()
 
         with auth_context:
-
             ret = client.post(
                 INPUT_OUTPUT_TIMESERIES_URL,
                 query_string={
@@ -333,7 +319,6 @@ class TestInputOutputTimeseries:
     )
     @pytest.mark.usefixtures("campaign_scopes")
     def test_timeseries_csv_post_errors(self, app, users, campaigns, timeseries_csv):
-
         campaign_1_id = campaigns[0]
 
         creds = users["Chuck"]["creds"]
@@ -342,7 +327,6 @@ class TestInputOutputTimeseries:
         client = app.test_client()
 
         with auth_context:
-
             ret = client.post(
                 INPUT_OUTPUT_TIMESERIES_URL,
                 query_string={
@@ -358,7 +342,6 @@ class TestInputOutputTimeseries:
             assert ret.status_code == 422
 
     def test_timeseries_csv_post_unknown_campaign(self, app, users):
-
         creds = users["Chuck"]["creds"]
         auth_context = AuthHeader(creds)
 
@@ -374,7 +357,6 @@ class TestInputOutputTimeseries:
         )
 
         with auth_context:
-
             ret = client.post(
                 INPUT_OUTPUT_TIMESERIES_URL,
                 query_string={

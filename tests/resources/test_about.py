@@ -15,7 +15,6 @@ ABOUT_URL = "/about/"
 class TestAboutApi:
     @pytest.mark.parametrize("user", ("user", "admin", "anonym"))
     def test_about_api(self, app, user, users):
-
         if user == "user":
             auth_ctx = AuthHeader(users["Active"]["creds"])
         elif user == "admin":
@@ -26,7 +25,6 @@ class TestAboutApi:
         client = app.test_client()
 
         with auth_ctx:
-
             # GET about info
             ret = client.get(ABOUT_URL)
             assert ret.status_code == 200

@@ -11,7 +11,6 @@ STOREYS_URL = "/storeys/"
 
 class TestStoreysApi:
     def test_storeys_api(self, app, users, campaigns, sites, buildings):
-
         creds = users["Chuck"]["creds"]
         campaign_2_id = campaigns[1]
         site_2_id = sites[1]
@@ -20,7 +19,6 @@ class TestStoreysApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(STOREYS_URL)
             assert ret.status_code == 200
@@ -149,7 +147,6 @@ class TestStoreysApi:
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     def test_storeys_as_user_api(self, app, users, buildings, storeys):
-
         user_creds = users["Active"]["creds"]
         building_2_id = buildings[1]
         storey_1_id = storeys[0]
@@ -158,7 +155,6 @@ class TestStoreysApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(STOREYS_URL)
             assert ret.status_code == 200
@@ -211,7 +207,6 @@ class TestStoreysApi:
             assert ret.status_code == 403
 
     def test_storeys_as_anonym_api(self, app, storeys, buildings):
-
         storey_1_id = storeys[0]
         building_1_id = buildings[0]
 

@@ -13,13 +13,11 @@ CAMPAIGNS_URL = "/campaigns/"
 
 class TestCampaignsApi:
     def test_campaigns_api(self, app, users):
-
         creds = users["Chuck"]["creds"]
 
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(CAMPAIGNS_URL)
             assert ret.status_code == 200
@@ -186,14 +184,12 @@ class TestCampaignsApi:
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     def test_campaigns_as_user_api(self, app, users, campaigns):
-
         user_creds = users["Active"]["creds"]
         campaign_1_id, campaign_2_id = campaigns
 
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(CAMPAIGNS_URL)
             assert ret.status_code == 200
@@ -261,7 +257,6 @@ class TestCampaignsApi:
             assert ret.status_code == 403
 
     def test_campaigns_as_anonym_api(self, app, campaigns):
-
         campaign_1_id, _ = campaigns
 
         client = app.test_client()

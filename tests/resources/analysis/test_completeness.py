@@ -39,7 +39,6 @@ class TestAnalysisApiCompleteness:
         client = app.test_client()
 
         with auth_context:
-
             query_url = COMPLETENESS_URL
             ts_l = (ts_1_id,)
 

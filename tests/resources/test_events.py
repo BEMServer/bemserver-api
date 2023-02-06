@@ -28,7 +28,6 @@ class TestEventsApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(EVENTS_URL)
             assert ret.status_code == 200
@@ -223,7 +222,6 @@ class TestEventsApi:
         zones,
         timeseries,
     ):
-
         creds = users["Chuck"]["creds"]
         site_1_id = sites[0]
         building_1_id = buildings[0]
@@ -320,7 +318,6 @@ class TestEventsApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(EVENTS_URL)
             assert ret.status_code == 200

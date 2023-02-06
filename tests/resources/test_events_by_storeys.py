@@ -12,7 +12,6 @@ EVENTS_URL = "/events/"
 
 class TestEventByStoreyApi:
     def test_events_by_storeys_api(self, app, users, storeys, events):
-
         creds = users["Chuck"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -22,7 +21,6 @@ class TestEventByStoreyApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(EVENTS_BY_STOREYS_URL)
             assert ret.status_code == 200
@@ -134,7 +132,6 @@ class TestEventByStoreyApi:
     def test_events_by_storeys_as_user_api(
         self, app, users, storeys, events, events_by_storeys
     ):
-
         user_creds = users["Active"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -146,7 +143,6 @@ class TestEventByStoreyApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(EVENTS_BY_STOREYS_URL)
             assert ret.status_code == 200

@@ -11,14 +11,12 @@ SITES_URL = "/sites/"
 
 class TestSitesApi:
     def test_sites_api(self, app, users, campaigns):
-
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
 
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(SITES_URL)
             assert ret.status_code == 200
@@ -139,7 +137,6 @@ class TestSitesApi:
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     def test_sites_as_user_api(self, app, users, campaigns, sites):
-
         user_creds = users["Active"]["creds"]
         campaign_2_id = campaigns[1]
         site_1_id = sites[0]
@@ -148,7 +145,6 @@ class TestSitesApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(SITES_URL)
             assert ret.status_code == 200
@@ -201,7 +197,6 @@ class TestSitesApi:
             assert ret.status_code == 403
 
     def test_sites_as_anonym_api(self, app, sites, campaigns):
-
         site_1_id = sites[0]
         campaign_1_id = campaigns[0]
 

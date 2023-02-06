@@ -12,7 +12,6 @@ EVENTS_URL = "/events/"
 
 class TestEventBySpaceApi:
     def test_events_by_spaces_api(self, app, users, spaces, events):
-
         creds = users["Chuck"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -22,7 +21,6 @@ class TestEventBySpaceApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(EVENTS_BY_SPACES_URL)
             assert ret.status_code == 200
@@ -136,7 +134,6 @@ class TestEventBySpaceApi:
     def test_events_by_spaces_as_user_api(
         self, app, users, spaces, events, events_by_spaces
     ):
-
         user_creds = users["Active"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -148,7 +145,6 @@ class TestEventBySpaceApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(EVENTS_BY_SPACES_URL)
             assert ret.status_code == 200

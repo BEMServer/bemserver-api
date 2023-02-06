@@ -16,7 +16,6 @@ uve = sqla.exc.IntegrityError(None, None, None)
 class TestIntegrityError:
     @pytest.mark.parametrize("error", (uve, fkve, uve))
     def test_blp_integrity_error(self, error):
-
         app = flask.Flask("Test")
         api = Api(
             app, spec_kwargs={"title": "Test", "version": "1", "openapi_version": "3"}

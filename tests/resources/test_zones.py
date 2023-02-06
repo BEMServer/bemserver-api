@@ -11,14 +11,12 @@ ZONES_URL = "/zones/"
 
 class TestZonesApi:
     def test_zones_api(self, app, users, campaigns):
-
         creds = users["Chuck"]["creds"]
         campaign_1_id = campaigns[0]
 
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(ZONES_URL)
             assert ret.status_code == 200
@@ -139,7 +137,6 @@ class TestZonesApi:
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     def test_zones_as_user_api(self, app, users, campaigns, zones):
-
         user_creds = users["Active"]["creds"]
         campaign_2_id = campaigns[1]
         zone_1_id = zones[0]
@@ -148,7 +145,6 @@ class TestZonesApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(ZONES_URL)
             assert ret.status_code == 200
@@ -201,7 +197,6 @@ class TestZonesApi:
             assert ret.status_code == 403
 
     def test_zones_as_anonym_api(self, app, zones, campaigns):
-
         zone_1_id = zones[0]
         campaign_1_id = campaigns[0]
 

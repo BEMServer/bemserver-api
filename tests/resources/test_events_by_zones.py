@@ -12,7 +12,6 @@ EVENTS_URL = "/events/"
 
 class TestEventByZoneApi:
     def test_events_by_zones_api(self, app, users, zones, events):
-
         creds = users["Chuck"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -22,7 +21,6 @@ class TestEventByZoneApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-
             # GET list
             ret = client.get(EVENTS_BY_ZONES_URL)
             assert ret.status_code == 200
@@ -130,7 +128,6 @@ class TestEventByZoneApi:
     def test_events_by_zones_as_user_api(
         self, app, users, zones, events, events_by_zones
     ):
-
         user_creds = users["Active"]["creds"]
         event_1_id = events[0]
         event_2_id = events[1]
@@ -142,7 +139,6 @@ class TestEventByZoneApi:
         client = app.test_client()
 
         with AuthHeader(user_creds):
-
             # GET list
             ret = client.get(EVENTS_BY_ZONES_URL)
             assert ret.status_code == 200
