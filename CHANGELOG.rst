@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.11.0 (2023-02-08)
++++++++++++++++++++
+
+Other changes:
+
+- Require bemserver-core 0.9.1
+
 0.10.3 (2023-02-03)
 +++++++++++++++++++
 
@@ -29,7 +36,7 @@ Bug fixes:
 
 Other changes:
 
-- Require bemserver-core 0.8.1.
+- Require bemserver-core 0.8.1
 
 0.10.0 (2023-01-17)
 +++++++++++++++++++
@@ -40,7 +47,7 @@ Features:
 
 Other changes:
 
-- Require bemserver-core 0.8.0.
+- Require bemserver-core 0.8.0
 
 0.9.0 (2023-01-12)
 ++++++++++++++++++
@@ -63,7 +70,7 @@ Features:
 
 Other changes:
 
-- Require bemserver-core 0.7.0.
+- Require bemserver-core 0.7.0
 
 0.7.0 (2023-01-06)
 ++++++++++++++++++
@@ -76,7 +83,7 @@ Features:
 
 Other changes:
 
-- Require bemserver-core 0.6.0.
+- Require bemserver-core 0.6.0
 
 0.6.0 (2022-12-22)
 ++++++++++++++++++
@@ -88,7 +95,7 @@ Features:
 
 Other changes:
 
-- Require bemserver-core 0.5.0.
+- Require bemserver-core 0.5.0
 
 0.5.0 (2022-12-15)
 ++++++++++++++++++
@@ -101,38 +108,38 @@ Features:
 
 Other changes:
 
-- Require bemserver-core 0.4.0.
+- Require bemserver-core 0.4.0
 
 0.4.0 (2022-12-09)
 ++++++++++++++++++
 
 Features:
 
-- EventBySite, EventByBuilding,... resources.
-- Remove PUT endpoint in TimeseriesByEvent resources.
+- EventBySite, EventByBuilding,... resources
+- Remove PUT endpoint in TimeseriesByEvent resources
 
 Other changes:
 
-- Require bemserver-core 0.3.0.
+- Require bemserver-core 0.3.0
 
 0.3.0 (2022-12-06)
 ++++++++++++++++++
 
 Features:
 
-- Event resources.
-- Check missing data scheduled task.
-- Hardcode ``API_VERSION`` and ``OPENAPI_VERSION``.
-- Set ``API_VERSION`` as ``bemserver_api.__version__``.
+- Event resources
+- Check missing data scheduled task
+- Hardcode ``API_VERSION`` and ``OPENAPI_VERSION``
+- Set ``API_VERSION`` as ``bemserver_api.__version__``
 
 Bug fixes:
 
-- Fix ``API_VERSION``.
+- Fix ``API_VERSION``
 
 Other changes:
 
-- Require bemserver-core 0.2.1.
-- Support Python 3.11.
+- Require bemserver-core 0.2.1
+- Support Python 3.11
 
 
 0.2.0 (2022-11-30)
@@ -140,17 +147,17 @@ Other changes:
 
 Features:
 
-- Timeseries data IO: provide JSON I/O.
-- Timeseries data IO: improve error handling.
-- Timeseries data IO: data in request/response body.
+- Timeseries data IO: provide JSON I/O
+- Timeseries data IO: improve error handling
+- Timeseries data IO: data in request/response body
 
 Other changes:
 
-- Require bemserver-core 0.2.
+- Require bemserver-core 0.2.0
 
 0.1.0 (2022-11-18)
 ++++++++++++++++++
 
 Features:
 
-- Support bemserver-core 0.1.
+- Support bemserver-core 0.1.0
