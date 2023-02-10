@@ -36,6 +36,8 @@ class TestTimeseriesByEventApi:
             assert ret.status_code == 201
             ret_val = ret.json
             tbs_1_id = ret_val.pop("id")
+            assert "id" not in ret_val.pop("event")
+            assert "id" not in ret_val.pop("timeseries")
             assert ret_val == tbs_1
 
             # POST violating unique constraint
@@ -66,6 +68,8 @@ class TestTimeseriesByEventApi:
             assert ret.status_code == 200
             ret_val = ret.json
             ret_val.pop("id")
+            assert "id" not in ret_val.pop("event")
+            assert "id" not in ret_val.pop("timeseries")
             assert ret_val == tbs_1
 
             # POST
@@ -167,6 +171,9 @@ class TestTimeseriesByEventApi:
             # GET by id
             ret = client.get(f"{TIMESERIES_BY_EVENTS_URL}{tbs_1_id}")
             assert ret.status_code == 200
+            ret_val = ret.json
+            assert "id" not in ret_val.pop("event")
+            assert "id" not in ret_val.pop("timeseries")
 
             # GET by id not in campaign scope
             ret = client.get(f"{TIMESERIES_BY_EVENTS_URL}{tbs_2_id}")
