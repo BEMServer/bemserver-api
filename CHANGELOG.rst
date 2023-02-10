@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.11.1 (2023-02-10)
++++++++++++++++++++
+
+Features:
+
+- Embed Timeseries and Event in TimeseriesByEvent response
+
 0.11.0 (2023-02-09)
 +++++++++++++++++++
 
