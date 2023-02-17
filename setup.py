@@ -34,7 +34,7 @@ setup(
         "flask>=2.0.0",
         "python-dotenv>=0.9.0",
         "marshmallow>=3.18.0,<4.0",
-        "sqlalchemy>=1.4.40,<2.0",
+        "sqlalchemy>=1.4.40,<3.0",
         "marshmallow-sqlalchemy>=0.24.0",
         "flask_smorest>=0.40.0,<0.41",
         "flask-httpauth>=0.5.0",
