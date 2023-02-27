@@ -5,6 +5,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.scheduled_tasks import ST_CleanupByTimeseries
 
 from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api.extensions import ma_fields
 
 
 class ST_CleanupByTimeseriesSchema(AutoSchema):
@@ -18,7 +19,7 @@ class ST_CleanupByTimeseriesFullSchema(Schema):
     id = ma.fields.Int()
     timeseries_id = ma.fields.Int()
     timeseries_name = ma.fields.Str()
-    timeseries_unit_symbol = ma.fields.Str()
+    timeseries_unit_symbol = ma_fields.UnitSymbol()
     last_timestamp = ma.fields.AwareDateTime(allow_none=True)
 
 
