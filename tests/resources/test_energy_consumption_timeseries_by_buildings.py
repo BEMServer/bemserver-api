@@ -38,7 +38,6 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
                 "timeseries_id": ts_1_id,
                 "source_id": energy_source_1_id,
                 "end_use_id": energy_end_use_1_id,
-                "wh_conversion_factor": 1,
             }
             ret = client.post(
                 ENERGY_CONSUMPTION_TIMESERIES_BY_BUILDINGS_URL, json=ectbs_1
@@ -99,7 +98,6 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
                 "timeseries_id": ts_2_id,
                 "source_id": energy_source_1_id,
                 "end_use_id": energy_end_use_1_id,
-                "wh_conversion_factor": 1,
             }
             ret = client.post(
                 ENERGY_CONSUMPTION_TIMESERIES_BY_BUILDINGS_URL, json=ectbs_2
@@ -212,7 +210,6 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
                 "timeseries_id": ts_1_id,
                 "source_id": energy_source_1_id,
                 "end_use_id": energy_end_use_1_id,
-                "wh_conversion_factor": 1,
             }
             ret = client.post(
                 ENERGY_CONSUMPTION_TIMESERIES_BY_BUILDINGS_URL, json=ectbs_3
