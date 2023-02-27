@@ -73,7 +73,7 @@ marshmallow==3.19.0
     #   flask-smorest
     #   marshmallow-sqlalchemy
     #   webargs
-marshmallow-sqlalchemy==0.28.1
+marshmallow-sqlalchemy==0.29.0
     # via bemserver-api (setup.py)
 numpy==1.24.1
     # via pandas
@@ -109,12 +109,14 @@ six==1.16.0
     # via
     #   click-repl
     #   python-dateutil
-sqlalchemy==1.4.46
+sqlalchemy==2.0.4
     # via
     #   alembic
     #   bemserver-api (setup.py)
     #   bemserver-core
     #   marshmallow-sqlalchemy
+typing-extensions==4.5.0
+    # via sqlalchemy
 vine==5.0.0
     # via
     #   amqp
