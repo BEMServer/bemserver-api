@@ -16,7 +16,7 @@ argon2-cffi-bindings==21.2.0
     # via argon2-cffi
 async-timeout==4.0.2
     # via redis
-bemserver-core==0.9.1
+bemserver-core==0.10.1
     # via bemserver-api (setup.py)
 billiard==3.6.4.0
     # via celery
@@ -88,6 +88,8 @@ packaging==23.0
 pandas==1.5.2
     # via bemserver-core
 passlib==1.7.4
+    # via bemserver-core
+pint==0.20.1
     # via bemserver-core
 prompt-toolkit==3.0.36
     # via click-repl
