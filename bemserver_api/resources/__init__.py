@@ -44,7 +44,7 @@ from . import timeseries_by_buildings
 from . import timeseries_by_storeys
 from . import timeseries_by_spaces
 from . import timeseries_by_zones
-from . import energy_sources
+from . import energies
 from . import energy_end_uses
 from . import energy_consumption_timeseries_by_sites
 from . import energy_consumption_timeseries_by_buildings
@@ -102,7 +102,7 @@ MODULES = (
     timeseries_by_storeys,
     timeseries_by_spaces,
     timeseries_by_zones,
-    energy_sources,
+    energies,
     energy_end_uses,
     energy_consumption_timeseries_by_sites,
     energy_consumption_timeseries_by_buildings,

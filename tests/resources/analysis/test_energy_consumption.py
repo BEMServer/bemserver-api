@@ -11,7 +11,7 @@ from bemserver_core.model import (
     UserGroupByCampaignScope,
     Timeseries,
     TimeseriesDataState,
-    EnergySource,
+    Energy,
     EnergyEndUse,
     EnergyConsumptionTimeseriesBySite,
     EnergyConsumptionTimeseriesByBuilding,
@@ -117,64 +117,64 @@ class TestAnalysisApiEnergyConsumption:
                 campaign_1_id, cs_1_id
             )
 
-            source_all = EnergySource.get(name="all").first()
-            source_elec = EnergySource.get(name="electricity").first()
-            source_gas = EnergySource.get(name="natural gas").first()
+            energy_all = Energy.get(name="all").first()
+            energy_elec = Energy.get(name="electricity").first()
+            energy_gas = Energy.get(name="natural gas").first()
             end_use_all = EnergyEndUse.get(name="all").first()
             end_use_heating = EnergyEndUse.get(name="heating").first()
             end_use_cooling = EnergyEndUse.get(name="cooling").first()
 
             ectbs_all_all = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
-                source_id=source_all.id,
+                energy_id=energy_all.id,
                 end_use_id=end_use_all.id,
                 timeseries_id=timeseries[0].id,
             )
             ectbs_all_heating = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
-                source_id=source_all.id,
+                energy_id=energy_all.id,
                 end_use_id=end_use_heating.id,
                 timeseries_id=timeseries[1].id,
             )
             ectbs_all_cooling = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
-                source_id=source_all.id,
+                energy_id=energy_all.id,
                 end_use_id=end_use_cooling.id,
                 timeseries_id=timeseries[2].id,
             )
             ectbs_elec_all = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
-                source_id=source_elec.id,
+                energy_id=energy_elec.id,
                 end_use_id=end_use_all.id,
                 timeseries_id=timeseries[3].id,
             )
             ectbs_elec_heating = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
-                source_id=source_elec.id,
+                energy_id=energy_elec.id,
                 end_use_id=end_use_heating.id,
                 timeseries_id=timeseries[4].id,
             )
             ectbs_elec_cooling = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
-                source_id=source_elec.id,
+                energy_id=energy_elec.id,
                 end_use_id=end_use_cooling.id,
                 timeseries_id=timeseries[5].id,
             )
             ectbs_gas_all = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
-                source_id=source_gas.id,
+                energy_id=energy_gas.id,
                 end_use_id=end_use_all.id,
                 timeseries_id=timeseries[6].id,
             )
             ectbs_gas_heating = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
-                source_id=source_gas.id,
+                energy_id=energy_gas.id,
                 end_use_id=end_use_heating.id,
                 timeseries_id=timeseries[7].id,
             )
             ectbs_gas_cooling = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
-                source_id=source_gas.id,
+                energy_id=energy_gas.id,
                 end_use_id=end_use_cooling.id,
                 timeseries_id=timeseries[8].id,
             )
@@ -303,64 +303,64 @@ class TestAnalysisApiEnergyConsumption:
                 campaign_1_id, cs_1_id
             )
 
-            source_all = EnergySource.get(name="all").first()
-            source_elec = EnergySource.get(name="electricity").first()
-            source_gas = EnergySource.get(name="natural gas").first()
+            energy_all = Energy.get(name="all").first()
+            energy_elec = Energy.get(name="electricity").first()
+            energy_gas = Energy.get(name="natural gas").first()
             end_use_all = EnergyEndUse.get(name="all").first()
             end_use_heating = EnergyEndUse.get(name="heating").first()
             end_use_cooling = EnergyEndUse.get(name="cooling").first()
 
             ectbs_all_all = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
-                source_id=source_all.id,
+                energy_id=energy_all.id,
                 end_use_id=end_use_all.id,
                 timeseries_id=timeseries[0].id,
             )
             ectbs_all_heating = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
-                source_id=source_all.id,
+                energy_id=energy_all.id,
                 end_use_id=end_use_heating.id,
                 timeseries_id=timeseries[1].id,
             )
             ectbs_all_cooling = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
-                source_id=source_all.id,
+                energy_id=energy_all.id,
                 end_use_id=end_use_cooling.id,
                 timeseries_id=timeseries[2].id,
             )
             ectbs_elec_all = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
-                source_id=source_elec.id,
+                energy_id=energy_elec.id,
                 end_use_id=end_use_all.id,
                 timeseries_id=timeseries[3].id,
             )
             ectbs_elec_heating = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
-                source_id=source_elec.id,
+                energy_id=energy_elec.id,
                 end_use_id=end_use_heating.id,
                 timeseries_id=timeseries[4].id,
             )
             ectbs_elec_cooling = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
-                source_id=source_elec.id,
+                energy_id=energy_elec.id,
                 end_use_id=end_use_cooling.id,
                 timeseries_id=timeseries[5].id,
             )
             ectbs_gas_all = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
-                source_id=source_gas.id,
+                energy_id=energy_gas.id,
                 end_use_id=end_use_all.id,
                 timeseries_id=timeseries[6].id,
             )
             ectbs_gas_heating = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
-                source_id=source_gas.id,
+                energy_id=energy_gas.id,
                 end_use_id=end_use_heating.id,
                 timeseries_id=timeseries[7].id,
             )
             ectbs_gas_cooling = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
-                source_id=source_gas.id,
+                energy_id=energy_gas.id,
                 end_use_id=end_use_cooling.id,
                 timeseries_id=timeseries[8].id,
             )

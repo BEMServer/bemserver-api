@@ -6,13 +6,13 @@ from tests.common import AuthHeader
 
 DUMMY_ID = "69"
 
-ENERGY_SOURCES_URL = "/energy_sources/"
+ENERGIES_URL = "/energies/"
 ENERGY_END_USES_URL = "/energy_end_uses/"
 
 
-class TestEnergySourcesApi:
+class TestEnergiesApi:
     @pytest.mark.parametrize("user", ("user", "admin"))
-    def test_energy_sources_api_as_admin_or_user(self, app, user, users):
+    def test_energies_api_as_admin_or_user(self, app, user, users):
         if user == "user":
             creds = users["Active"]["creds"]
         else:
@@ -21,14 +21,14 @@ class TestEnergySourcesApi:
         client = app.test_client()
 
         with AuthHeader(creds):
-            ret = client.get(ENERGY_SOURCES_URL)
+            ret = client.get(ENERGIES_URL)
             assert ret.status_code == 200
             assert "all" in [e["name"] for e in ret.json]
 
-    def test_enery_sources_api_as_anonym(self, app):
+    def test_energies_api_as_anonym(self, app):
         client = app.test_client()
 
-        ret = client.get(ENERGY_SOURCES_URL)
+        ret = client.get(ENERGIES_URL)
         assert ret.status_code == 401
 
 

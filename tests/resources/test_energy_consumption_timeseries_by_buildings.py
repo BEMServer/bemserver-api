@@ -14,14 +14,14 @@ BUILDINGS_URL = "/buildings/"
 
 class TestEnergyConsumptionTimeseriesByBuildingApi:
     def test_energy_consumption_timeseries_by_buildings_api(
-        self, app, users, buildings, timeseries, energy_sources, energy_end_uses
+        self, app, users, buildings, timeseries, energies, energy_end_uses
     ):
         creds = users["Chuck"]["creds"]
         building_1_id = buildings[0]
         building_2_id = buildings[1]
         ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
-        energy_source_1_id = energy_sources[1]
+        energy_1_id = energies[1]
         energy_end_use_1_id = energy_end_uses[1]
 
         client = app.test_client()
@@ -36,7 +36,7 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
             ectbs_1 = {
                 "building_id": building_1_id,
                 "timeseries_id": ts_1_id,
-                "source_id": energy_source_1_id,
+                "energy_id": energy_1_id,
                 "end_use_id": energy_end_use_1_id,
             }
             ret = client.post(
@@ -96,7 +96,7 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
             ectbs_2 = {
                 "building_id": building_2_id,
                 "timeseries_id": ts_2_id,
-                "source_id": energy_source_1_id,
+                "energy_id": energy_1_id,
                 "end_use_id": energy_end_use_1_id,
             }
             ret = client.post(
@@ -181,7 +181,7 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
         users,
         buildings,
         timeseries,
-        energy_sources,
+        energies,
         energy_end_uses,
         energy_consumption_timeseries_by_buildings,
     ):
@@ -189,7 +189,7 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
         building_1_id = buildings[0]
         ts_1_id = timeseries[0]
         ts_3_id = timeseries[2]
-        energy_source_1_id = energy_sources[1]
+        energy_1_id = energies[1]
         energy_end_use_1_id = energy_end_uses[1]
         ectbs_1_id = energy_consumption_timeseries_by_buildings[0]
 
@@ -208,7 +208,7 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
             ectbs_3 = {
                 "building_id": building_1_id,
                 "timeseries_id": ts_1_id,
-                "source_id": energy_source_1_id,
+                "energy_id": energy_1_id,
                 "end_use_id": energy_end_use_1_id,
             }
             ret = client.post(
