@@ -48,6 +48,7 @@ from . import energy_sources
 from . import energy_end_uses
 from . import energy_consumption_timeseries_by_sites
 from . import energy_consumption_timeseries_by_buildings
+from . import weather_timeseries_by_sites
 from . import input_output
 from . import analysis
 from . import st_cleanups_by_campaigns
@@ -105,6 +106,7 @@ MODULES = (
     energy_end_uses,
     energy_consumption_timeseries_by_sites,
     energy_consumption_timeseries_by_buildings,
+    weather_timeseries_by_sites,
     input_output,
     analysis,
     st_cleanups_by_campaigns,

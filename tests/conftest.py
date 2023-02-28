@@ -801,6 +801,23 @@ def energy_consumption_timeseries_by_buildings(app, timeseries, buildings):
 
 
 @pytest.fixture
+def weather_timeseries_by_sites(app, timeseries, sites):
+    with OpenBar():
+        ectbs_1 = model.WeatherTimeseriesBySite.new(
+            site_id=sites[0],
+            parameter=model.WeatherParameterEnum.AIR_TEMPERATURE,
+            timeseries_id=timeseries[0],
+        )
+        ectbs_2 = model.WeatherTimeseriesBySite.new(
+            site_id=sites[1],
+            parameter=model.WeatherParameterEnum.RELATIVE_HUMIDITY,
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (ectbs_1.id, ectbs_2.id)
+
+
+@pytest.fixture
 def st_cleanups_by_campaigns(app, campaigns):
     with OpenBar():
         st_cbc_1 = scheduled_tasks.ST_CleanupByCampaign.new(campaign_id=campaigns[0])
