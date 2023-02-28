@@ -1,6 +1,19 @@
 Changelog
 ---------
 
+0.12.0 (2023-02-28)
++++++++++++++++++++
+
+Features:
+
+- Validate unit symbols in timeseries and properties
+- Remove wh_conversion_factor from EnergyConsumptionTimeseriesBySite/Building
+
+Other changes:
+
+- Require bemserver-core 0.10.1
+- Require SQLAlchemy 2.0
+
 0.11.1 (2023-02-10)
 +++++++++++++++++++
 
