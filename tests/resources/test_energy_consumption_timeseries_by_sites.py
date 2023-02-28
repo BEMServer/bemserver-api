@@ -36,7 +36,6 @@ class TestEnergyConsumptionTimeseriesBySiteApi:
                 "timeseries_id": ts_1_id,
                 "source_id": energy_source_1_id,
                 "end_use_id": energy_end_use_1_id,
-                "wh_conversion_factor": 1,
             }
             ret = client.post(ENERGY_CONSUMPTION_TIMESERIES_BY_SITES_URL, json=ectbs_1)
             assert ret.status_code == 201
@@ -93,7 +92,6 @@ class TestEnergyConsumptionTimeseriesBySiteApi:
                 "timeseries_id": ts_2_id,
                 "source_id": energy_source_1_id,
                 "end_use_id": energy_end_use_1_id,
-                "wh_conversion_factor": 1,
             }
             ret = client.post(ENERGY_CONSUMPTION_TIMESERIES_BY_SITES_URL, json=ectbs_2)
             ret_val = ret.json
@@ -204,7 +202,6 @@ class TestEnergyConsumptionTimeseriesBySiteApi:
                 "timeseries_id": ts_1_id,
                 "source_id": energy_source_1_id,
                 "end_use_id": energy_end_use_1_id,
-                "wh_conversion_factor": 1,
             }
             ret = client.post(ENERGY_CONSUMPTION_TIMESERIES_BY_SITES_URL, json=ectbs_3)
             assert ret.status_code == 403

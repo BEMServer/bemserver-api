@@ -29,7 +29,7 @@ class TestTimeseriesDataStatesApi:
             tsp_1 = {
                 "name": "Deutsche Qualität",
                 "value_type": "float",
-                "unit_symbol": "Qualität unit",
+                "unit_symbol": "kW",
             }
             ret = client.post(TIMESERIES_PROPERTIES_URL, json=tsp_1)
             assert ret.status_code == 201
@@ -125,14 +125,14 @@ class TestTimeseriesDataStatesApi:
             assert len(ret_val) == nb_bool
             ret = client.get(
                 TIMESERIES_PROPERTIES_URL,
-                query_string={"unit_symbol": "Qualität unit"},
+                query_string={"unit_symbol": "kW"},
             )
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
             ret = client.get(
                 TIMESERIES_PROPERTIES_URL,
-                query_string={"unit_symbol": "Qualità unit"},
+                query_string={"unit_symbol": "W"},
             )
             assert ret.status_code == 200
             ret_val = ret.json

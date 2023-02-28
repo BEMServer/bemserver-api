@@ -41,6 +41,7 @@ class TestAnalysisApiEnergyConsumption:
                 name=f"Timeseries {i+1}",
                 campaign_id=campaign_id,
                 campaign_scope_id=campaign_scope_id,
+                unit_symbol=("Wh" if i < 6 else "kWh"),
             )
             timeseries.append(ts_i)
         db.session.add_all(timeseries)
@@ -164,21 +165,18 @@ class TestAnalysisApiEnergyConsumption:
                 source_id=source_gas.id,
                 end_use_id=end_use_all.id,
                 timeseries_id=timeseries[6].id,
-                wh_conversion_factor=1000,
             )
             ectbs_gas_heating = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
                 source_id=source_gas.id,
                 end_use_id=end_use_heating.id,
                 timeseries_id=timeseries[7].id,
-                wh_conversion_factor=1000,
             )
             ectbs_gas_cooling = EnergyConsumptionTimeseriesBySite.new(
                 site_id=sites[0],
                 source_id=source_gas.id,
                 end_use_id=end_use_cooling.id,
                 timeseries_id=timeseries[8].id,
-                wh_conversion_factor=1000,
             )
             db.session.add_all(
                 (
@@ -327,21 +325,18 @@ class TestAnalysisApiEnergyConsumption:
                 source_id=source_gas.id,
                 end_use_id=end_use_all.id,
                 timeseries_id=timeseries[6].id,
-                wh_conversion_factor=1000,
             )
             ectbs_gas_heating = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
                 source_id=source_gas.id,
                 end_use_id=end_use_heating.id,
                 timeseries_id=timeseries[7].id,
-                wh_conversion_factor=1000,
             )
             ectbs_gas_cooling = EnergyConsumptionTimeseriesByBuilding.new(
                 building_id=buildings[0],
                 source_id=source_gas.id,
                 end_use_id=end_use_cooling.id,
                 timeseries_id=timeseries[8].id,
-                wh_conversion_factor=1000,
             )
             db.session.add_all(
                 (
