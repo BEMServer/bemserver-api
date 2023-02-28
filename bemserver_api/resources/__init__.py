@@ -49,6 +49,8 @@ from . import energy_end_uses
 from . import energy_production_technologies
 from . import energy_consumption_timeseries_by_sites
 from . import energy_consumption_timeseries_by_buildings
+from . import energy_production_timeseries_by_sites
+from . import energy_production_timeseries_by_buildings
 from . import weather_timeseries_by_sites
 from . import input_output
 from . import analysis
@@ -108,6 +110,8 @@ MODULES = (
     energy_production_technologies,
     energy_consumption_timeseries_by_sites,
     energy_consumption_timeseries_by_buildings,
+    energy_production_timeseries_by_sites,
+    energy_production_timeseries_by_buildings,
     weather_timeseries_by_sites,
     input_output,
     analysis,

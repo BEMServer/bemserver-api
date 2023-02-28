@@ -763,6 +763,12 @@ def energy_end_uses(app):
 
 
 @pytest.fixture
+def energy_production_technologies(app):
+    with OpenBar():
+        return [x.id for x in model.EnergyProductionTechnology.get()]
+
+
+@pytest.fixture
 def energy_consumption_timeseries_by_sites(app, timeseries, sites):
     with OpenBar():
         ectbs_1 = model.EnergyConsumptionTimeseriesBySite.new(
@@ -798,6 +804,44 @@ def energy_consumption_timeseries_by_buildings(app, timeseries, buildings):
         )
         db.session.commit()
     return (ectbs_1.id, ectbs_2.id)
+
+
+@pytest.fixture
+def energy_production_timeseries_by_sites(app, timeseries, sites):
+    with OpenBar():
+        ectbs_1 = model.EnergyProductionTimeseriesBySite.new(
+            site_id=sites[0],
+            energy_id=1,
+            prod_tech_id=1,
+            timeseries_id=timeseries[0],
+        )
+        ectbs_2 = model.EnergyProductionTimeseriesBySite.new(
+            site_id=sites[1],
+            energy_id=2,
+            prod_tech_id=2,
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (ectbs_1.id, ectbs_2.id)
+
+
+@pytest.fixture
+def energy_production_timeseries_by_buildings(app, timeseries, buildings):
+    with OpenBar():
+        ectbb_1 = model.EnergyProductionTimeseriesByBuilding.new(
+            building_id=buildings[0],
+            energy_id=1,
+            prod_tech_id=1,
+            timeseries_id=timeseries[0],
+        )
+        ectbb_2 = model.EnergyProductionTimeseriesByBuilding.new(
+            building_id=buildings[1],
+            energy_id=2,
+            prod_tech_id=2,
+            timeseries_id=timeseries[1],
+        )
+        db.session.commit()
+    return (ectbb_1.id, ectbb_2.id)
 
 
 @pytest.fixture
