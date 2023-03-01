@@ -6,6 +6,7 @@ from bemserver_core.process.energy_consumption import (
     compute_energy_consumption_breakdown_for_building,
 )
 from bemserver_core.model import Site, Building
+from bemserver_core.exceptions import BEMServerCoreDimensionalityError
 
 
 from bemserver_api import Blueprint
@@ -32,14 +33,17 @@ def get_energy_consumption_breakdown_for_site(args, site_id):
     if site is None:
         abort(404)
 
-    brkdwn = compute_energy_consumption_breakdown_for_site(
-        site,
-        args["start_time"],
-        args["end_time"],
-        args["bucket_width_value"],
-        args["bucket_width_unit"],
-        timezone=args["timezone"],
-    )
+    try:
+        brkdwn = compute_energy_consumption_breakdown_for_site(
+            site,
+            args["start_time"],
+            args["end_time"],
+            args["bucket_width_value"],
+            args["bucket_width_unit"],
+            timezone=args["timezone"],
+        )
+    except BEMServerCoreDimensionalityError:
+        abort(409, message="Incompatible unit in input timeseries.")
 
     return brkdwn
 
@@ -55,13 +59,16 @@ def get_energy_consumption_breakdown_for_building(args, building_id):
     if building is None:
         abort(404)
 
-    brkdwn = compute_energy_consumption_breakdown_for_building(
-        building,
-        args["start_time"],
-        args["end_time"],
-        args["bucket_width_value"],
-        args["bucket_width_unit"],
-        timezone=args["timezone"],
-    )
+    try:
+        brkdwn = compute_energy_consumption_breakdown_for_building(
+            building,
+            args["start_time"],
+            args["end_time"],
+            args["bucket_width_value"],
+            args["bucket_width_unit"],
+            timezone=args["timezone"],
+        )
+    except BEMServerCoreDimensionalityError:
+        abort(409, message="Incompatible unit in input timeseries.")
 
     return brkdwn

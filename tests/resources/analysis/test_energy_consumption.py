@@ -211,8 +211,34 @@ class TestAnalysisApiEnergyConsumption:
                 ret_data = ret.json
                 assert ret_data == expected
 
+        # Wrong unit
         with OpenBar():
-            # Remove user <-> timeseries association
+            timeseries[0].unit_symbol = ""
+            db.session.add(timeseries[0])
+            db.session.commit()
+
+        with auth_context:
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                    "timezone": "UTC",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 409
+                ret_data = ret.json
+                assert ret_data["message"] == "Incompatible unit in input timeseries."
+
+        # Without user <-> timeseries association
+        with OpenBar():
+            timeseries[0].unit_symbol = "Wh"
+            db.session.add(timeseries[0])
             ugbcs_1 = UserGroupByCampaignScope.get(campaign_scope_id=cs_1_id).first()
             ugbcs_1.delete()
             db.session.commit()
@@ -371,8 +397,34 @@ class TestAnalysisApiEnergyConsumption:
                 ret_data = ret.json
                 assert ret_data == expected
 
+        # Wrong unit
         with OpenBar():
-            # Remove user <-> timeseries association
+            timeseries[0].unit_symbol = ""
+            db.session.add(timeseries[0])
+            db.session.commit()
+
+        with auth_context:
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                    "timezone": "UTC",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 409
+                ret_data = ret.json
+                assert ret_data["message"] == "Incompatible unit in input timeseries."
+
+        # Without user <-> timeseries association
+        with OpenBar():
+            timeseries[0].unit_symbol = "Wh"
+            db.session.add(timeseries[0])
             ugbcs_1 = UserGroupByCampaignScope.get(campaign_scope_id=cs_1_id).first()
             ugbcs_1.delete()
             db.session.commit()
