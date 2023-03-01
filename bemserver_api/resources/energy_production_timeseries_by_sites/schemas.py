@@ -5,6 +5,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.model import EnergyProductionTimeseriesBySite
 
 from bemserver_api import AutoSchema, Schema
+from ..timeseries.schemas import TimeseriesSchema
 
 
 class EnergyProductionTimeseriesBySiteSchema(AutoSchema):
@@ -12,6 +13,7 @@ class EnergyProductionTimeseriesBySiteSchema(AutoSchema):
         model = EnergyProductionTimeseriesBySite
 
     id = msa.auto_field(dump_only=True)
+    timeseries = ma.fields.Nested(TimeseriesSchema(exclude=("id",)), dump_only=True)
 
 
 class EnergyProductionTimeseriesBySiteQueryArgsSchema(Schema):

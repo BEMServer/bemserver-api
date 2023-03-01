@@ -46,6 +46,7 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
             ret_val = ret.json
             ectbb_1_id = ret_val.pop("id")
             ectbb_1_etag = ret.headers["ETag"]
+            assert "id" not in ret_val.pop("timeseries")
             assert ret_val == ectbb_1
 
             # POST violating unique constraint
@@ -69,6 +70,7 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
             assert ret.headers["ETag"] == ectbb_1_etag
             ret_val = ret.json
             ret_val.pop("id")
+            assert "id" not in ret_val.pop("timeseries")
             assert ret_val == ectbb_1
 
             # PUT
@@ -82,6 +84,7 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
             ret_val = ret.json
             ret_val.pop("id")
             ectbb_1_etag = ret.headers["ETag"]
+            assert "id" not in ret_val.pop("timeseries")
             assert ret_val == ectbb_1
 
             # PUT wrong ID -> 404
@@ -202,6 +205,7 @@ class TestEnergyConsumptionTimeseriesByBuildingApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             ectbb_1 = ret_val[0]
+            assert "id" not in ectbb_1.pop("timeseries")
             assert ectbb_1.pop("id") == ectbb_1_id
 
             # POST
