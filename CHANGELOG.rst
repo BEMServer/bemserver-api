@@ -1,6 +1,21 @@
 Changelog
 ---------
 
+0.13.0 (2023-03-01)
++++++++++++++++++++
+
+Features:
+
+- Rename EnergySource -> Energy
+- EnergyProductionTechnology API
+- EnergyProductionTimeseriesBySite/Building API
+- Embed Timeseries in EnergyConsumption/ProductionByTimeseries response
+- WeatherTimeseriesBySite API
+
+Other changes:
+
+- Require bemserver-core 0.11.0
+
 0.12.1 (2023-03-01)
 +++++++++++++++++++
 
