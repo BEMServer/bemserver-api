@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+0.12.1 (2023-03-01)
++++++++++++++++++++
+
+Bug fixes:
+
+- Fix error messages returned with 409 responses on integrity errors
+- Catch BEMServerCoreDimensionalityError when computing energy consumption
+  breakdown to return a 409 with meaningful error instead of a 500
+
 0.12.0 (2023-02-28)
 +++++++++++++++++++
 
