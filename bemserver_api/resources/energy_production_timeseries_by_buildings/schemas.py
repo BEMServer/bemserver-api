@@ -1,24 +1,24 @@
-"""Energy consumption timeseries by sites API schemas"""
+"""Energy production timeseries by buildings API schemas"""
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 
-from bemserver_core.model import EnergyConsumptionTimeseriesBySite
+from bemserver_core.model import EnergyProductionTimeseriesByBuilding
 
 from bemserver_api import AutoSchema, Schema
 from ..timeseries.schemas import TimeseriesSchema
 
 
-class EnergyConsumptionTimeseriesBySiteSchema(AutoSchema):
+class EnergyProductionTimeseriesByBuildingSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
-        model = EnergyConsumptionTimeseriesBySite
+        model = EnergyProductionTimeseriesByBuilding
 
     id = msa.auto_field(dump_only=True)
     timeseries = ma.fields.Nested(TimeseriesSchema(exclude=("id",)), dump_only=True)
 
 
-class EnergyConsumptionTimeseriesBySiteQueryArgsSchema(Schema):
+class EnergyProductionTimeseriesByBuildingQueryArgsSchema(Schema):
     campaign_id = ma.fields.Int()
-    site_id = ma.fields.Int()
+    building_id = ma.fields.Int()
     source_id = ma.fields.Int()
     end_use_id = ma.fields.Int()
     timeseries_id = ma.fields.Int()

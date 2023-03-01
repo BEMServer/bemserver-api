@@ -44,10 +44,14 @@ from . import timeseries_by_buildings
 from . import timeseries_by_storeys
 from . import timeseries_by_spaces
 from . import timeseries_by_zones
-from . import energy_sources
+from . import energies
 from . import energy_end_uses
+from . import energy_production_technologies
 from . import energy_consumption_timeseries_by_sites
 from . import energy_consumption_timeseries_by_buildings
+from . import energy_production_timeseries_by_sites
+from . import energy_production_timeseries_by_buildings
+from . import weather_timeseries_by_sites
 from . import input_output
 from . import analysis
 from . import st_cleanups_by_campaigns
@@ -101,10 +105,14 @@ MODULES = (
     timeseries_by_storeys,
     timeseries_by_spaces,
     timeseries_by_zones,
-    energy_sources,
+    energies,
     energy_end_uses,
+    energy_production_technologies,
     energy_consumption_timeseries_by_sites,
     energy_consumption_timeseries_by_buildings,
+    energy_production_timeseries_by_sites,
+    energy_production_timeseries_by_buildings,
+    weather_timeseries_by_sites,
     input_output,
     analysis,
     st_cleanups_by_campaigns,
