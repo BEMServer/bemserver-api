@@ -8,14 +8,25 @@ import pytest
 from bemserver_api import Api, Blueprint
 
 
-uve = sqla.exc.IntegrityError(None, None, ppe.UniqueViolation())
-fkve = sqla.exc.IntegrityError(None, None, ppe.ForeignKeyViolation())
-uve = sqla.exc.IntegrityError(None, None, None)
-
-
 class TestIntegrityError:
-    @pytest.mark.parametrize("error", (uve, fkve, uve))
-    def test_blp_integrity_error(self, error):
+    @pytest.mark.parametrize(
+        ("error", "message"),
+        (
+            (
+                sqla.exc.IntegrityError(None, None, ppe.UniqueViolation()),
+                "Unique constraint violation",
+            ),
+            (
+                sqla.exc.IntegrityError(None, None, ppe.ForeignKeyViolation()),
+                "Foreign key constraint violation",
+            ),
+            (
+                sqla.exc.IntegrityError(None, None, None),
+                None,
+            ),
+        ),
+    )
+    def test_blp_integrity_error(self, error, message):
         app = flask.Flask("Test")
         api = Api(
             app, spec_kwargs={"title": "Test", "version": "1", "openapi_version": "3"}
@@ -38,7 +49,7 @@ class TestIntegrityError:
         api.register_blueprint(blp)
         client = app.test_client()
 
-        resp = client.get("/test/decorator")
-        assert resp.status_code == 409
-        resp = client.get("/test/decorator_factory")
-        assert resp.status_code == 409
+        for url in ("/test/decorator", "/test/decorator_factory"):
+            resp = client.get(url)
+            assert resp.status_code == 409
+            assert resp.json.get("message") == message
