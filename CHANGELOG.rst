@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.13.1 (2023-03-03)
++++++++++++++++++++
+
+Bug fixes:
+
+- Fix GET Energy Consumption/ProductionTimeseriesBySite/Building query arguments
+
 0.13.0 (2023-03-01)
 +++++++++++++++++++
 
