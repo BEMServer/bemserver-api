@@ -6,6 +6,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.model import Event, EventLevelEnum
 
 from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api.extensions import ma_fields
 
 
 class EventSchema(AutoSchema):
@@ -13,7 +14,7 @@ class EventSchema(AutoSchema):
         model = Event
 
     id = msa.auto_field(dump_only=True)
-    timestamp = ma.fields.AwareDateTime()
+    timestamp = ma_fields.AwareDateTime()
     level = ma.fields.Enum(EventLevelEnum)
 
 
@@ -32,8 +33,8 @@ class EventQueryArgsSchema(Schema):
     category_id = ma.fields.Int()
     level = ma.fields.Enum(EventLevelEnum)
     level_min = ma.fields.Enum(EventLevelEnum)
-    timestamp_min = ma.fields.AwareDateTime()
-    timestamp_max = ma.fields.AwareDateTime()
+    timestamp_min = ma_fields.AwareDateTime()
+    timestamp_max = ma_fields.AwareDateTime()
     timeseries_id = ma.fields.Integer()
     site_id = ma.fields.Int()
     recurse_site_id = ma.fields.Int()

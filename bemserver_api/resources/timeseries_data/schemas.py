@@ -5,7 +5,7 @@ from bemserver_core.input_output.timeseries_data_io import AGGREGATION_FUNCTIONS
 from bemserver_core.time_utils import PERIODS, FIXED_SIZE_PERIODS
 
 from bemserver_api import Schema
-from bemserver_api.extensions.ma_fields import Timezone
+from bemserver_api.extensions import ma_fields
 
 
 class TimeseriesIDListMixinSchema(Schema):
@@ -31,13 +31,13 @@ class TimeseriesNameListMixinSchema(Schema):
 class TimeseriesDataBaseQueryArgsSchema(Schema):
     """Timeseries values query parameters base schema"""
 
-    start_time = ma.fields.AwareDateTime(
+    start_time = ma_fields.AwareDateTime(
         required=True,
         metadata={
             "description": "Initial datetime",
         },
     )
-    end_time = ma.fields.AwareDateTime(
+    end_time = ma_fields.AwareDateTime(
         required=True,
         metadata={
             "description": "End datetime (excluded from the interval)",
@@ -66,7 +66,7 @@ class TimeseriesDataDeleteByNameQueryArgsSchema(
 class TimeseriesDataGetBaseQueryArgsSchema(TimeseriesDataBaseQueryArgsSchema):
     """Timeseries values GET query parameters base schema"""
 
-    timezone = Timezone(
+    timezone = ma_fields.Timezone(
         load_default="UTC",
         metadata={
             "description": "Timezone to use for response data",

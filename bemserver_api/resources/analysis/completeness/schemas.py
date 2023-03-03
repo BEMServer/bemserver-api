@@ -2,7 +2,7 @@
 import marshmallow as ma
 
 from bemserver_api import Schema
-from bemserver_api.extensions.ma_fields import Timezone
+from bemserver_api.extensions import ma_fields
 from bemserver_api.resources.timeseries_data.schemas import TimeseriesBucketWidthSchema
 
 
@@ -61,7 +61,7 @@ class TimeseriesCompletenessSchema(Schema):
 
 class CompletenessSchema(Schema):
     timestamps = ma.fields.List(
-        ma.fields.AwareDateTime,
+        ma_fields.AwareDateTime,
         metadata={
             "description": "Time index (value is bucket start time)",
         },
@@ -73,13 +73,13 @@ class CompletenessSchema(Schema):
 
 
 class CompletenessQueryArgsSchema(TimeseriesBucketWidthSchema):
-    start_time = ma.fields.AwareDateTime(
+    start_time = ma_fields.AwareDateTime(
         required=True,
         metadata={
             "description": "Initial datetime",
         },
     )
-    end_time = ma.fields.AwareDateTime(
+    end_time = ma_fields.AwareDateTime(
         required=True,
         metadata={
             "description": "End datetime (excluded from the interval)",
@@ -98,7 +98,7 @@ class CompletenessQueryArgsSchema(TimeseriesBucketWidthSchema):
             "description": "Data state ID",
         },
     )
-    timezone = Timezone(
+    timezone = ma_fields.Timezone(
         load_default="UTC",
         metadata={
             "description": "Timezone to use for the aggreagation",

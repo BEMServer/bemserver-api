@@ -20,7 +20,7 @@ class ST_CleanupByTimeseriesFullSchema(Schema):
     timeseries_id = ma.fields.Int()
     timeseries_name = ma.fields.Str()
     timeseries_unit_symbol = ma_fields.UnitSymbol()
-    last_timestamp = ma.fields.AwareDateTime(allow_none=True)
+    last_timestamp = ma_fields.AwareDateTime(allow_none=True)
 
 
 class ST_CleanupByTimeseriesQueryArgsSchema(Schema):
