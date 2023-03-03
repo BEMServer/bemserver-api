@@ -19,6 +19,6 @@ class EnergyConsumptionTimeseriesBySiteSchema(AutoSchema):
 class EnergyConsumptionTimeseriesBySiteQueryArgsSchema(Schema):
     campaign_id = ma.fields.Int()
     site_id = ma.fields.Int()
-    source_id = ma.fields.Int()
+    energy_id = ma.fields.Int()
     end_use_id = ma.fields.Int()
     timeseries_id = ma.fields.Int()
