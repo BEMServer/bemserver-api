@@ -1,6 +1,18 @@
 Changelog
 ---------
 
+0.14.0 (unreleased)
++++++++++++++++++++
+
+Features:
+
+- Reject all datetimes before 1680 or after 2260 to avoid pandas issues
+
+Other changes:
+
+- Require bemserver-core 0.11.1
+- Require apispec 6.1.0
+
 0.13.1 (2023-03-03)
 +++++++++++++++++++
 
