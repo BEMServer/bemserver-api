@@ -1,5 +1,6 @@
 """Timeseries data tests"""
 import contextlib
+import datetime as dt
 
 import pytest
 
@@ -152,6 +153,26 @@ class TestTimeseriesDataApi:
                     "timeseries": ts_l,
                     "data_state": ds_id,
                     "timezone": "DTC",
+                },
+                headers={"Accept": f"application/{format_}"},
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 422
+
+            # Datetime out of range
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": dt.datetime(
+                        2500, 1, 1, tzinfo=dt.timezone.utc
+                    ).isoformat(),
+                    "end_time": dt.datetime(
+                        2500, 1, 2, tzinfo=dt.timezone.utc
+                    ).isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
                 },
                 headers={"Accept": f"application/{format_}"},
             )
@@ -313,6 +334,29 @@ class TestTimeseriesDataApi:
                     assert len(ret_csv_lines) > 1
                 else:
                     assert list(ret.json.keys()) == [str(ts_l[0])]
+
+            # Datetime out of range
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": dt.datetime(
+                        2500, 1, 1, tzinfo=dt.timezone.utc
+                    ).isoformat(),
+                    "end_time": dt.datetime(
+                        2500, 1, 2, tzinfo=dt.timezone.utc
+                    ).isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "day",
+                    "timezone": "UTC",
+                },
+                headers={"Accept": f"application/{format_}"},
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 422
 
             # Unknown format
             ret = client.get(

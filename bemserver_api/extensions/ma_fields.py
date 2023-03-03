@@ -1,5 +1,6 @@
 """Custom marshmallow fields"""
 from pathlib import Path
+import datetime as dt
 import json
 
 import marshmallow as ma
@@ -13,6 +14,29 @@ TIMEZONES_FILE = Path(__file__).parent / "timezones.json"
 
 with open(TIMEZONES_FILE, encoding="utf-8") as tz_f:
     TIMEZONES = json.load(tz_f)
+
+
+# https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html
+# Timestamp limitations
+# Since pandas represents timestamps in nanosecond resolution, the time span that
+# can be represented using a 64-bit integer is limited to approximately 584 years:
+# pd.Timestamp.min: Timestamp('1677-09-21 00:12:43.145224193')
+# pd.Timestamp.max: Timestamp('2262-04-11 23:47:16.854775807')
+DATETIME_RANGE_VALIDATOR = ma.validate.Range(
+    dt.datetime(1680, 1, 1, tzinfo=dt.timezone.utc),
+    dt.datetime(2260, 1, 1, tzinfo=dt.timezone.utc),
+)
+
+
+class AwareDateTime(ma.fields.AwareDateTime):
+    """A timezone aware datetime field
+
+    Rejects datetimes that can't be converted to pandas timestamps
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.validators.append(DATETIME_RANGE_VALIDATOR)
 
 
 class Timezone(ma.fields.String):

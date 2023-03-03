@@ -5,6 +5,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.model import Notification
 
 from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api.extensions import ma_fields
 from ..events.schemas import EventSchema
 
 
@@ -26,8 +27,8 @@ class NotificationQueryArgsSchema(Schema):
     user_id = ma.fields.Integer()
     event_id = ma.fields.Integer()
     campaign_id = ma.fields.Integer()
-    timestamp_min = ma.fields.AwareDateTime()
-    timestamp_max = ma.fields.AwareDateTime()
+    timestamp_min = ma_fields.AwareDateTime()
+    timestamp_max = ma_fields.AwareDateTime()
     read = ma.fields.Boolean()
 
 
