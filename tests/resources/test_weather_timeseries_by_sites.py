@@ -37,6 +37,7 @@ class TestWeatherTimeseriesBySiteApi:
             ret_val = ret.json
             wtbs_1_id = ret_val.pop("id")
             wtbs_1_etag = ret.headers["ETag"]
+            assert "id" not in ret_val.pop("timeseries")
             assert ret_val == wtbs_1
 
             # POST violating unique constraint
@@ -56,6 +57,7 @@ class TestWeatherTimeseriesBySiteApi:
             assert ret.headers["ETag"] == wtbs_1_etag
             ret_val = ret.json
             ret_val.pop("id")
+            assert "id" not in ret_val.pop("timeseries")
             assert ret_val == wtbs_1
 
             # PUT
@@ -69,6 +71,7 @@ class TestWeatherTimeseriesBySiteApi:
             ret_val = ret.json
             ret_val.pop("id")
             wtbs_1_etag = ret.headers["ETag"]
+            assert "id" not in ret_val.pop("timeseries")
             assert ret_val == wtbs_1
 
             # PUT wrong ID -> 404
@@ -181,6 +184,7 @@ class TestWeatherTimeseriesBySiteApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             wtbs_1 = ret_val[0]
+            assert "id" not in wtbs_1.pop("timeseries")
             assert wtbs_1.pop("id") == wtbs_1_id
 
             # POST
