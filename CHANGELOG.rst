@@ -1,12 +1,13 @@
 Changelog
 ---------
 
-0.14.0 (unreleased)
+0.14.0 (2023-03-06)
 +++++++++++++++++++
 
 Features:
 
 - Reject all datetimes before 1680 or after 2260 to avoid pandas issues
+- Embed Timeseries in WeatherTimeseriesBySite response
 
 Other changes:
 
@@ -28,7 +29,7 @@ Features:
 - Rename EnergySource -> Energy
 - EnergyProductionTechnology API
 - EnergyProductionTimeseriesBySite/Building API
-- Embed Timeseries in EnergyConsumption/ProductionByTimeseries response
+- Embed Timeseries in EnergyConsumption/ProductionTimeseriesBySite/Building response
 - WeatherTimeseriesBySite API
 
 Other changes:
