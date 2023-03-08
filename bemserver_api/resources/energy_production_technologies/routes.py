@@ -23,5 +23,5 @@ class EnergyProductionTechnologyViews(MethodView):
     @blp.etag
     @blp.response(200, EnergyProductionTechnologySchema(many=True))
     def get(self):
-        """List energy end uses"""
+        """List energy production technologies"""
         return EnergyProductionTechnology.get()
