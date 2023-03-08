@@ -18,7 +18,6 @@ class WeatherTimeseriesBySiteSchema(AutoSchema):
 
 
 class WeatherTimeseriesBySiteQueryArgsSchema(Schema):
-    campaign_id = ma.fields.Int()
     site_id = ma.fields.Int()
     parameter = ma.fields.String()
     timeseries_id = ma.fields.Int()

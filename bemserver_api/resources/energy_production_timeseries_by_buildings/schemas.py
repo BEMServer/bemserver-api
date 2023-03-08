@@ -17,7 +17,6 @@ class EnergyProductionTimeseriesByBuildingSchema(AutoSchema):
 
 
 class EnergyProductionTimeseriesByBuildingQueryArgsSchema(Schema):
-    campaign_id = ma.fields.Int()
     building_id = ma.fields.Int()
     energy_id = ma.fields.Int()
     prod_tech_id = ma.fields.Int()

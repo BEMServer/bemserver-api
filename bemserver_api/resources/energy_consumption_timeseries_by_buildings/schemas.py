@@ -17,7 +17,6 @@ class EnergyConsumptionTimeseriesByBuildingSchema(AutoSchema):
 
 
 class EnergyConsumptionTimeseriesByBuildingQueryArgsSchema(Schema):
-    campaign_id = ma.fields.Int()
     building_id = ma.fields.Int()
     energy_id = ma.fields.Int()
     end_use_id = ma.fields.Int()
