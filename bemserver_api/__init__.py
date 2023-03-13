@@ -43,7 +43,6 @@ def create_app(config_override=None):
     api.init_app(app)
     register_blueprints(api)
 
-    bsc = BEMServerCore()
-    bsc.init_auth()
+    BEMServerCore()
 
     return app
