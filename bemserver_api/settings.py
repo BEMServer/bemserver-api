@@ -4,9 +4,6 @@
 class Config:
     """Default configuration"""
 
-    # SQLAlchemy parameters
-    SQLALCHEMY_DATABASE_URI = ""
-
     # API parameters
     API_TITLE = "BEMServer API"
     OPENAPI_JSON_PATH = "api-spec.json"

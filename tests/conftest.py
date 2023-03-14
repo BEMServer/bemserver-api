@@ -56,6 +56,19 @@ def timescale_db(postgresql_db):
     yield postgresql_db
 
 
+@pytest.fixture(params=(None,))
+def bsc_config(request, timescale_db, tmp_path, monkeypatch):
+    cfg_dict = {
+        "SQLALCHEMY_DATABASE_URI": timescale_db,
+        **(request.param or {}),
+    }
+    cfg = "".join([f"{k}={v!r}\n" for k, v in cfg_dict.items()])
+    cfg_file = tmp_path / "config.py"
+    cfg_file.write_text(cfg)
+    monkeypatch.setenv("BEMSERVER_CORE_SETTINGS_FILE", str(cfg_file))
+    yield cfg_file
+
+
 class TestClient(flask.testing.FlaskClient):
     def open(self, *args, **kwargs):
         auth_header = AUTH_HEADER.get()
@@ -65,11 +78,8 @@ class TestClient(flask.testing.FlaskClient):
 
 
 @pytest.fixture(params=(TestConfig,))
-def app(request, timescale_db):
-    class AppConfig(request.param):
-        SQLALCHEMY_DATABASE_URI = timescale_db
-
-    application = create_app(AppConfig)
+def app(request, bsc_config):
+    application = create_app()
     application.test_client_class = TestClient
     setup_db()
     yield application
