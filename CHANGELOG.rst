@@ -1,6 +1,18 @@
 Changelog
 ---------
 
+0.15.0 (2023-03-14)
++++++++++++++++++++
+
+Feature:
+
+- Leave BEMServerCore configuration to BEMServerCore config file
+- Rename FLASK_SETTINGS_FILE into BEMSERVER_API_SETTINGS_FILE
+
+Other changes:
+
+- Require bemserver-core 0.12.0
+
 0.14.0 (2023-03-06)
 +++++++++++++++++++
 
