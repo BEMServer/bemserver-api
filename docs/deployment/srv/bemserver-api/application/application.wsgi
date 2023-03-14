@@ -9,7 +9,7 @@ os.environ["BEMSERVER_CELERY_SETTINGS_FILE"] = str(
 
 from bemserver_api import create_app  # noqa: E402
 
-os.environ["FLASK_SETTINGS_FILE"] = str(
+os.environ["BEMSERVER_API_SETTINGS_FILE"] = str(
     Path(__file__).parent.resolve() / "settings.cfg"
 )
 
