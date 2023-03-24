@@ -32,6 +32,7 @@ setup(
     python_requires=">=3.9",
     install_requires=[
         "flask>=2.0.0,<3.0",
+        "python-dotenv>=0.9.0",
         "marshmallow>=3.18.0,<4.0",
         "sqlalchemy>=2.0,<3.0",
         "marshmallow-sqlalchemy>=0.29.0,<0.30",
