@@ -101,8 +101,6 @@ pycparser==2.21
     # via cffi
 python-dateutil==2.8.2
     # via pandas
-python-dotenv==0.21.0
-    # via bemserver-api (setup.py)
 pytz==2022.7
     # via
     #   celery
