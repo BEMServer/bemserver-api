@@ -16,7 +16,7 @@ class TestTimeseriesDataApi:
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
     @pytest.mark.parametrize("for_campaign", (True, False))
-    @pytest.mark.parametrize("format_", ("json", "csv"))
+    @pytest.mark.parametrize("mime_type", ("application/json", "text/csv"))
     def test_timeseries_data_get(
         self,
         app,
@@ -26,7 +26,7 @@ class TestTimeseriesDataApi:
         timeseries,
         timeseries_data,
         for_campaign,
-        format_,
+        mime_type,
     ):
         start_time, end_time = timeseries_data
         ts_1_id = timeseries[0]
@@ -64,13 +64,13 @@ class TestTimeseriesDataApi:
                     "timeseries": ts_l,
                     "data_state": ds_id,
                 },
-                headers={"Accept": f"application/{format_}"},
+                headers={"Accept": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 200
-                if format_ == "csv":
+                if mime_type == "text/csv":
                     ret_csv_lines = ret.data.decode("utf-8").splitlines()
                     assert ret_csv_lines[0] == ret_line_1
                     assert ret_csv_lines[1] == "2020-01-01T00:00:00+0000,0.0"
@@ -92,13 +92,13 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                     "timezone": "Europe/Paris",
                 },
-                headers={"Accept": f"application/{format_}"},
+                headers={"Accept": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 200
-                if format_ == "csv":
+                if mime_type == "text/csv":
                     ret_csv_lines = ret.data.decode("utf-8").splitlines()
                     assert ret_csv_lines[0] == ret_line_1
                     assert ret_csv_lines[1] == "2020-01-01T01:00:00+0100,0.0"
@@ -110,6 +110,28 @@ class TestTimeseriesDataApi:
                         "2020-01-01T03:00:00+01:00": 2.0,
                         "2020-01-01T04:00:00+01:00": 3.0,
                     }
+
+            # Accepted mime type not specified: default to application/json
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                assert list(ret.json.keys()) == [str(ts_l[0])]
+                assert ret.json[str(ts_l[0])] == {
+                    "2020-01-01T00:00:00+00:00": 0.0,
+                    "2020-01-01T01:00:00+00:00": 1.0,
+                    "2020-01-01T02:00:00+00:00": 2.0,
+                    "2020-01-01T03:00:00+00:00": 3.0,
+                }
 
             # User not in Timeseries group
             if not for_campaign:
@@ -129,7 +151,7 @@ class TestTimeseriesDataApi:
                     "timeseries": ts_l,
                     "data_state": ds_id,
                 },
-                headers={"Accept": f"application/{format_}"},
+                headers={"Accept": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
@@ -137,7 +159,7 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 200
-                if format_ == "csv":
+                if mime_type == "text/csv":
                     ret_csv_lines = ret.data.decode("utf-8").splitlines()
                     assert ret_csv_lines[0] == ret_line_1
                     assert len(ret_csv_lines) > 1
@@ -154,7 +176,7 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                     "timezone": "DTC",
                 },
-                headers={"Accept": f"application/{format_}"},
+                headers={"Accept": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
@@ -174,35 +196,19 @@ class TestTimeseriesDataApi:
                     "timeseries": ts_l,
                     "data_state": ds_id,
                 },
-                headers={"Accept": f"application/{format_}"},
+                headers={"Accept": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 422
 
-            # Unknown format
-            ret = client.get(
-                query_url,
-                query_string={
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat(),
-                    "timeseries": ts_l,
-                    "data_state": ds_id,
-                },
-                headers={"Accept": "Dummy"},
-            )
-            if user == "anonym":
-                assert ret.status_code == 401
-            else:
-                assert ret.status_code == 406
-
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
     @pytest.mark.parametrize("for_campaign", (True, False))
-    @pytest.mark.parametrize("format_", ("json", "csv"))
+    @pytest.mark.parametrize("mime_type", ("application/json", "text/csv"))
     def test_timeseries_data_get_aggregate(
         self,
         app,
@@ -212,7 +218,7 @@ class TestTimeseriesDataApi:
         timeseries,
         timeseries_data,
         for_campaign,
-        format_,
+        mime_type,
     ):
         start_time, end_time = timeseries_data
         ts_1_id = timeseries[0]
@@ -253,13 +259,13 @@ class TestTimeseriesDataApi:
                     "bucket_width_unit": "day",
                     "timezone": "UTC",
                 },
-                headers={"Accept": f"application/{format_}"},
+                headers={"Accept": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 200
-                if format_ == "csv":
+                if mime_type == "text/csv":
                     ret_csv_lines = ret.data.decode("utf-8").splitlines()
                     assert ret_csv_lines[0] == ret_line_1
                     assert len(ret_csv_lines) > 1
@@ -287,13 +293,13 @@ class TestTimeseriesDataApi:
                     "bucket_width_unit": "hour",
                     "timezone": "UTC",
                 },
-                headers={"Accept": f"application/{format_}"},
+                headers={"Accept": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 200
-                if format_ == "csv":
+                if mime_type == "text/csv":
                     ret_csv_lines = ret.data.decode("utf-8").splitlines()
                     assert ret_csv_lines[0] == ret_line_1
                     assert len(ret_csv_lines) > 1
@@ -320,7 +326,7 @@ class TestTimeseriesDataApi:
                     "bucket_width_value": 1,
                     "bucket_width_unit": "day",
                 },
-                headers={"Accept": f"application/{format_}"},
+                headers={"Accept": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
@@ -328,7 +334,7 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 200
-                if format_ == "csv":
+                if mime_type == "text/csv":
                     ret_csv_lines = ret.data.decode("utf-8").splitlines()
                     assert ret_csv_lines[0] == ret_line_1
                     assert len(ret_csv_lines) > 1
@@ -351,30 +357,12 @@ class TestTimeseriesDataApi:
                     "bucket_width_unit": "day",
                     "timezone": "UTC",
                 },
-                headers={"Accept": f"application/{format_}"},
+                headers={"Accept": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 422
-
-            # Unknown format
-            ret = client.get(
-                f"{query_url}aggregate",
-                query_string={
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat(),
-                    "timeseries": ts_l,
-                    "data_state": ds_id,
-                    "bucket_width_value": 1,
-                    "bucket_width_unit": "day",
-                },
-                headers={"Accept": "Dummy"},
-            )
-            if user == "anonym":
-                assert ret.status_code == 401
-            else:
-                assert ret.status_code == 406
 
     @pytest.mark.parametrize("for_campaign", (True, False))
     def test_timeseries_data_get_aggregate_errors(
@@ -544,9 +532,9 @@ class TestTimeseriesDataApi:
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
     @pytest.mark.parametrize("for_campaign", (True, False))
-    @pytest.mark.parametrize("format_", ("json", "csv"))
+    @pytest.mark.parametrize("mime_type", ("application/json", "text/csv"))
     def test_timeseries_data_post(
-        self, app, user, users, campaigns, timeseries, for_campaign, format_
+        self, app, user, users, campaigns, timeseries, for_campaign, mime_type
     ):
         ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
@@ -575,7 +563,7 @@ class TestTimeseriesDataApi:
                 header = f"Datetime,Timeseries {ts_1_id-1}\n"
                 ts_l = (f"Timeseries {ts_1_id-1}",)
 
-            if format_ == "csv":
+            if mime_type == "text/csv":
                 kwargs = {
                     "data": header
                     + (
@@ -602,7 +590,7 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                 },
                 **kwargs,
-                headers={"Accept": f"application/{format_}"},
+                headers={"content-type": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
@@ -629,7 +617,7 @@ class TestTimeseriesDataApi:
                 header = f"Datetime,Timeseries {ts_2_id-1}\n"
                 ts_l = (f"Timeseries {ts_2_id-1}",)
 
-            if format_ == "csv":
+            if mime_type == "text/csv":
                 kwargs = {
                     "data": header
                     + (
@@ -656,7 +644,7 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                 },
                 **kwargs,
-                headers={"Accept": f"application/{format_}"},
+                headers={"content-type": mime_type},
             )
             if user == "anonym":
                 assert ret.status_code == 401
@@ -676,9 +664,9 @@ class TestTimeseriesDataApi:
                 assert ret.json
 
     @pytest.mark.parametrize("for_campaign", (True, False))
-    @pytest.mark.parametrize("format_", ("json", "csv"))
+    @pytest.mark.parametrize("mime_type", ("application/json", "text/csv"))
     def test_timeseries_data_post_errors(
-        self, app, users, campaigns, timeseries, for_campaign, format_
+        self, app, users, campaigns, timeseries, for_campaign, mime_type
     ):
         campaign_1_id = campaigns[0]
         ts_1_id = timeseries[0]
@@ -694,7 +682,7 @@ class TestTimeseriesDataApi:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
                 header = f"Datetime,Timeseries {ts_1_id-1}\n"
                 ts_l = (f"Timeseries {ts_1_id-1}",)
-                if format_ == "csv":
+                if mime_type == "text/csv":
                     kwargs = {"data": header + "2020-01-01T00:00:00+00:00,0\n"}
                 else:
                     kwargs = {"json": {str(ts_l[0]): {"2020-01-01T00:00:00+00:00": 0}}}
@@ -704,7 +692,7 @@ class TestTimeseriesDataApi:
                         "data_state": ds_id,
                     },
                     **kwargs,
-                    headers={"Accept": f"application/{format_}"},
+                    headers={"content-type": mime_type},
                 )
                 assert ret.status_code == 404
 
@@ -717,7 +705,7 @@ class TestTimeseriesDataApi:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
                 header = f"Datetime,Timeseries {ts_1_id-1}\n"
                 ts_l = (f"Timeseries {ts_1_id-1}",)
-            if format_ == "csv":
+            if mime_type == "text/csv":
                 kwargs = {"data": header + "2020-01-01T00:00:00+00:00,0\n"}
             else:
                 kwargs = {"json": {str(ts_l[0]): {"2020-01-01T00:00:00+00:00": 0}}}
@@ -727,7 +715,7 @@ class TestTimeseriesDataApi:
                     "data_state": DUMMY_ID,
                 },
                 **kwargs,
-                headers={"Accept": f"application/{format_}"},
+                headers={"content-type": mime_type},
             )
             assert ret.status_code == 422
             assert ret.json["errors"]["query"]["data_state"] == "Unknown data state ID"
@@ -742,7 +730,7 @@ class TestTimeseriesDataApi:
                 dummy_ts = "Dummy name"
                 header = f"Datetime,{dummy_ts}\n"
 
-            if format_ == "csv":
+            if mime_type == "text/csv":
                 kwargs = {"data": header + "2020-01-01T00:00:00+00:00,0\n"}
             else:
                 kwargs = {"json": {dummy_ts: {"2020-01-01T00:00:00+00:00": 0}}}
@@ -752,7 +740,7 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                 },
                 **kwargs,
-                headers={"Accept": f"application/{format_}"},
+                headers={"content-type": mime_type},
             )
             assert ret.status_code == 422
             assert ret.json["message"].startswith("Unknown timeseries")
@@ -762,7 +750,7 @@ class TestTimeseriesDataApi:
                 query_url = TIMESERIES_DATA_URL
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-            if format_ == "csv":
+            if mime_type == "text/csv":
                 kwargs = {"data": ""}
             else:
                 kwargs = {"json": {"dummy": []}}
@@ -773,14 +761,14 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                 },
                 **kwargs,
-                headers={"Accept": f"application/{format_}"},
+                headers={"content-type": mime_type},
             )
             assert ret.status_code == 422
 
             # Invalid TS IDs
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
-                if format_ == "csv":
+                if mime_type == "text/csv":
                     kwargs = {
                         "data": "Datetime,Timeseries 1\n2020-01-01T00:00:00+00:00,0\n"
                     }
@@ -795,20 +783,9 @@ class TestTimeseriesDataApi:
                         "data_state": ds_id,
                     },
                     **kwargs,
-                    headers={"Accept": f"application/{format_}"},
+                    headers={"content-type": mime_type},
                 )
                 assert ret.status_code == 422
-
-            # Unknown format
-            ret = client.post(
-                query_url,
-                query_string={
-                    "data_state": ds_id,
-                },
-                **kwargs,
-                headers={"Accept": "Dummy"},
-            )
-            assert ret.status_code == 406
 
             # Invalid payload
             ret = client.post(
@@ -817,23 +794,26 @@ class TestTimeseriesDataApi:
                     "data_state": ds_id,
                 },
                 data=bytes.fromhex("2Ef0"),
-                headers={"Accept": f"application/{format_}"},
+                headers={"content-type": mime_type},
             )
             assert ret.status_code == 422
 
             # Wrong format
-            if format_ == "csv":
+            if mime_type == "text/csv":
                 kwargs = {"data": header + "2020-01-01T00:00:00+00:00,0\n"}
             else:
                 kwargs = {"json": {str(ts_l[0]): {"2020-01-01T00:00:00+00:00": 0}}}
-            wrong_format_ = {"json": "csv", "csv": "json"}[format_]
+            wrong_mime_type = {
+                "application/json": "text/csv",
+                "text/csv": "application/json",
+            }[mime_type]
             ret = client.post(
                 query_url,
                 query_string={
                     "data_state": ds_id,
                 },
                 **kwargs,
-                headers={"Accept": f"application/{wrong_format_}"},
+                headers={"content-type": wrong_mime_type},
             )
             assert ret.status_code == 422
 
@@ -914,6 +894,7 @@ class TestTimeseriesDataApi:
                         "timeseries": ts_l,
                         "data_state": ds_id,
                     },
+                    headers={"Accept": "application/json"},
                 )
                 assert not ret.json
 
@@ -968,7 +949,7 @@ class TestTimeseriesDataApi:
 
     @pytest.mark.parametrize("method", ("get", "delete"))
     @pytest.mark.parametrize("for_campaign", (True, False))
-    def test_timeseries_data_get_delete_errors(
+    def test_timeseries_data_delete_errors(
         self,
         app,
         users,
@@ -1002,6 +983,7 @@ class TestTimeseriesDataApi:
                         "timeseries": ts_l,
                         "data_state": ds_id,
                     },
+                    headers={"Accept": "application/json"},
                 )
                 assert ret.status_code == 404
 
