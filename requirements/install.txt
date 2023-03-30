@@ -49,7 +49,7 @@ flask==2.2.2
     #   flask-smorest
 flask-httpauth==4.7.0
     # via bemserver-api (setup.py)
-flask-smorest==0.40.0
+flask-smorest==0.41.0
     # via bemserver-api (setup.py)
 greenlet==2.0.1
     # via sqlalchemy
