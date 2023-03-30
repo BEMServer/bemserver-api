@@ -1,10 +1,21 @@
 Changelog
 ---------
 
+0.16.0 (2023-03-30)
++++++++++++++++++++
+
+Bug fixes:
+
+- Fix MIME type management and doc in Timeseries data routes
+
+Other changes:
+
+- Set upper bound to requirements versions in setup.py
+
 0.15.0 (2023-03-14)
 +++++++++++++++++++
 
-Feature:
+Features:
 
 - Leave BEMServerCore configuration to BEMServerCore config file
 - Rename FLASK_SETTINGS_FILE into BEMSERVER_API_SETTINGS_FILE
