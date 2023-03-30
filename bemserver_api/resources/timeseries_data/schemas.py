@@ -153,11 +153,3 @@ class TimeseriesDataPostQueryArgsSchema(Schema):
             "description": "Data state ID",
         },
     )
-
-
-class TimeseriesDataGetAcceptHeader(Schema):
-    accept = ma.fields.String(
-        validate=ma.validate.OneOf(["application/json", "application/csv"]),
-        data_key="Accept",
-        load_default="application/json",
-    )
