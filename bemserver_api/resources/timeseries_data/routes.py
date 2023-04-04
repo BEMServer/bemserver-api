@@ -214,7 +214,7 @@ def get_aggregate(args):
 @blp.route("/", methods=("POST",))
 @blp.login_required
 @blp.arguments(TimeseriesDataPostQueryArgsSchema, location="query")
-@blp4c.doc(
+@blp.doc(
     requestBody={
         "content": {
             "application/json": {
