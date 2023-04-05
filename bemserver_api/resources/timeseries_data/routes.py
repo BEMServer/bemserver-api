@@ -147,6 +147,7 @@ def get(args):
             args["end_time"],
             timeseries,
             data_state,
+            convert_to=args.get("convert_to"),
             timezone=args["timezone"],
             col_label="id",
         )
@@ -156,6 +157,7 @@ def get(args):
             args["end_time"],
             timeseries,
             data_state,
+            convert_to=args.get("convert_to"),
             timezone=args["timezone"],
             col_label="id",
         )
@@ -193,6 +195,7 @@ def get_aggregate(args):
             args["bucket_width_value"],
             args["bucket_width_unit"],
             args["aggregation"],
+            convert_to=args.get("convert_to"),
             timezone=args["timezone"],
             col_label="id",
         )
@@ -205,6 +208,7 @@ def get_aggregate(args):
             args["bucket_width_value"],
             args["bucket_width_unit"],
             args["aggregation"],
+            convert_to=args.get("convert_to"),
             timezone=args["timezone"],
             col_label="id",
         )
@@ -313,6 +317,7 @@ def get_for_campaign(args, campaign_id):
             args["end_time"],
             timeseries,
             data_state,
+            convert_to=args.get("convert_to"),
             timezone=args["timezone"],
             col_label="name",
         )
@@ -322,6 +327,7 @@ def get_for_campaign(args, campaign_id):
             args["end_time"],
             timeseries,
             data_state,
+            convert_to=args.get("convert_to"),
             timezone=args["timezone"],
             col_label="name",
         )
@@ -362,6 +368,7 @@ def get_aggregate_for_campaign(args, campaign_id):
             args["bucket_width_value"],
             args["bucket_width_unit"],
             args["aggregation"],
+            convert_to=args.get("convert_to"),
             timezone=args["timezone"],
             col_label="name",
         )
@@ -374,6 +381,7 @@ def get_aggregate_for_campaign(args, campaign_id):
             args["bucket_width_value"],
             args["bucket_width_unit"],
             args["aggregation"],
+            convert_to=args.get("convert_to"),
             timezone=args["timezone"],
             col_label="name",
         )

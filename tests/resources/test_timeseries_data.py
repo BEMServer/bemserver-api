@@ -4,6 +4,10 @@ import datetime as dt
 
 import pytest
 
+from bemserver_core.model import Timeseries
+from bemserver_core.authorization import OpenBar
+from bemserver_api.database import db
+
 from tests.common import AuthHeader
 
 TIMESERIES_DATA_URL = "/timeseries_data/"
@@ -34,6 +38,10 @@ class TestTimeseriesDataApi:
         campaign_1_id = campaigns[0]
         campaign_2_id = campaigns[1]
         ds_id = 1
+
+        with OpenBar():
+            Timeseries.get_by_id(ts_1_id).unit_symbol = "m"
+            db.session.commit()
 
         if user == "admin":
             creds = users["Chuck"]["creds"]
@@ -110,6 +118,52 @@ class TestTimeseriesDataApi:
                         "2020-01-01T03:00:00+01:00": 2.0,
                         "2020-01-01T04:00:00+01:00": 3.0,
                     }
+
+            # Conversions
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "convert_to": ("mm",),
+                },
+                headers={"Accept": mime_type},
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                if mime_type == "text/csv":
+                    ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                    assert ret_csv_lines[0] == ret_line_1
+                    assert ret_csv_lines[1] == "2020-01-01T00:00:00+0000,0.0"
+                else:
+                    assert list(ret.json.keys()) == [str(ts_l[0])]
+                    assert ret.json[str(ts_l[0])] == {
+                        "2020-01-01T00:00:00+00:00": 0.0,
+                        "2020-01-01T01:00:00+00:00": 1000.0,
+                        "2020-01-01T02:00:00+00:00": 2000.0,
+                        "2020-01-01T03:00:00+00:00": 3000.0,
+                    }
+
+            # Conversions: wrong convert_to list size
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "convert_to": ("mm", "m/s"),
+                },
+                headers={"Accept": mime_type},
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 422
 
             # Accepted mime type not specified: default to application/json
             ret = client.get(
@@ -227,6 +281,10 @@ class TestTimeseriesDataApi:
         campaign_2_id = campaigns[1]
         ds_id = 1
 
+        with OpenBar():
+            Timeseries.get_by_id(ts_1_id).unit_symbol = "m"
+            db.session.commit()
+
         if user == "admin":
             creds = users["Chuck"]["creds"]
             auth_context = AuthHeader(creds)
@@ -268,9 +326,12 @@ class TestTimeseriesDataApi:
                 if mime_type == "text/csv":
                     ret_csv_lines = ret.data.decode("utf-8").splitlines()
                     assert ret_csv_lines[0] == ret_line_1
-                    assert len(ret_csv_lines) > 1
+                    assert ret_csv_lines[1] == "2020-01-01T00:00:00+0000,1.5"
+                    assert len(ret_csv_lines) == 2
                 else:
-                    assert list(ret.json.keys()) == [str(ts_l[0])]
+                    assert ret.json == {
+                        str(ts_l[0]): {"2020-01-01T00:00:00+00:00": 1.5}
+                    }
 
             # Set a bucket width value != 1 for a fixed size period
             if not for_campaign:
@@ -305,6 +366,80 @@ class TestTimeseriesDataApi:
                     assert len(ret_csv_lines) > 1
                 else:
                     assert list(ret.json.keys()) == [str(ts_l[0])]
+
+            # Conversions: m -> mm
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+                ret_line_1 = "Datetime,1"
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ret_line_1 = "Datetime,Timeseries 0"
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "day",
+                    "convert_to": ("mm",),
+                },
+                headers={"Accept": mime_type},
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                if mime_type == "text/csv":
+                    ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                    assert ret_csv_lines[0] == ret_line_1
+                    assert ret_csv_lines[1] == "2020-01-01T00:00:00+0000,1500.0"
+                    assert len(ret_csv_lines) == 2
+                else:
+                    assert ret.json == {
+                        str(ts_l[0]): {"2020-01-01T00:00:00+00:00": 1500.0}
+                    }
+
+            # Conversions: "" -> no conversion
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+                ret_line_1 = "Datetime,1"
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ret_line_1 = "Datetime,Timeseries 0"
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "day",
+                    "convert_to": ("",),
+                },
+                headers={"Accept": mime_type},
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                if mime_type == "text/csv":
+                    ret_csv_lines = ret.data.decode("utf-8").splitlines()
+                    assert ret_csv_lines[0] == ret_line_1
+                    assert ret_csv_lines[1] == "2020-01-01T00:00:00+0000,1.5"
+                    assert len(ret_csv_lines) == 2
+                else:
+                    assert ret.json == {
+                        str(ts_l[0]): {"2020-01-01T00:00:00+00:00": 1.5}
+                    }
 
             # User not in Timeseries group
             if not for_campaign:
@@ -523,6 +658,29 @@ class TestTimeseriesDataApi:
                     "bucket_width_value": 2,
                     "bucket_width_unit": "week",
                     "aggregation": "avg",
+                },
+            )
+            assert ret.status_code == 422
+
+            # Conversions: wrong convert_to list size
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width_value": 2,
+                    "bucket_width_unit": "week",
+                    "aggregation": "avg",
+                    "convert_to": ("mm", "m/s"),
                 },
             )
             assert ret.status_code == 422
