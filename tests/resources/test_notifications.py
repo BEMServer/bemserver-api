@@ -172,7 +172,7 @@ class TestNotificationsApi:
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_1_id},
             )
-            assert ret.status_code == 200
+            assert ret.status_code == 204
             ret = client.get(
                 NOTIFICATIONS_URL, query_string={"user_id": user_1_id, "read": False}
             )
@@ -185,7 +185,7 @@ class TestNotificationsApi:
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_2_id, "campaign_id": campaign_1_id},
             )
-            assert ret.status_code == 200
+            assert ret.status_code == 204
             ret = client.get(
                 NOTIFICATIONS_URL, query_string={"user_id": user_2_id, "read": False}
             )
@@ -197,7 +197,7 @@ class TestNotificationsApi:
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_2_id, "campaign_id": campaign_2_id},
             )
-            assert ret.status_code == 200
+            assert ret.status_code == 204
             ret = client.get(
                 NOTIFICATIONS_URL, query_string={"user_id": user_2_id, "read": False}
             )
@@ -312,7 +312,7 @@ class TestNotificationsApi:
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_1_id, "campaign_id": campaign_2_id},
             )
-            assert ret.status_code == 200
+            assert ret.status_code == 204
             ret = client.get(
                 NOTIFICATIONS_URL, query_string={"user_id": user_1_id, "read": False}
             )
@@ -324,7 +324,7 @@ class TestNotificationsApi:
                 f"{NOTIFICATIONS_URL}mark_all_as_read",
                 query_string={"user_id": user_1_id, "campaign_id": campaign_1_id},
             )
-            assert ret.status_code == 200
+            assert ret.status_code == 204
             ret = client.get(
                 NOTIFICATIONS_URL, query_string={"user_id": user_2_id, "read": False}
             )

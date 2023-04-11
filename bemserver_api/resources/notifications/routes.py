@@ -98,7 +98,7 @@ def count_by_campaign(args):
 @blp.put("/mark_all_as_read")
 @blp.login_required
 @blp.arguments(NotificationMarkAllAsReadQueryArgsSchema, location="query")
-@blp.response(200)
+@blp.response(204)
 def mark_all_as_read(args):
     """Mark all notifications as read"""
     Notification.mark_all_as_read(**args)
