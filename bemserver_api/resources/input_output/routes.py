@@ -5,6 +5,7 @@ from flask_smorest import abort
 
 from bemserver_core.model import Campaign
 from bemserver_core.input_output import sites_csv_io, timeseries_csv_io
+from bemserver_core.database import db
 from bemserver_core.exceptions import BEMServerCoreIOError
 
 from bemserver_api import Blueprint
@@ -46,6 +47,8 @@ def sites_csv_io_post(args, files):
     except UnicodeDecodeError as exc:
         abort(422, message=str(exc))
 
+    db.session.commit()
+
 
 @blp.post("/timeseries")
 @blp.login_required
@@ -66,3 +69,5 @@ def timeseries_csv_io_post(args, files):
         abort(422, message=f"Invalid CSV file content: {exc}")
     except UnicodeDecodeError as exc:
         abort(422, message=str(exc))
+
+    db.session.commit()

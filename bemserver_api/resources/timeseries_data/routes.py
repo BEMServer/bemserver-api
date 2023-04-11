@@ -6,6 +6,7 @@ from flask_smorest import abort
 
 from bemserver_core.model import Timeseries, TimeseriesDataState, Campaign
 from bemserver_core.input_output import tsdcsvio, tsdjsonio
+from bemserver_core.database import db
 from bemserver_core.exceptions import (
     TimeseriesNotFoundError,
     TimeseriesDataIOError,
@@ -260,6 +261,8 @@ def post(args):
     except (TimeseriesNotFoundError, TimeseriesDataIOError) as exc:
         abort(422, message=str(exc))
 
+    db.session.commit()
+
 
 @blp.route("/", methods=("DELETE",))
 @blp.login_required
@@ -276,6 +279,8 @@ def delete(args):
         timeseries,
         data_state,
     )
+
+    db.session.commit()
 
 
 @blp4c.route("/", methods=("GET",))
@@ -426,6 +431,8 @@ def post_for_campaign(args, campaign_id):
     except (TimeseriesNotFoundError, TimeseriesDataIOError) as exc:
         abort(422, message=str(exc))
 
+    db.session.commit()
+
 
 @blp4c.route("/", methods=("DELETE",))
 @blp4c.login_required
@@ -443,3 +450,5 @@ def delete_for_campaign(args, campaign_id):
         timeseries,
         data_state,
     )
+
+    db.session.commit()

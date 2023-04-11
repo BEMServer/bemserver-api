@@ -101,4 +101,5 @@ def count_by_campaign(args):
 @blp.response(200)
 def mark_all_as_read(args):
     """Mark all notifications as read"""
-    return Notification.mark_all_as_read(**args)
+    Notification.mark_all_as_read(**args)
+    db.session.commit()
