@@ -80,6 +80,7 @@ class TestClient(flask.testing.FlaskClient):
 @pytest.fixture(params=(TestConfig,))
 def app(request, bsc_config):
     application = create_app()
+    application.config.from_object(TestConfig)
     application.test_client_class = TestClient
     setup_db()
     yield application
