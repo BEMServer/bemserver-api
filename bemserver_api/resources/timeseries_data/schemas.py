@@ -73,6 +73,36 @@ class TimeseriesDataGetBaseQueryArgsSchema(TimeseriesDataBaseQueryArgsSchema):
         },
     )
 
+    convert_to = ma.fields.List(
+        ma.fields.String(),
+        metadata={
+            "description": (
+                "Optional list of units to convert to. "
+                "If passed, must be of same length as timeseries list. "
+                "Empty string means no conversion for a timeseries."
+            ),
+        },
+    )
+
+    @ma.validates_schema
+    def validate_convert_to(self, data, **kwargs):
+        if "convert_to" in data and (
+            len(data["convert_to"]) != len(data["timeseries"])
+        ):
+            raise ma.ValidationError(
+                "If provided, convert_to must be the same size as timeseries."
+            )
+
+    @ma.post_load
+    def make_convert_to_mapping(self, data, **kwargs):
+        if "convert_to" in data:
+            data["convert_to"] = {
+                ts_label: unit
+                for ts_label, unit in zip(data["timeseries"], data["convert_to"])
+                if unit
+            }
+        return data
+
 
 class TimeseriesDataGetByIDQueryArgsSchema(
     TimeseriesDataGetBaseQueryArgsSchema, TimeseriesIDListMixinSchema
