@@ -862,6 +862,9 @@ def energy_production_timeseries_by_buildings(app, timeseries, buildings):
 @pytest.fixture
 def weather_timeseries_by_sites(app, timeseries, sites):
     with OpenBar():
+        # Set units to timeseries
+        model.Timeseries.get_by_id(timeseries[0]).unit_symbol = "°C"
+        model.Timeseries.get_by_id(timeseries[1]).unit_symbol = "percent"
         ectbs_1 = model.WeatherTimeseriesBySite.new(
             site_id=sites[0],
             parameter=model.WeatherParameterEnum.AIR_TEMPERATURE,
