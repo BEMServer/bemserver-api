@@ -21,7 +21,7 @@ blp = Blueprint(
     __name__,
     url_prefix="/st_download_weather_data_by_sites",
     description=(
-        "Operations on download weather data scheduled task x site associations",
+        "Operations on download weather data scheduled task x site associations"
     ),
 )
 
