@@ -1,13 +1,25 @@
 """Site resources"""
+import http
+
 from flask.views import MethodView
 from flask_smorest import abort
 
 from bemserver_core.model import Site
-
+from bemserver_core.process.weather import wdp
+from bemserver_core.exceptions import (
+    BEMServerCoreSettingsError,
+    BEMServerCoreWeatherAPIAuthenticationError,
+    BEMServerCoreWeatherProcessMissingCoordinatesError,
+)
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import SiteSchema, SitePutSchema, SiteQueryArgsSchema
+from .schemas import (
+    SiteSchema,
+    SitePutSchema,
+    SiteQueryArgsSchema,
+    DownloadWeatherDataQueryArgsSchema,
+)
 
 
 blp = Blueprint(
@@ -75,3 +87,23 @@ class SiteByIdViews(MethodView):
         blp.check_etag(item, SiteSchema)
         item.delete()
         db.session.commit()
+
+
+@blp.route("/<int:item_id>/download_weather_data", methods=["PUT"])
+@blp.login_required
+@blp.arguments(DownloadWeatherDataQueryArgsSchema, location="query")
+@blp.response(204)
+@blp.alt_response(409, http.HTTPStatus(409).name)
+def download_weather_data(args, item_id):
+    item = Site.get_by_id(item_id)
+    if item is None:
+        abort(404)
+    try:
+        wdp.get_weather_data_for_site(item, args["start_time"], args["end_time"])
+    except (
+        BEMServerCoreSettingsError,
+        BEMServerCoreWeatherProcessMissingCoordinatesError,
+        BEMServerCoreWeatherAPIAuthenticationError,
+    ) as exc:
+        abort(409, message=str(exc))
+    db.session.commit()
