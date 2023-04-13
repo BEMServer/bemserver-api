@@ -87,9 +87,12 @@ class Blueprint(flask_smorest.Blueprint):
             # Store doc in wrapper function
             # The deepcopy avoids modifying the wrapped function doc
             wrapper._apidoc = deepcopy(getattr(wrapper, "_apidoc", {}))
-            wrapper._apidoc.setdefault("response", {}).setdefault("responses", {})[
-                409
-            ] = http.HTTPStatus(409).name
+            (
+                wrapper._apidoc.setdefault("response", {})
+                .setdefault("responses", {})
+                .setdefault(409, [])
+                .append(http.HTTPStatus(409).name)
+            )
 
             return wrapper
 
