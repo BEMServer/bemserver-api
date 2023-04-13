@@ -1,18 +1,22 @@
 Changelog
 ---------
 
-0.17.0 (unreleased)
+0.17.0 (2023-04-13)
 +++++++++++++++++++
 
 Features:
 
 - Timeseries data IO: add convert_to to convert units on-the-fly on GET
 - Site: add latitude, longitude
-- Download weather data scheduled task
+- Download weather data: resources and scheduled task
+
+Bug fixes:
+
+- Notifications: return 204 on mark_all_as_read
 
 Other changes:
 
-- Require bemserver-core 0.13.0
+- Require bemserver-core 0.13.1
 
 0.16.0 (2023-03-30)
 +++++++++++++++++++
