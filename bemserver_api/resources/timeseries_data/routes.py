@@ -10,6 +10,8 @@ from bemserver_core.database import db
 from bemserver_core.exceptions import (
     TimeseriesNotFoundError,
     TimeseriesDataIOError,
+    BEMServerCoreUndefinedUnitError,
+    BEMServerCoreDimensionalityError,
 )
 
 from bemserver_api import Blueprint
@@ -141,26 +143,29 @@ def get(args):
     timeseries = _get_many_timeseries_by_id(args["timeseries"])
     data_state = _get_data_state(args["data_state"])
 
-    if mime_type == "text/csv":
-        resp = tsdcsvio.export_csv(
-            args["start_time"],
-            args["end_time"],
-            timeseries,
-            data_state,
-            convert_to=args.get("convert_to"),
-            timezone=args["timezone"],
-            col_label="id",
-        )
-    else:
-        resp = tsdjsonio.export_json(
-            args["start_time"],
-            args["end_time"],
-            timeseries,
-            data_state,
-            convert_to=args.get("convert_to"),
-            timezone=args["timezone"],
-            col_label="id",
-        )
+    try:
+        if mime_type == "text/csv":
+            resp = tsdcsvio.export_csv(
+                args["start_time"],
+                args["end_time"],
+                timeseries,
+                data_state,
+                convert_to=args.get("convert_to"),
+                timezone=args["timezone"],
+                col_label="id",
+            )
+        else:
+            resp = tsdjsonio.export_json(
+                args["start_time"],
+                args["end_time"],
+                timeseries,
+                data_state,
+                convert_to=args.get("convert_to"),
+                timezone=args["timezone"],
+                col_label="id",
+            )
+    except (BEMServerCoreUndefinedUnitError, BEMServerCoreDimensionalityError) as exc:
+        abort(422, message=str(exc))
 
     return flask.Response(resp, mimetype=mime_type)
 
@@ -311,26 +316,29 @@ def get_for_campaign(args, campaign_id):
     timeseries = _get_many_timeseries_by_name(campaign, args["timeseries"])
     data_state = _get_data_state(args["data_state"])
 
-    if mime_type == "text/csv":
-        resp = tsdcsvio.export_csv(
-            args["start_time"],
-            args["end_time"],
-            timeseries,
-            data_state,
-            convert_to=args.get("convert_to"),
-            timezone=args["timezone"],
-            col_label="name",
-        )
-    else:
-        resp = tsdjsonio.export_json(
-            args["start_time"],
-            args["end_time"],
-            timeseries,
-            data_state,
-            convert_to=args.get("convert_to"),
-            timezone=args["timezone"],
-            col_label="name",
-        )
+    try:
+        if mime_type == "text/csv":
+            resp = tsdcsvio.export_csv(
+                args["start_time"],
+                args["end_time"],
+                timeseries,
+                data_state,
+                convert_to=args.get("convert_to"),
+                timezone=args["timezone"],
+                col_label="name",
+            )
+        else:
+            resp = tsdjsonio.export_json(
+                args["start_time"],
+                args["end_time"],
+                timeseries,
+                data_state,
+                convert_to=args.get("convert_to"),
+                timezone=args["timezone"],
+                col_label="name",
+            )
+    except (BEMServerCoreUndefinedUnitError, BEMServerCoreDimensionalityError) as exc:
+        abort(422, message=str(exc))
 
     return flask.Response(resp, mimetype=mime_type)
 
