@@ -165,6 +165,40 @@ class TestTimeseriesDataApi:
             else:
                 assert ret.status_code == 422
 
+            # Conversions: wrong convert_to unit
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "convert_to": ("dummy",),
+                },
+                headers={"Accept": mime_type},
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 422
+
+            # Conversions: incompatible convert_to unit
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "convert_to": ("Wh",),
+                },
+                headers={"Accept": mime_type},
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 422
+
             # Accepted mime type not specified: default to application/json
             ret = client.get(
                 query_url,
