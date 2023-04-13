@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.17.1 (2023-04-13)
++++++++++++++++++++
+
+Bug fixes:
+
+- Timeseries data IO: catch convert_to unit errors
+
 0.17.0 (2023-04-13)
 +++++++++++++++++++
 
