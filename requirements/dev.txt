@@ -34,7 +34,7 @@ pre-commit==3.2.2
     # via -r requirements/dev.in
 psutil==5.9.4
     # via mirakuru
-pytest==7.3.0
+pytest==7.3.1
     # via
     #   -r requirements/tests.in
     #   pytest-cov
