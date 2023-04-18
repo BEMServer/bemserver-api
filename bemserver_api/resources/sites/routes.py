@@ -6,10 +6,13 @@ from flask_smorest import abort
 
 from bemserver_core.model import Site
 from bemserver_core.process.weather import wdp
+from bemserver_core.process.degree_days import compute_dd_for_site
 from bemserver_core.exceptions import (
     BEMServerCoreSettingsError,
     BEMServerCoreWeatherAPIAuthenticationError,
     BEMServerCoreWeatherProcessMissingCoordinatesError,
+    BEMServerCoreUnitError,
+    BEMServerCoreDegreeDayProcessMissingTemperatureError,
 )
 from bemserver_api import Blueprint
 from bemserver_api.database import db
@@ -19,6 +22,7 @@ from .schemas import (
     SitePutSchema,
     SiteQueryArgsSchema,
     DownloadWeatherDataQueryArgsSchema,
+    GetDegreeDaysQueryArgsSchema,
 )
 
 
@@ -107,3 +111,29 @@ def download_weather_data(args, item_id):
     ) as exc:
         abort(409, message=str(exc))
     db.session.commit()
+
+
+@blp.route("/<int:item_id>/degree_days", methods=["GET"])
+@blp.login_required
+@blp.arguments(GetDegreeDaysQueryArgsSchema, location="query")
+@blp.response(200)
+@blp.alt_response(409, http.HTTPStatus(409).name)
+def get_degree_days(args, item_id):
+    item = Site.get_by_id(item_id)
+    if item is None:
+        abort(404)
+    try:
+        dd_s = compute_dd_for_site(
+            item,
+            args["start_date"],
+            args["end_date"],
+            period=args["period"],
+            type_=args["type_"],
+            base=args["base"],
+            unit=args["unit"],
+        )
+    except BEMServerCoreDegreeDayProcessMissingTemperatureError as exc:
+        abort(409, message=str(exc))
+    except BEMServerCoreUnitError as exc:
+        abort(422, message=str(exc))
+    return dd_s.to_json(date_format="iso")
