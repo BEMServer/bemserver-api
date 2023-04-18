@@ -17,7 +17,7 @@ class TimeseriesPropertySchema(AutoSchema):
     id = msa.auto_field(dump_only=True)
     name = msa.auto_field(validate=ma.validate.Length(1, 80))
     value_type = ma.fields.Enum(PropertyType, metadata={"default": "string"})
-    unit_symbol = ma_fields.UnitSymbol(validate=ma.validate.Length(0, 20))
+    unit_symbol = ma_fields.UnitSymbol()
 
 
 class TimeseriesPropertyPutSchema(TimeseriesPropertySchema):
