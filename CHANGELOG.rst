@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.17.3 (2023-04-18)
++++++++++++++++++++
+
+Bug fixes:
+
+- Site Heating/Cooling Degree Days: fix type enum
+
 0.17.2 (2023-04-18)
 +++++++++++++++++++
 
