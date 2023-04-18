@@ -99,6 +99,11 @@ class SiteByIdViews(MethodView):
 @blp.response(204)
 @blp.alt_response(409, http.HTTPStatus(409).name)
 def download_weather_data(args, item_id):
+    """Download weather data for a site
+
+    Download weather data from external web service and store it in DB.
+    Requires weather timeseries to be defined.
+    """
     item = Site.get_by_id(item_id)
     if item is None:
         abort(404)
@@ -119,6 +124,11 @@ def download_weather_data(args, item_id):
 @blp.response(200)
 @blp.alt_response(409, http.HTTPStatus(409).name)
 def get_degree_days(args, item_id):
+    """Get degree days for a site
+
+    Computes degree days on-the-fly.
+    Requires air temperature timeseries to be defined.
+    """
     item = Site.get_by_id(item_id)
     if item is None:
         abort(404)
