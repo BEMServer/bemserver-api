@@ -11,6 +11,7 @@ import pytest
 from bemserver_core.model import Timeseries, TimeseriesDataState
 from bemserver_core.input_output import tsdio
 from bemserver_core.authorization import OpenBar
+from bemserver_api.database import db
 
 from tests.common import AuthHeader
 
@@ -477,3 +478,304 @@ class TestSitesDownloadWeatherDataApi:
             )
             assert ret.status_code == 409
             assert ret.json["message"] == "Wrong API key."
+
+    @pytest.mark.parametrize("type_", ("heating", "cooling"))
+    @pytest.mark.parametrize("base", (18, 19.5))
+    @pytest.mark.parametrize("unit", ("°C", "°F"))
+    @pytest.mark.usefixtures("weather_timeseries_by_sites")
+    def test_sites_get_degree_days(
+        self, app, users, sites, timeseries, type_, base, unit
+    ):
+        creds = users["Chuck"]["creds"]
+        site_1_id = sites[0]
+
+        start_d = dt.date(2020, 1, 1)
+        end_d = dt.date(2021, 1, 1)
+        post_d = dt.date(2022, 1, 1)
+
+        air_temp_ts_id = timeseries[0]
+
+        if unit == "°F":
+            base = base * 9 / 5 + 32
+
+        with OpenBar():
+            ds_clean = TimeseriesDataState.get(name="Clean").first()
+
+            index = pd.date_range(
+                start_d, end_d, freq="H", tz="UTC", inclusive="left", name="timestamp"
+            )
+            weather_df = pd.DataFrame(index=index)
+            weather_df[air_temp_ts_id] = index.month
+            if type_ == "cooling":
+                weather_df[air_temp_ts_id] += 20
+
+            # Introduce a bias to check that computation method uses min/max
+            weather_df[air_temp_ts_id] += 5
+            weather_df[air_temp_ts_id][index.hour == 1] -= 10
+
+            tsdio.set_timeseries_data(weather_df, data_state=ds_clean)
+            db.session.commit()
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+            # Daily DD
+            ret = client.get(
+                f"{SITES_URL}{site_1_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": end_d.isoformat(),
+                    "period": "day",
+                    "type": type_,
+                    "base": base,
+                    "unit": unit,
+                },
+            )
+            assert ret.status_code == 200
+            ret_data = ret.json
+
+            expected_d_index = pd.date_range(
+                "2020-01-01",
+                "2021-01-01",
+                freq="D",
+                tz="UTC",
+                inclusive="left",
+                name="timestamp",
+            )
+            month_avg_temp = expected_d_index.month
+            if type_ == "cooling":
+                month_avg_temp += 20
+            if unit == "°F":
+                month_avg_temp = month_avg_temp * 9 / 5 + 32
+            expected_d = pd.Series(
+                (month_avg_temp - base)
+                if type_ == "cooling"
+                else (base - month_avg_temp),
+                index=expected_d_index,
+                dtype="float",
+            )
+            assert ret_data == expected_d.to_json(date_format="iso")
+
+            # Monthly DD
+            ret = client.get(
+                f"{SITES_URL}{site_1_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": end_d.isoformat(),
+                    "period": "month",
+                    "type": type_,
+                    "base": base,
+                    "unit": unit,
+                },
+            )
+            assert ret.status_code == 200
+            ret_data = ret.json
+
+            expected_m = expected_d.resample("MS").sum()
+            assert ret_data == expected_m.to_json(date_format="iso")
+
+            # Yearly DD
+            ret = client.get(
+                f"{SITES_URL}{site_1_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": end_d.isoformat(),
+                    "period": "year",
+                    "type": type_,
+                    "base": base,
+                    "unit": unit,
+                },
+            )
+            assert ret.status_code == 200
+            ret_data = ret.json
+
+            expected_y = expected_d.resample("AS").sum()
+            assert ret_data == expected_y.to_json(date_format="iso")
+
+            # Missing data
+            ret = client.get(
+                f"{SITES_URL}{site_1_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": post_d.isoformat(),
+                    "period": "day",
+                    "type": type_,
+                    "base": base,
+                    "unit": unit,
+                },
+            )
+            assert ret.status_code == 200
+            ret_data = ret.json
+
+            expected_post_index = pd.date_range(
+                "2021-01-01",
+                "2022-01-01",
+                freq="D",
+                tz="UTC",
+                inclusive="left",
+                name="timestamp",
+            )
+            expected_post = pd.Series(
+                None,
+                index=expected_post_index,
+                dtype="float",
+            )
+            assert ret_data == pd.concat((expected_d, expected_post)).to_json(
+                date_format="iso"
+            )
+
+            # Wrong unit
+            ret = client.get(
+                f"{SITES_URL}{site_1_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": post_d.isoformat(),
+                    "period": "day",
+                    "unit": "dummy",
+                },
+            )
+            assert ret.status_code == 422
+            ret_data = ret.json
+
+            # Incompatible unit
+            ret = client.get(
+                f"{SITES_URL}{site_1_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": post_d.isoformat(),
+                    "period": "day",
+                    "unit": "Wh",
+                },
+            )
+            assert ret.status_code == 422
+            ret_data = ret.json
+
+            # Undefined site
+            ret = client.get(
+                f"{SITES_URL}{DUMMY_ID}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": post_d.isoformat(),
+                    "period": "day",
+                },
+            )
+            assert ret.status_code == 404
+            ret_data = ret.json
+
+    def test_sites_get_degree_days_missing_temperature_ts(self, app, users, sites):
+        creds = users["Chuck"]["creds"]
+        site_1_id = sites[0]
+
+        start_d = dt.date(2020, 1, 1)
+        end_d = dt.date(2021, 1, 1)
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+            # Daily DD
+            ret = client.get(
+                f"{SITES_URL}{site_1_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": end_d.isoformat(),
+                    "period": "day",
+                },
+            )
+            assert ret.status_code == 409
+
+    @pytest.mark.usefixtures("weather_timeseries_by_sites")
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaigns")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    def test_sites_get_degree_days_as_user(self, app, users, sites, timeseries):
+        creds = users["Active"]["creds"]
+        site_1_id = sites[0]
+        site_2_id = sites[1]
+
+        start_d = dt.date(2020, 1, 1)
+        end_d = dt.date(2021, 1, 1)
+
+        air_temp_ts_id = timeseries[0]
+
+        with OpenBar():
+            ds_clean = TimeseriesDataState.get(name="Clean").first()
+
+            index = pd.date_range(
+                start_d, end_d, freq="H", tz="UTC", inclusive="left", name="timestamp"
+            )
+            weather_df = pd.DataFrame(index=index)
+            weather_df[air_temp_ts_id] = index.month
+
+            tsdio.set_timeseries_data(weather_df, data_state=ds_clean)
+            db.session.commit()
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+            # User in campaign and in air temperature TS campaign scope
+            ret = client.get(
+                f"{SITES_URL}{site_1_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": end_d.isoformat(),
+                    "period": "day",
+                    "type": "heating",
+                    "base": "18",
+                    "unit": "°C",
+                },
+            )
+            assert ret.status_code == 200
+            ret_data = ret.json
+
+            expected_d_index = pd.date_range(
+                "2020-01-01",
+                "2021-01-01",
+                freq="D",
+                tz="UTC",
+                inclusive="left",
+                name="timestamp",
+            )
+            month_avg_temp = expected_d_index.month
+            expected_d = pd.Series(
+                18 - month_avg_temp,
+                index=expected_d_index,
+                dtype="float",
+            )
+            assert ret_data == expected_d.to_json(date_format="iso")
+
+            # Wrong campaign: site not found
+            ret = client.get(
+                f"{SITES_URL}{site_2_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": end_d.isoformat(),
+                    "period": "day",
+                },
+            )
+            assert ret.status_code == 403
+
+    @pytest.mark.usefixtures("weather_timeseries_by_sites")
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaigns")
+    def test_sites_get_degree_days_as_user_wtbs_denied(self, app, users, sites):
+        """Air temperature defined but in unauthorized campaign scope"""
+
+        creds = users["Active"]["creds"]
+        site_1_id = sites[0]
+
+        start_d = dt.date(2020, 1, 1)
+        end_d = dt.date(2021, 1, 1)
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+            # User in campaign but not in air temperature TS campaign scope
+            ret = client.get(
+                f"{SITES_URL}{site_1_id}/degree_days",
+                query_string={
+                    "start_date": start_d.isoformat(),
+                    "end_date": end_d.isoformat(),
+                    "period": "day",
+                },
+            )
+            assert ret.status_code == 409
