@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+0.17.2 (2023-04-18)
++++++++++++++++++++
+
+Features:
+
+- Site Heating/Cooling Degree Days computation resource
+
+Other changes:
+
+- Require bemserver-core 0.13.2
+
 0.17.1 (2023-04-13)
 +++++++++++++++++++
 
