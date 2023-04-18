@@ -61,7 +61,7 @@ class GetDegreeDaysQueryArgsSchema(Schema):
     period = ma.fields.String(validate=ma.validate.OneOf(("day", "month", "year")))
     type_ = ma.fields.String(
         data_key="type",
-        validate=ma.validate.OneOf(("heating", "cooling", "year")),
+        validate=ma.validate.OneOf(("heating", "cooling")),
         load_default="heating",
     )
     base = ma.fields.Float(load_default="18.0")
