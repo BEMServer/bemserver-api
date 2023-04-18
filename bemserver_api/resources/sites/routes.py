@@ -11,7 +11,7 @@ from bemserver_core.exceptions import (
     BEMServerCoreSettingsError,
     BEMServerCoreWeatherAPIAuthenticationError,
     BEMServerCoreWeatherProcessMissingCoordinatesError,
-    BEMServerCoreUnitError,
+    BEMServerCoreDimensionalityError,
     BEMServerCoreDegreeDayProcessMissingTemperatureError,
 )
 from bemserver_api import Blueprint
@@ -134,6 +134,6 @@ def get_degree_days(args, item_id):
         )
     except BEMServerCoreDegreeDayProcessMissingTemperatureError as exc:
         abort(409, message=str(exc))
-    except BEMServerCoreUnitError as exc:
+    except BEMServerCoreDimensionalityError as exc:
         abort(422, message=str(exc))
     return dd_s.to_json(date_format="iso")

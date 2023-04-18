@@ -10,7 +10,6 @@ from bemserver_core.database import db
 from bemserver_core.exceptions import (
     TimeseriesNotFoundError,
     TimeseriesDataIOError,
-    BEMServerCoreUndefinedUnitError,
     BEMServerCoreDimensionalityError,
 )
 
@@ -164,7 +163,7 @@ def get(args):
                 timezone=args["timezone"],
                 col_label="id",
             )
-    except (BEMServerCoreUndefinedUnitError, BEMServerCoreDimensionalityError) as exc:
+    except BEMServerCoreDimensionalityError as exc:
         abort(422, message=str(exc))
 
     return flask.Response(resp, mimetype=mime_type)
@@ -337,7 +336,7 @@ def get_for_campaign(args, campaign_id):
                 timezone=args["timezone"],
                 col_label="name",
             )
-    except (BEMServerCoreUndefinedUnitError, BEMServerCoreDimensionalityError) as exc:
+    except BEMServerCoreDimensionalityError as exc:
         abort(422, message=str(exc))
 
     return flask.Response(resp, mimetype=mime_type)

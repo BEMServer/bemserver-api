@@ -74,7 +74,7 @@ class TimeseriesDataGetBaseQueryArgsSchema(TimeseriesDataBaseQueryArgsSchema):
     )
 
     convert_to = ma.fields.List(
-        ma.fields.String(),
+        ma_fields.UnitSymbol(),
         metadata={
             "description": (
                 "Optional list of units to convert to. "
