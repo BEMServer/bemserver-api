@@ -14,4 +14,6 @@ class Config:
         "theme": "dark",
         "show-header": "false",
         "render-style": "focused",
+        "allow-spec-file-download": "true",
+        "show-components": "true",
     }
