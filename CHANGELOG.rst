@@ -1,6 +1,19 @@
 Changelog
 ---------
 
+0.18.0 (2023-04-21)
++++++++++++++++++++
+
+Features:
+
+- Site Heating/Cooling Degree Days: rework response
+- Add TimeseriesDataIO stats resource
+- RapidDoc: allow-spec-file-download, show-components
+
+Other changes:
+
+- Require bemserver-core 0.13.4
+
 0.17.3 (2023-04-18)
 +++++++++++++++++++
 
