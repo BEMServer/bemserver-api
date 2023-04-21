@@ -18,7 +18,7 @@ argon2-cffi-bindings==21.2.0
     # via argon2-cffi
 async-timeout==4.0.2
     # via redis
-bemserver-core==0.13.3
+bemserver-core==0.13.4
     # via bemserver-api (setup.py)
 billiard==3.6.4.0
     # via celery
