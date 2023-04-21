@@ -1,4 +1,5 @@
 """Site resources"""
+from textwrap import dedent
 import http
 
 from flask.views import MethodView
@@ -23,6 +24,17 @@ from .schemas import (
     SiteQueryArgsSchema,
     DownloadWeatherDataQueryArgsSchema,
     GetDegreeDaysQueryArgsSchema,
+    DegreeDaysSchema,
+)
+
+
+DEGREE_DAYS_EXAMPLE = dedent(
+    """\
+    {
+        "2020-01-01T00:00:00+00:00": 690.0,
+        "2020-02-01T00:00:00+00:00": 420.0,
+        "2020-03-01T00:00:00+00:00": 120.0,
+    }"""
 )
 
 
@@ -121,7 +133,7 @@ def download_weather_data(args, item_id):
 @blp.route("/<int:item_id>/degree_days", methods=["GET"])
 @blp.login_required
 @blp.arguments(GetDegreeDaysQueryArgsSchema, location="query")
-@blp.response(200)
+@blp.response(200, DegreeDaysSchema, example=DEGREE_DAYS_EXAMPLE)
 @blp.alt_response(409, http.HTTPStatus(409).name)
 def get_degree_days(args, item_id):
     """Get degree days for a site
@@ -146,4 +158,5 @@ def get_degree_days(args, item_id):
         abort(409, message=str(exc))
     except BEMServerCoreDimensionalityError as exc:
         abort(422, message=str(exc))
-    return dd_s.to_json(date_format="iso")
+
+    return {"degree_days": dd_s.to_dict()}
