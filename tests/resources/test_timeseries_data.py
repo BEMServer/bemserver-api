@@ -20,6 +20,93 @@ class TestTimeseriesDataApi:
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
     @pytest.mark.parametrize("for_campaign", (True, False))
+    def test_timeseries_data_stats(
+        self,
+        app,
+        user,
+        users,
+        campaigns,
+        timeseries,
+        timeseries_data,
+        for_campaign,
+    ):
+        start_time, end_time = timeseries_data
+        h3_dt = start_time + dt.timedelta(hours=3)
+        ts_1_id = timeseries[0]
+        ts_2_id = timeseries[1]
+        campaign_1_id = campaigns[0]
+        campaign_2_id = campaigns[1]
+        ds_id = 1
+
+        if user == "admin":
+            creds = users["Chuck"]["creds"]
+            auth_context = AuthHeader(creds)
+        elif user == "user":
+            creds = users["Active"]["creds"]
+            auth_context = AuthHeader(creds)
+        else:
+            auth_context = contextlib.nullcontext()
+
+        client = app.test_client()
+
+        with auth_context:
+            if not for_campaign:
+                query_url = f"{TIMESERIES_DATA_URL}stats"
+                ts_l = (ts_1_id,)
+            else:
+                query_url = f"{TIMESERIES_DATA_URL}campaign/{campaign_1_id}/stats"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                query_url,
+                query_string={
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                assert ret.json == {
+                    "stats": {
+                        str(ts_l[0]): {
+                            "avg": 1.5,
+                            "first_timestamp": start_time.isoformat(),
+                            "last_timestamp": h3_dt.isoformat(),
+                            "max": 3.0,
+                            "min": 0.0,
+                            "stddev": 1.2909944487358056,
+                        }
+                    }
+                }
+
+            if not for_campaign:
+                query_url = f"{TIMESERIES_DATA_URL}stats"
+                ts_l = (ts_2_id,)
+            else:
+                query_url = f"{TIMESERIES_DATA_URL}campaign/{campaign_2_id}/stats"
+                ts_l = (f"Timeseries {ts_2_id-1}",)
+
+            ret = client.get(
+                query_url,
+                query_string={
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            elif user == "user":
+                assert ret.status_code == 403
+            else:
+                assert ret.status_code == 200
+
+    @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
+    @pytest.mark.usefixtures("users_by_user_groups")
+    @pytest.mark.usefixtures("user_groups_by_campaigns")
+    @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    @pytest.mark.parametrize("for_campaign", (True, False))
     @pytest.mark.parametrize("mime_type", ("application/json", "text/csv"))
     def test_timeseries_data_get(
         self,

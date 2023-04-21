@@ -28,6 +28,84 @@ class TimeseriesNameListMixinSchema(Schema):
     )
 
 
+class TimeseriesDataGetStatsBaseQueryArgsSchema(Schema):
+    data_state = ma.fields.Int(
+        required=True,
+        metadata={
+            "description": "Data state ID",
+        },
+    )
+    timezone = ma_fields.Timezone(
+        load_default="UTC",
+        metadata={
+            "description": "Timezone to use for response data",
+        },
+    )
+
+
+class TimeseriesDataGetStatsByIDBaseQueryArgsSchema(
+    TimeseriesIDListMixinSchema, TimeseriesDataGetStatsBaseQueryArgsSchema
+):
+    """Timeseries stats by ID query parameters"""
+
+
+class TimeseriesDataGetStatsByNameBaseQueryArgsSchema(
+    TimeseriesNameListMixinSchema, TimeseriesDataGetStatsBaseQueryArgsSchema
+):
+    """Timeseries stats by name query parameters"""
+
+
+class TSStatsSchema(Schema):
+    first_timestamp = ma_fields.AwareDateTime(
+        metadata={
+            "description": "First datetime",
+        },
+    )
+    last_timestamp = ma_fields.AwareDateTime(
+        metadata={
+            "description": "Last datetime",
+        },
+    )
+    min = ma.fields.Float(
+        metadata={
+            "description": "Minimum value",
+        },
+    )
+    max = ma.fields.Float(
+        metadata={
+            "description": "Maximum value",
+        },
+    )
+    avg = ma.fields.Float(
+        metadata={
+            "description": "Minimum value",
+        },
+    )
+    stddev = ma.fields.Float(
+        metadata={
+            "description": "Standard deviation",
+        },
+    )
+
+
+class TimeseriesDataStatsByIDSchema(Schema):
+    """Timeseries stats response schema"""
+
+    stats = ma.fields.Dict(
+        keys=ma.fields.Integer(),
+        values=ma.fields.Nested(TSStatsSchema()),
+    )
+
+
+class TimeseriesDataStatsByNameSchema(Schema):
+    """Timeseries stats response schema"""
+
+    stats = ma.fields.Dict(
+        keys=ma.fields.String(),
+        values=ma.fields.Nested(TSStatsSchema()),
+    )
+
+
 class TimeseriesDataBaseQueryArgsSchema(Schema):
     """Timeseries values query parameters base schema"""
 

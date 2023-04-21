@@ -5,7 +5,7 @@ import flask
 from flask_smorest import abort
 
 from bemserver_core.model import Timeseries, TimeseriesDataState, Campaign
-from bemserver_core.input_output import tsdcsvio, tsdjsonio
+from bemserver_core.input_output import tsdio, tsdcsvio, tsdjsonio
 from bemserver_core.database import db
 from bemserver_core.exceptions import (
     TimeseriesNotFoundError,
@@ -16,6 +16,10 @@ from bemserver_core.exceptions import (
 from bemserver_api import Blueprint
 
 from .schemas import (
+    TimeseriesDataGetStatsByIDBaseQueryArgsSchema,
+    TimeseriesDataGetStatsByNameBaseQueryArgsSchema,
+    TimeseriesDataStatsByIDSchema,
+    TimeseriesDataStatsByNameSchema,
     TimeseriesDataGetByIDQueryArgsSchema,
     TimeseriesDataDeleteByIDQueryArgsSchema,
     TimeseriesDataGetByNameQueryArgsSchema,
@@ -23,6 +27,52 @@ from .schemas import (
     TimeseriesDataGetByIDAggregateQueryArgsSchema,
     TimeseriesDataGetByNameAggregateQueryArgsSchema,
     TimeseriesDataPostQueryArgsSchema,
+)
+
+
+STATS_BY_ID_EXAMPLE = dedent(
+    """\
+    {
+        "1": {
+            "first_timestamp": "2020-01-01T00:00:00+00:00",
+            "last_timestamp": "2021-01-01T00:00:00+00:00",
+            "min": 0.0,
+            "max": 42.0,
+            "avg": 12.0,
+            "stddev": 4.2,
+        },
+        "2": {
+            "first_timestamp": "2020-01-01T00:00:00+00:00",
+            "last_timestamp": "2021-01-01T00:00:00+00:00",
+            "min": 12.0,
+            "max": 142.0,
+            "avg": 69.0,
+            "stddev": 6.9,
+        },
+    }"""
+)
+
+
+STATS_BY_NAME_EXAMPLE = dedent(
+    """\
+    {
+        "Timeseries 1": {
+            "first_timestamp": "2020-01-01T00:00:00+00:00",
+            "last_timestamp": "2021-01-01T00:00:00+00:00",
+            "min": 0.0,
+            "max": 42.0,
+            "avg": 12.0,
+            "stddev": 4.2,
+        },
+        "Timeseries 2": {
+            "first_timestamp": "2020-01-01T00:00:00+00:00",
+            "last_timestamp": "2021-01-01T00:00:00+00:00",
+            "min": 12.0,
+            "max": 142.0,
+            "avg": 69.0,
+            "stddev": 6.9,
+        },
+    }"""
 )
 
 
@@ -119,6 +169,25 @@ blp4c = Blueprint(
     url_prefix="/timeseries_data/campaign/<int:campaign_id>",
     description="Operations on timeseries data for a given campaign",
 )
+
+
+@blp.route("/stats", methods=("GET",))
+@blp.login_required
+@blp.arguments(TimeseriesDataGetStatsByIDBaseQueryArgsSchema, location="query")
+@blp.response(200, TimeseriesDataStatsByIDSchema, example=STATS_BY_ID_EXAMPLE)
+def get_stats(args):
+    """Get timeseries data stats"""
+    timeseries = _get_many_timeseries_by_id(args["timeseries"])
+    data_state = _get_data_state(args["data_state"])
+
+    data_df = tsdio.get_timeseries_stats(
+        timeseries,
+        data_state,
+        timezone=args["timezone"],
+        col_label="id",
+    )
+
+    return {"stats": data_df.to_dict(orient="index")}
 
 
 @blp.route("/", methods=("GET",))
@@ -289,6 +358,26 @@ def delete(args):
     )
 
     db.session.commit()
+
+
+@blp4c.route("/stats", methods=("GET",))
+@blp4c.login_required
+@blp4c.arguments(TimeseriesDataGetStatsByNameBaseQueryArgsSchema, location="query")
+@blp4c.response(200, TimeseriesDataStatsByNameSchema, example=STATS_BY_NAME_EXAMPLE)
+def get_stats_for_campaign(args, campaign_id):
+    """Get timeseries data stats"""
+    campaign = Campaign.get_by_id(campaign_id) or abort(404)
+    timeseries = _get_many_timeseries_by_name(campaign, args["timeseries"])
+    data_state = _get_data_state(args["data_state"])
+
+    data_df = tsdio.get_timeseries_stats(
+        timeseries,
+        data_state,
+        timezone=args["timezone"],
+        col_label="name",
+    )
+
+    return {"stats": data_df.to_dict(orient="index")}
 
 
 @blp4c.route("/", methods=("GET",))
