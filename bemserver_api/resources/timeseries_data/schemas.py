@@ -66,6 +66,11 @@ class TSStatsSchema(Schema):
             "description": "Last datetime",
         },
     )
+    count = ma.fields.Integer(
+        metadata={
+            "description": "Values count",
+        },
+    )
     min = ma.fields.Float(
         metadata={
             "description": "Minimum value",

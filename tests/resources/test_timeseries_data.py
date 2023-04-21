@@ -74,6 +74,7 @@ class TestTimeseriesDataApi:
                             "avg": 1.5,
                             "first_timestamp": start_time.isoformat(),
                             "last_timestamp": h3_dt.isoformat(),
+                            "count": 4,
                             "max": 3.0,
                             "min": 0.0,
                             "stddev": 1.2909944487358056,
