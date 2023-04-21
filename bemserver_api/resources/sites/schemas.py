@@ -66,3 +66,12 @@ class GetDegreeDaysQueryArgsSchema(Schema):
     )
     base = ma.fields.Float(load_default="18.0")
     unit = ma_fields.UnitSymbol(load_default="°C")
+
+
+class DegreeDaysSchema(Schema):
+    """Degree days response schema"""
+
+    degree_days = ma.fields.Dict(
+        keys=ma_fields.AwareDateTime(),
+        values=ma.fields.Float(),
+    )

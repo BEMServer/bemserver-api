@@ -4,7 +4,7 @@ import json
 from unittest.mock import patch
 
 import pandas as pd
-from pandas.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal, assert_series_equal
 
 import pytest
 
@@ -554,7 +554,15 @@ class TestSitesDownloadWeatherDataApi:
                 index=expected_d_index,
                 dtype="float",
             )
-            assert ret_data == expected_d.to_json(date_format="iso")
+            loaded_dd = pd.Series(ret_data["degree_days"])
+            loaded_dd.index = pd.DatetimeIndex(loaded_dd.index)
+            assert_series_equal(
+                loaded_dd,
+                expected_d,
+                check_index_type=False,
+                check_names=False,
+                check_freq=False,
+            )
 
             # Monthly DD
             ret = client.get(
@@ -572,7 +580,15 @@ class TestSitesDownloadWeatherDataApi:
             ret_data = ret.json
 
             expected_m = expected_d.resample("MS").sum()
-            assert ret_data == expected_m.to_json(date_format="iso")
+            loaded_dd = pd.Series(ret_data["degree_days"])
+            loaded_dd.index = pd.DatetimeIndex(loaded_dd.index)
+            assert_series_equal(
+                loaded_dd,
+                expected_m,
+                check_index_type=False,
+                check_names=False,
+                check_freq=False,
+            )
 
             # Yearly DD
             ret = client.get(
@@ -590,7 +606,15 @@ class TestSitesDownloadWeatherDataApi:
             ret_data = ret.json
 
             expected_y = expected_d.resample("AS").sum()
-            assert ret_data == expected_y.to_json(date_format="iso")
+            loaded_dd = pd.Series(ret_data["degree_days"])
+            loaded_dd.index = pd.DatetimeIndex(loaded_dd.index)
+            assert_series_equal(
+                loaded_dd,
+                expected_y,
+                check_index_type=False,
+                check_names=False,
+                check_freq=False,
+            )
 
             # Missing data
             ret = client.get(
@@ -620,8 +644,14 @@ class TestSitesDownloadWeatherDataApi:
                 index=expected_post_index,
                 dtype="float",
             )
-            assert ret_data == pd.concat((expected_d, expected_post)).to_json(
-                date_format="iso"
+            loaded_dd = pd.Series(ret_data["degree_days"])
+            loaded_dd.index = pd.DatetimeIndex(loaded_dd.index)
+            assert_series_equal(
+                loaded_dd,
+                pd.concat((expected_d, expected_post)),
+                check_index_type=False,
+                check_names=False,
+                check_freq=False,
             )
 
             # Wrong unit
@@ -741,7 +771,15 @@ class TestSitesDownloadWeatherDataApi:
                 index=expected_d_index,
                 dtype="float",
             )
-            assert ret_data == expected_d.to_json(date_format="iso")
+            loaded_dd = pd.Series(ret_data["degree_days"])
+            loaded_dd.index = pd.DatetimeIndex(loaded_dd.index)
+            assert_series_equal(
+                loaded_dd,
+                expected_d,
+                check_index_type=False,
+                check_names=False,
+                check_freq=False,
+            )
 
             # Wrong campaign: site not found
             ret = client.get(
