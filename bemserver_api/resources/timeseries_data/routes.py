@@ -33,23 +33,26 @@ from .schemas import (
 STATS_BY_ID_EXAMPLE = dedent(
     """\
     {
-        "1": {
-            "first_timestamp": "2020-01-01T00:00:00+00:00",
-            "last_timestamp": "2021-01-01T00:00:00+00:00",
-            "count": 42,
-            "min": 0.0,
-            "max": 42.0,
-            "avg": 12.0,
-            "stddev": 4.2,
-        },
-        "2": {
-            "first_timestamp": "2020-01-01T00:00:00+00:00",
-            "last_timestamp": "2021-01-01T00:00:00+00:00",
-            "count": 69,
-            "min": 12.0,
-            "max": 142.0,
-            "avg": 69.0,
-            "stddev": 6.9,
+        "stats":
+        {
+            "1": {
+                "first_timestamp": "2020-01-01T00:00:00+00:00",
+                "last_timestamp": "2021-01-01T00:00:00+00:00",
+                "count": 42,
+                "min": 0.0,
+                "max": 42.0,
+                "avg": 12.0,
+                "stddev": 4.2,
+            },
+            "2": {
+                "first_timestamp": "2020-01-01T00:00:00+00:00",
+                "last_timestamp": "2021-01-01T00:00:00+00:00",
+                "count": 69,
+                "min": 12.0,
+                "max": 142.0,
+                "avg": 69.0,
+                "stddev": 6.9,
+            },
         },
     }"""
 )
@@ -58,23 +61,26 @@ STATS_BY_ID_EXAMPLE = dedent(
 STATS_BY_NAME_EXAMPLE = dedent(
     """\
     {
-        "Timeseries 1": {
-            "first_timestamp": "2020-01-01T00:00:00+00:00",
-            "last_timestamp": "2021-01-01T00:00:00+00:00",
-            "count": 42,
-            "min": 0.0,
-            "max": 42.0,
-            "avg": 12.0,
-            "stddev": 4.2,
-        },
-        "Timeseries 2": {
-            "first_timestamp": "2020-01-01T00:00:00+00:00",
-            "last_timestamp": "2021-01-01T00:00:00+00:00",
-            "count": 69,
-            "min": 12.0,
-            "max": 142.0,
-            "avg": 69.0,
-            "stddev": 6.9,
+        "stats":
+        {
+            "Timeseries 1": {
+                "first_timestamp": "2020-01-01T00:00:00+00:00",
+                "last_timestamp": "2021-01-01T00:00:00+00:00",
+                "count": 42,
+                "min": 0.0,
+                "max": 42.0,
+                "avg": 12.0,
+                "stddev": 4.2,
+            },
+            "Timeseries 2": {
+                "first_timestamp": "2020-01-01T00:00:00+00:00",
+                "last_timestamp": "2021-01-01T00:00:00+00:00",
+                "count": 69,
+                "min": 12.0,
+                "max": 142.0,
+                "avg": 69.0,
+                "stddev": 6.9,
+            },
         },
     }"""
 )
