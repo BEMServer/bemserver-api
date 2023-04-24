@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.18.1 (2023-04-24)
++++++++++++++++++++
+
+Bug fixes:
+
+- Site degree_days resource: fix base default value
+
 0.18.0 (2023-04-21)
 +++++++++++++++++++
 
