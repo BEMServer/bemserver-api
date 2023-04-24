@@ -64,7 +64,7 @@ class GetDegreeDaysQueryArgsSchema(Schema):
         validate=ma.validate.OneOf(("heating", "cooling")),
         load_default="heating",
     )
-    base = ma.fields.Float(load_default="18.0")
+    base = ma.fields.Float(load_default=18.0)
     unit = ma_fields.UnitSymbol(load_default="°C")
 
 
