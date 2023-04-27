@@ -1,12 +1,19 @@
 Changelog
 ---------
 
+0.18.2 (2023-04-27)
++++++++++++++++++++
+
+Bug fixes:
+
+- Site degree days and Timeseries stats: serialize Nan/Nat as null
+
 0.18.1 (2023-04-24)
 +++++++++++++++++++
 
 Bug fixes:
 
-- Site degree_days resource: fix base default value
+- Site degree days resource: fix base default value
 
 0.18.0 (2023-04-21)
 +++++++++++++++++++
