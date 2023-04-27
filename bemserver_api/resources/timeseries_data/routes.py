@@ -197,7 +197,11 @@ def get_stats(args):
         col_label="id",
     )
 
-    return {"stats": data_df.to_dict(orient="index")}
+    return {
+        "stats": data_df.astype(object)
+        .where(data_df.notnull(), None)
+        .to_dict(orient="index")
+    }
 
 
 @blp.route("/", methods=("GET",))
@@ -387,7 +391,11 @@ def get_stats_for_campaign(args, campaign_id):
         col_label="name",
     )
 
-    return {"stats": data_df.to_dict(orient="index")}
+    return {
+        "stats": data_df.astype(object)
+        .where(data_df.notnull(), None)
+        .to_dict(orient="index")
+    }
 
 
 @blp4c.route("/", methods=("GET",))

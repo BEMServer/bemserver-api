@@ -162,4 +162,4 @@ def get_degree_days(args, item_id):
     except BEMServerCoreDimensionalityError as exc:
         abort(422, message=str(exc))
 
-    return {"degree_days": dd_s.to_dict()}
+    return {"degree_days": dd_s.astype(object).where(dd_s.notnull(), None).to_dict()}

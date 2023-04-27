@@ -30,8 +30,8 @@ class TestTimeseriesDataApi:
         timeseries_data,
         for_campaign,
     ):
-        start_time, end_time = timeseries_data
-        h3_dt = start_time + dt.timedelta(hours=3)
+        start_dt, _ = timeseries_data
+        h3_dt = start_dt + dt.timedelta(hours=3)
         ts_1_id = timeseries[0]
         ts_2_id = timeseries[1]
         campaign_1_id = campaigns[0]
@@ -72,7 +72,7 @@ class TestTimeseriesDataApi:
                     "stats": {
                         str(ts_l[0]): {
                             "avg": 1.5,
-                            "first_timestamp": start_time.isoformat(),
+                            "first_timestamp": start_dt.isoformat(),
                             "last_timestamp": h3_dt.isoformat(),
                             "count": 4,
                             "max": 3.0,
@@ -102,6 +102,54 @@ class TestTimeseriesDataApi:
                 assert ret.status_code == 403
             else:
                 assert ret.status_code == 200
+
+    @pytest.mark.parametrize("for_campaign", (True, False))
+    def test_timeseries_data_stats_no_data(
+        self,
+        app,
+        users,
+        campaigns,
+        timeseries,
+        for_campaign,
+    ):
+        ts_1_id = timeseries[0]
+        campaign_1_id = campaigns[0]
+        ds_id = 1
+
+        creds = users["Chuck"]["creds"]
+        auth_context = AuthHeader(creds)
+
+        client = app.test_client()
+
+        with auth_context:
+            if not for_campaign:
+                query_url = f"{TIMESERIES_DATA_URL}stats"
+                ts_l = (ts_1_id,)
+            else:
+                query_url = f"{TIMESERIES_DATA_URL}campaign/{campaign_1_id}/stats"
+                ts_l = (f"Timeseries {ts_1_id-1}",)
+
+            ret = client.get(
+                query_url,
+                query_string={
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                },
+            )
+            assert ret.status_code == 200
+            assert ret.json == {
+                "stats": {
+                    str(ts_l[0]): {
+                        "avg": None,
+                        "first_timestamp": None,
+                        "last_timestamp": None,
+                        "count": 0,
+                        "max": None,
+                        "min": None,
+                        "stddev": None,
+                    }
+                }
+            }
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
