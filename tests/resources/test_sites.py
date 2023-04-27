@@ -1,4 +1,5 @@
 """Sites routes tests"""
+import math
 import datetime as dt
 import json
 from unittest.mock import patch
@@ -631,6 +632,10 @@ class TestSitesDownloadWeatherDataApi:
             assert ret.status_code == 200
             ret_data = ret.json
 
+            # Check NaN is serialized as None
+            assert all(val is not math.nan for val in ret_data["degree_days"].values())
+            assert ret_data["degree_days"]["2021-12-31T00:00:00+00:00"] is None
+
             expected_post_index = pd.date_range(
                 "2021-01-01",
                 "2022-01-01",
@@ -659,7 +664,7 @@ class TestSitesDownloadWeatherDataApi:
                 f"{SITES_URL}{site_1_id}/degree_days",
                 query_string={
                     "start_date": start_d.isoformat(),
-                    "end_date": post_d.isoformat(),
+                    "end_date": end_d.isoformat(),
                     "period": "day",
                     "unit": "dummy",
                 },
@@ -672,7 +677,7 @@ class TestSitesDownloadWeatherDataApi:
                 f"{SITES_URL}{site_1_id}/degree_days",
                 query_string={
                     "start_date": start_d.isoformat(),
-                    "end_date": post_d.isoformat(),
+                    "end_date": end_d.isoformat(),
                     "period": "day",
                     "unit": "Wh",
                 },
@@ -685,7 +690,7 @@ class TestSitesDownloadWeatherDataApi:
                 f"{SITES_URL}{DUMMY_ID}/degree_days",
                 query_string={
                     "start_date": start_d.isoformat(),
-                    "end_date": post_d.isoformat(),
+                    "end_date": end_d.isoformat(),
                     "period": "day",
                 },
             )
