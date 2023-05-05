@@ -16,7 +16,7 @@ from .extensions import (  # noqa
 from .resources import register_blueprints
 
 
-__version__ = "0.19.0"
+__version__ = "0.20.0"
 
 API_VERSION = __version__
 OPENAPI_VERSION = "3.1.0"
