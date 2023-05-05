@@ -21,3 +21,4 @@ class WeatherTimeseriesBySiteQueryArgsSchema(Schema):
     site_id = ma.fields.Int()
     parameter = ma.fields.String()
     timeseries_id = ma.fields.Int()
+    forecast = ma.fields.Boolean()

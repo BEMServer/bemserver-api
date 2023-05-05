@@ -864,16 +864,18 @@ def weather_timeseries_by_sites(app, timeseries, sites):
     with OpenBar():
         # Set units to timeseries
         model.Timeseries.get_by_id(timeseries[0]).unit_symbol = "°C"
-        model.Timeseries.get_by_id(timeseries[1]).unit_symbol = "percent"
+        model.Timeseries.get_by_id(timeseries[1]).unit_symbol = "%"
         ectbs_1 = model.WeatherTimeseriesBySite.new(
             site_id=sites[0],
             parameter=model.WeatherParameterEnum.AIR_TEMPERATURE,
             timeseries_id=timeseries[0],
+            forecast=False,
         )
         ectbs_2 = model.WeatherTimeseriesBySite.new(
             site_id=sites[1],
             parameter=model.WeatherParameterEnum.RELATIVE_HUMIDITY,
             timeseries_id=timeseries[1],
+            forecast=True,
         )
         db.session.commit()
     return (ectbs_1.id, ectbs_2.id)

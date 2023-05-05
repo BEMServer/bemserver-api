@@ -31,6 +31,7 @@ class TestWeatherTimeseriesBySiteApi:
                 "site_id": site_1_id,
                 "timeseries_id": ts_1_id,
                 "parameter": "AIR_TEMPERATURE",
+                "forecast": False,
             }
             ret = client.post(WEATHER_TIMESERIES_BY_SITES_URL, json=wtbs_1)
             assert ret.status_code == 201
@@ -87,6 +88,7 @@ class TestWeatherTimeseriesBySiteApi:
                 "site_id": site_2_id,
                 "timeseries_id": ts_2_id,
                 "parameter": "RELATIVE_HUMIDITY",
+                "forecast": True,
             }
             ret = client.post(WEATHER_TIMESERIES_BY_SITES_URL, json=wtbs_2)
             assert ret.status_code == 201
@@ -97,6 +99,7 @@ class TestWeatherTimeseriesBySiteApi:
             # PUT violating unique constraint
             wtbs_1["site_id"] = wtbs_2["site_id"]
             wtbs_1["parameter"] = wtbs_2["parameter"]
+            wtbs_1["forecast"] = wtbs_2["forecast"]
             ret = client.put(
                 f"{WEATHER_TIMESERIES_BY_SITES_URL}{wtbs_1_id}",
                 json=wtbs_1,
@@ -119,6 +122,14 @@ class TestWeatherTimeseriesBySiteApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == wtbs_1_id
+            ret = client.get(
+                WEATHER_TIMESERIES_BY_SITES_URL,
+                query_string={"forecast": True},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == wtbs_2_id
 
             # DELETE wrong ID -> 404
             ret = client.delete(
@@ -192,6 +203,7 @@ class TestWeatherTimeseriesBySiteApi:
                 "site_id": site_1_id,
                 "timeseries_id": ts_1_id,
                 "parameter": "AIR_TEMPERATURE",
+                "forecast": False,
             }
             ret = client.post(WEATHER_TIMESERIES_BY_SITES_URL, json=wtbs_3)
             assert ret.status_code == 403
@@ -236,6 +248,7 @@ class TestWeatherTimeseriesBySiteApi:
             "site_id": site_1_id,
             "timeseries_id": ts_2_id,
             "parameter": "AIR_TEMPERATURE",
+            "forecast": False,
         }
         ret = client.post(WEATHER_TIMESERIES_BY_SITES_URL, json=wtbs_3)
         assert ret.status_code == 401
