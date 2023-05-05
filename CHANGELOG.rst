@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+0.19.0 (2023-05-05)
++++++++++++++++++++
+
+Features:
+
+- Weather: differentiate forecast data
+
+Other changes:
+
+- Require bemserver-core 0.14.0
+
 0.18.2 (2023-04-27)
 +++++++++++++++++++
 
