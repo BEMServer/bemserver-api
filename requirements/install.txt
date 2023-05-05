@@ -4,11 +4,11 @@
 #
 #    pip-compile --output-file=requirements/install.txt setup.py
 #
-alembic==1.9.1
+alembic==1.10.4
     # via bemserver-core
 amqp==5.1.1
     # via kombu
-apispec[marshmallow]==6.1.0
+apispec[marshmallow]==6.3.0
     # via
     #   bemserver-api (setup.py)
     #   flask-smorest
@@ -22,6 +22,8 @@ bemserver-core==0.14.0
     # via bemserver-api (setup.py)
 billiard==3.6.4.0
     # via celery
+blinker==1.6.2
+    # via flask
 celery==5.2.7
     # via bemserver-core
 certifi==2022.12.7
@@ -51,15 +53,15 @@ flask==2.3.2
     #   bemserver-api (setup.py)
     #   flask-httpauth
     #   flask-smorest
-flask-httpauth==4.7.0
+flask-httpauth==4.8.0
     # via bemserver-api (setup.py)
 flask-smorest==0.41.0
     # via bemserver-api (setup.py)
-greenlet==2.0.1
+greenlet==2.0.2
     # via sqlalchemy
 idna==3.4
     # via requests
-importlib-metadata==6.0.0
+importlib-metadata==6.6.0
     # via flask
 itsdangerous==2.1.2
     # via flask
@@ -69,7 +71,7 @@ kombu==5.2.4
     # via celery
 mako==1.2.4
     # via alembic
-markupsafe==2.1.1
+markupsafe==2.1.2
     # via
     #   jinja2
     #   mako
@@ -83,25 +85,25 @@ marshmallow==3.19.0
     #   webargs
 marshmallow-sqlalchemy==0.29.0
     # via bemserver-api (setup.py)
-numpy==1.24.1
+numpy==1.24.3
     # via pandas
-oso==0.26.4
+oso==0.27.0
     # via bemserver-core
-packaging==23.0
+packaging==23.1
     # via
     #   apispec
     #   marshmallow
     #   marshmallow-sqlalchemy
     #   webargs
-pandas==2.0.0
+pandas==2.0.1
     # via bemserver-core
 passlib==1.7.4
     # via bemserver-core
-pint==0.20.1
+pint==0.21
     # via bemserver-core
-prompt-toolkit==3.0.36
+prompt-toolkit==3.0.38
     # via click-repl
-psycopg2==2.9.5
+psycopg2==2.9.6
     # via bemserver-core
 pycparser==2.21
     # via cffi
@@ -109,36 +111,38 @@ python-dateutil==2.8.2
     # via pandas
 python-dotenv==1.0.0
     # via bemserver-api (setup.py)
-pytz==2022.7
+pytz==2023.3
     # via
     #   celery
     #   pandas
 redis==4.5.4
     # via bemserver-core
-requests==2.28.2
+requests==2.30.0
     # via bemserver-core
 six==1.16.0
     # via
     #   click-repl
     #   python-dateutil
-sqlalchemy==2.0.4
+sqlalchemy==2.0.12
     # via
     #   alembic
     #   bemserver-api (setup.py)
     #   bemserver-core
     #   marshmallow-sqlalchemy
 typing-extensions==4.5.0
-    # via sqlalchemy
+    # via
+    #   alembic
+    #   sqlalchemy
 tzdata==2023.3
     # via pandas
-urllib3==1.26.15
+urllib3==2.0.2
     # via requests
 vine==5.0.0
     # via
     #   amqp
     #   celery
     #   kombu
-wcwidth==0.2.5
+wcwidth==0.2.6
     # via prompt-toolkit
 webargs==8.2.0
     # via flask-smorest
@@ -146,5 +150,5 @@ werkzeug==2.3.3
     # via
     #   flask
     #   flask-smorest
-zipp==3.11.0
+zipp==3.15.0
     # via importlib-metadata
