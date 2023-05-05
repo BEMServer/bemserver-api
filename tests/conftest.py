@@ -937,3 +937,16 @@ def st_download_weather_data_by_sites(app, sites):
         st_cbc_2 = scheduled_tasks.ST_DownloadWeatherDataBySite.new(site_id=sites[1])
         db.session.commit()
     return (st_cbc_1.id, st_cbc_2.id)
+
+
+@pytest.fixture
+def st_download_weather_forecast_data_by_sites(app, sites):
+    with OpenBar():
+        st_cbc_1 = scheduled_tasks.ST_DownloadWeatherForecastDataBySite.new(
+            site_id=sites[0]
+        )
+        st_cbc_2 = scheduled_tasks.ST_DownloadWeatherForecastDataBySite.new(
+            site_id=sites[1]
+        )
+        db.session.commit()
+    return (st_cbc_1.id, st_cbc_2.id)
