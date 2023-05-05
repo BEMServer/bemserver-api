@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+0.20.0 (2023-05-05)
++++++++++++++++++++
+
+Features:
+
+- Download weather forecast data scheduled task
+
+Other changes:
+
+- Require bemserver-core 0.15.0
+
 0.19.0 (2023-05-05)
 +++++++++++++++++++
 
