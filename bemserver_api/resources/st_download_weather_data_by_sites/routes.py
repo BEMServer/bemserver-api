@@ -42,7 +42,7 @@ class ST_DownloadWeatherDataBySiteViews(MethodView):
     @blp.response(201, ST_DownloadWeatherDataBySiteSchema)
     @blp.catch_integrity_error
     def post(self, new_item):
-        """Add a new download weather data scheduled tasks x site association"""
+        """Add a new download weather data scheduled task x site association"""
         item = ST_DownloadWeatherDataBySite.new(**new_item)
         db.session.commit()
         return item
@@ -54,7 +54,7 @@ class ST_DownloadWeatherDataBySiteByIdViews(MethodView):
     @blp.etag
     @blp.response(200, ST_DownloadWeatherDataBySiteSchema)
     def get(self, item_id):
-        """Get download weather data scheduled tasks x site association by ID"""
+        """Get download weather data scheduled task x site association by ID"""
         item = ST_DownloadWeatherDataBySite.get_by_id(item_id)
         if item is None:
             abort(404)
@@ -65,7 +65,7 @@ class ST_DownloadWeatherDataBySiteByIdViews(MethodView):
     @blp.arguments(ST_DownloadWeatherDataBySitePutSchema)
     @blp.response(200, ST_DownloadWeatherDataBySiteSchema)
     def put(self, item_data, item_id):
-        """Update download weather data scheduled tasks x site association by ID"""
+        """Update a download weather data scheduled task x site association"""
         item = ST_DownloadWeatherDataBySite.get_by_id(item_id)
         if item is None:
             abort(404)
@@ -78,7 +78,7 @@ class ST_DownloadWeatherDataBySiteByIdViews(MethodView):
     @blp.etag
     @blp.response(204)
     def delete(self, item_id):
-        """Delete a download weather data scheduled tasks x site associations"""
+        """Delete a download weather data scheduled task x site association"""
         item = ST_DownloadWeatherDataBySite.get_by_id(item_id)
         if item is None:
             abort(404)
