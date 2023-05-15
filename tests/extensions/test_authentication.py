@@ -11,7 +11,7 @@ class TestAuthentication:
         active_user_creds = users["Active"]["creds"]
         active_user_invalid_creds = users["Active"]["invalid_creds"]
         inactive_user_creds = users["Inactive"]["creds"]
-        api = app.extensions["flask-smorest"]["ext_obj"]
+        api = app.extensions["flask-smorest"]["apis"][""]["ext_obj"]
         blp = Blueprint("AuthTest", __name__, url_prefix="/auth_test")
 
         @blp.route("/auth")
@@ -73,7 +73,7 @@ class TestAuthentication:
 
     def test_auth_current_user(self, app, users):
         active_user_creds = users["Active"]["creds"]
-        api = app.extensions["flask-smorest"]["ext_obj"]
+        api = app.extensions["flask-smorest"]["apis"][""]["ext_obj"]
 
         blp = Blueprint("AuthTest", __name__, url_prefix="/auth_test")
 

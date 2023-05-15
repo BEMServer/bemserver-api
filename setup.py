@@ -36,7 +36,7 @@ setup(
         "marshmallow>=3.18.0,<4.0",
         "sqlalchemy>=2.0,<3.0",
         "marshmallow-sqlalchemy>=0.29.0,<0.30",
-        "flask_smorest>=0.41.0,<0.42",
+        "flask_smorest>=0.42.0,<0.43",
         "apispec>=6.1.0,<7.0",
         "flask-httpauth>=4.7.0,<5.0",
         "bemserver-core>=0.15.0,<0.16",
