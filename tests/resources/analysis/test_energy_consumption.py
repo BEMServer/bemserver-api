@@ -1,4 +1,5 @@
 """Energy consumption tests"""
+from copy import deepcopy
 import datetime as dt
 import contextlib
 
@@ -56,7 +57,7 @@ class TestAnalysisApiEnergyConsumption:
         create_timeseries_data(timeseries[6], ds_clean, timestamps, [0.021, 0.021])
         create_timeseries_data(timeseries[7], ds_clean, timestamps, [0.021, 0.021])
 
-        expected_consumptions = {
+        expected_consumptions_wh = {
             "all": {
                 "all": [71.0, 71.0],
                 "heating": [46.0, 46.0],
@@ -74,9 +75,22 @@ class TestAnalysisApiEnergyConsumption:
             },
         }
 
+        expected_consumptions_mwh = deepcopy(expected_consumptions_wh)
+        for energy in expected_consumptions_mwh.values():
+            for usage in energy.keys():
+                energy[usage] = [val * 1000 for val in energy[usage]]
+
+        timestamps = [ts.isoformat() for ts in timestamps.to_list()]
+
         expected = {
-            "timestamps": [ts.isoformat() for ts in timestamps.to_list()],
-            "energy": expected_consumptions,
+            "Wh": {
+                "timestamps": timestamps,
+                "energy": expected_consumptions_wh,
+            },
+            "mWh": {
+                "timestamps": timestamps,
+                "energy": expected_consumptions_mwh,
+            },
         }
 
         return start_dt, end_dt, timeseries, expected
@@ -209,14 +223,27 @@ class TestAnalysisApiEnergyConsumption:
             else:
                 assert ret.status_code == 200
                 ret_data = ret.json
-                assert ret_data == expected
+                assert ret_data == expected["Wh"]
+
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                    "unit": "mWh",
+                    "timezone": "UTC",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                ret_data = ret.json
+                assert ret_data == expected["mWh"]
 
         # Wrong unit
-        with OpenBar():
-            timeseries[0].unit_symbol = ""
-            db.session.add(timeseries[0])
-            db.session.commit()
-
         with auth_context:
             ret = client.get(
                 query_url,
@@ -226,6 +253,7 @@ class TestAnalysisApiEnergyConsumption:
                     "bucket_width_value": 1,
                     "bucket_width_unit": "hour",
                     "timezone": "UTC",
+                    "unit": "°C",
                 },
             )
             if user == "anonym":
@@ -237,8 +265,6 @@ class TestAnalysisApiEnergyConsumption:
 
         # Without user <-> timeseries association
         with OpenBar():
-            timeseries[0].unit_symbol = "Wh"
-            db.session.add(timeseries[0])
             ugbcs_1 = UserGroupByCampaignScope.get(campaign_scope_id=cs_1_id).first()
             ugbcs_1.delete()
             db.session.commit()
@@ -258,14 +284,14 @@ class TestAnalysisApiEnergyConsumption:
                 assert ret.status_code == 401
             elif user == "user":
                 # User can't read consumption data from unauthorized timeseries
-                expected["energy"] = {}
+                expected["Wh"]["energy"] = {}
                 assert ret.status_code == 200
                 ret_data = ret.json
-                assert ret_data == expected
+                assert ret_data == expected["Wh"]
             else:
                 assert ret.status_code == 200
                 ret_data = ret.json
-                assert ret_data == expected
+                assert ret_data == expected["Wh"]
 
     @pytest.mark.parametrize("user", ("admin", "user", "anonym"))
     @pytest.mark.usefixtures("users_by_user_groups")
@@ -395,14 +421,27 @@ class TestAnalysisApiEnergyConsumption:
             else:
                 assert ret.status_code == 200
                 ret_data = ret.json
-                assert ret_data == expected
+                assert ret_data == expected["Wh"]
+
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                    "unit": "mWh",
+                    "timezone": "UTC",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                ret_data = ret.json
+                assert ret_data == expected["mWh"]
 
         # Wrong unit
-        with OpenBar():
-            timeseries[0].unit_symbol = ""
-            db.session.add(timeseries[0])
-            db.session.commit()
-
         with auth_context:
             ret = client.get(
                 query_url,
@@ -412,6 +451,7 @@ class TestAnalysisApiEnergyConsumption:
                     "bucket_width_value": 1,
                     "bucket_width_unit": "hour",
                     "timezone": "UTC",
+                    "unit": "°C",
                 },
             )
             if user == "anonym":
@@ -444,11 +484,11 @@ class TestAnalysisApiEnergyConsumption:
                 assert ret.status_code == 401
             elif user == "user":
                 # User can't read consumption data from unauthorized timeseries
-                expected["energy"] = {}
+                expected["Wh"]["energy"] = {}
                 assert ret.status_code == 200
                 ret_data = ret.json
-                assert ret_data == expected
+                assert ret_data == expected["Wh"]
             else:
                 assert ret.status_code == 200
                 ret_data = ret.json
-                assert ret_data == expected
+                assert ret_data == expected["Wh"]

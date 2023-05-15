@@ -40,6 +40,7 @@ def get_energy_consumption_breakdown_for_site(args, site_id):
             args["end_time"],
             args["bucket_width_value"],
             args["bucket_width_unit"],
+            unit=args["unit"],
             timezone=args["timezone"],
         )
     except BEMServerCoreDimensionalityError:
@@ -66,6 +67,7 @@ def get_energy_consumption_breakdown_for_building(args, building_id):
             args["end_time"],
             args["bucket_width_value"],
             args["bucket_width_unit"],
+            unit=args["unit"],
             timezone=args["timezone"],
         )
     except BEMServerCoreDimensionalityError:

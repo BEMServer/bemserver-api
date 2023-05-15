@@ -43,3 +43,4 @@ class EnergyConsumptionQueryArgsSchema(TimeseriesBucketWidthSchema):
             "description": "Timezone to use for the aggreagation",
         },
     )
+    unit = ma_fields.UnitSymbol(load_default="Wh")
