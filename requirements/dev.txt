@@ -12,8 +12,6 @@ coverage[toml]==7.2.5
     # via pytest-cov
 distlib==0.3.6
     # via virtualenv
-exceptiongroup==1.1.1
-    # via pytest
 filelock==3.12.0
     # via virtualenv
 identify==2.5.24
@@ -32,7 +30,7 @@ pluggy==1.0.0
     # via pytest
 port-for==0.6.3
     # via pytest-postgresql
-pre-commit==3.3.1
+pre-commit==3.3.2
     # via -r requirements/dev.in
 psutil==5.9.5
     # via mirakuru
@@ -47,10 +45,6 @@ pytest-postgresql==3.1.3
     # via -r requirements/tests.in
 pyyaml==6.0
     # via pre-commit
-tomli==2.0.1
-    # via
-    #   coverage
-    #   pytest
 virtualenv==20.23.0
     # via pre-commit
 
