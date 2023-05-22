@@ -623,16 +623,16 @@ def site_property_data(app, sites, site_properties):
 
 
 @pytest.fixture
-def building_property_data(app, sites, site_properties):
+def building_property_data(app, buildings, building_properties):
     with OpenBar():
         bpd_1 = model.BuildingPropertyData.new(
-            building_id=sites[0],
-            building_property_id=site_properties[0],
+            building_id=buildings[0],
+            building_property_id=building_properties[0],
             value="12",
         )
         bpd_2 = model.BuildingPropertyData.new(
-            building_id=sites[1],
-            building_property_id=site_properties[1],
+            building_id=buildings[1],
+            building_property_id=building_properties[1],
             value="42",
         )
         db.session.commit()
