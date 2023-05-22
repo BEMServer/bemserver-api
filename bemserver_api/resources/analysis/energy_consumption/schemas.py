@@ -44,3 +44,4 @@ class EnergyConsumptionQueryArgsSchema(TimeseriesBucketWidthSchema):
         },
     )
     unit = ma_fields.UnitSymbol(load_default="Wh")
+    ratio_property = ma.fields.String()

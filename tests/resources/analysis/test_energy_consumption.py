@@ -80,6 +80,11 @@ class TestAnalysisApiEnergyConsumption:
             for usage in energy.keys():
                 energy[usage] = [val * 1000 for val in energy[usage]]
 
+        expected_consumptions_wh_ratio_2 = deepcopy(expected_consumptions_wh)
+        for energy in expected_consumptions_wh_ratio_2.values():
+            for usage in energy.keys():
+                energy[usage] = [val / 2 for val in energy[usage]]
+
         timestamps = [ts.isoformat() for ts in timestamps.to_list()]
 
         expected = {
@@ -91,6 +96,10 @@ class TestAnalysisApiEnergyConsumption:
                 "timestamps": timestamps,
                 "energy": expected_consumptions_mwh,
             },
+            "Wh_ratio_2": {
+                "timestamps": timestamps,
+                "energy": expected_consumptions_wh_ratio_2,
+            },
         }
 
         return start_dt, end_dt, timeseries, expected
@@ -99,6 +108,7 @@ class TestAnalysisApiEnergyConsumption:
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    @pytest.mark.usefixtures("site_property_data")
     def test_analysis_energy_consumption_breakdown_for_site(
         self,
         app,
@@ -263,6 +273,44 @@ class TestAnalysisApiEnergyConsumption:
                 ret_data = ret.json
                 assert ret_data["message"] == "Incompatible unit in input timeseries."
 
+        # Ratio
+        with auth_context:
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                    "timezone": "UTC",
+                    "ratio_property": "Area",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                ret_data = ret.json
+                assert ret_data == expected["Wh_ratio_2"]
+
+        # Wrong ratio (no value or unknown property)
+        with auth_context:
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                    "timezone": "UTC",
+                    "ratio_property": "Dummy",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 409
+
         # Without user <-> timeseries association
         with OpenBar():
             ugbcs_1 = UserGroupByCampaignScope.get(campaign_scope_id=cs_1_id).first()
@@ -297,6 +345,7 @@ class TestAnalysisApiEnergyConsumption:
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaigns")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
+    @pytest.mark.usefixtures("building_property_data")
     def test_analysis_energy_consumption_breakdown_for_building(
         self,
         app,
@@ -460,6 +509,44 @@ class TestAnalysisApiEnergyConsumption:
                 assert ret.status_code == 409
                 ret_data = ret.json
                 assert ret_data["message"] == "Incompatible unit in input timeseries."
+
+        # Ratio
+        with auth_context:
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                    "timezone": "UTC",
+                    "ratio_property": "Area",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 200
+                ret_data = ret.json
+                assert ret_data == expected["Wh_ratio_2"]
+
+        # Wrong ratio (no value or unknown property)
+        with auth_context:
+            ret = client.get(
+                query_url,
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                    "timezone": "UTC",
+                    "ratio_property": "Dummy",
+                },
+            )
+            if user == "anonym":
+                assert ret.status_code == 401
+            else:
+                assert ret.status_code == 409
 
         # Without user <-> timeseries association
         with OpenBar():

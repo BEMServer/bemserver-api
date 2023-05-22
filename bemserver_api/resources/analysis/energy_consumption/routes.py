@@ -33,6 +33,14 @@ def get_energy_consumption_breakdown_for_site(args, site_id):
     if site is None:
         abort(404)
 
+    ratio_prop = args.get("ratio_property")
+    if ratio_prop:
+        ratio = site.get_property_value(ratio_prop)
+        if ratio is None:
+            abort(409, message='Site has no "{ratio_prop}" property.')
+    else:
+        ratio = 1
+
     try:
         brkdwn = compute_energy_consumption_breakdown_for_site(
             site,
@@ -41,6 +49,7 @@ def get_energy_consumption_breakdown_for_site(args, site_id):
             args["bucket_width_value"],
             args["bucket_width_unit"],
             unit=args["unit"],
+            ratio=ratio,
             timezone=args["timezone"],
         )
     except BEMServerCoreDimensionalityError:
@@ -60,6 +69,14 @@ def get_energy_consumption_breakdown_for_building(args, building_id):
     if building is None:
         abort(404)
 
+    ratio_prop = args.get("ratio_property")
+    if ratio_prop:
+        ratio = building.get_property_value(ratio_prop)
+        if ratio is None:
+            abort(409, message='Building has no "{ratio_prop}" property.')
+    else:
+        ratio = 1
+
     try:
         brkdwn = compute_energy_consumption_breakdown_for_building(
             building,
@@ -68,6 +85,7 @@ def get_energy_consumption_breakdown_for_building(args, building_id):
             args["bucket_width_value"],
             args["bucket_width_unit"],
             unit=args["unit"],
+            ratio=ratio,
             timezone=args["timezone"],
         )
     except BEMServerCoreDimensionalityError:
