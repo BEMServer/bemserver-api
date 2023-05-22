@@ -611,7 +611,7 @@ def site_property_data(app, sites, site_properties):
         spd_1 = model.SitePropertyData.new(
             site_id=sites[0],
             site_property_id=site_properties[0],
-            value="12",
+            value="2",
         )
         spd_2 = model.SitePropertyData.new(
             site_id=sites[1],
@@ -628,7 +628,7 @@ def building_property_data(app, buildings, building_properties):
         bpd_1 = model.BuildingPropertyData.new(
             building_id=buildings[0],
             building_property_id=building_properties[0],
-            value="12",
+            value="2",
         )
         bpd_2 = model.BuildingPropertyData.new(
             building_id=buildings[1],
@@ -645,7 +645,7 @@ def storey_property_data(app, storeys, storey_properties):
         spd_1 = model.StoreyPropertyData.new(
             storey_id=storeys[0],
             storey_property_id=storey_properties[0],
-            value="12",
+            value="2",
         )
         spd_2 = model.StoreyPropertyData.new(
             storey_id=storeys[1],
@@ -662,7 +662,7 @@ def space_property_data(app, spaces, space_properties):
         spd_1 = model.SpacePropertyData.new(
             space_id=spaces[0],
             space_property_id=space_properties[0],
-            value="12",
+            value="2",
         )
         spd_2 = model.SpacePropertyData.new(
             space_id=spaces[1],
@@ -679,7 +679,7 @@ def zone_property_data(app, zones, zone_properties):
         zpd_1 = model.ZonePropertyData.new(
             zone_id=zones[0],
             zone_property_id=zone_properties[0],
-            value="12",
+            value="2",
         )
         zpd_2 = model.ZonePropertyData.new(
             zone_id=zones[1],
