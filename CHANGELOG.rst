@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+0.20.1 (2023-05-22)
++++++++++++++++++++
+
+Features:
+
+- Add unit and ratio arguments to energy consumption breakdown resource
+
+Other changes:
+
+- Require bemserver-core 0.15.1
+
 0.20.0 (2023-05-05)
 +++++++++++++++++++
 
