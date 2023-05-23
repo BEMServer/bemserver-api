@@ -310,6 +310,8 @@ class TestAnalysisApiEnergyConsumption:
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 409
+                ret_data = ret.json
+                assert ret_data["message"] == 'Site has no "Dummy" property.'
 
         # Without user <-> timeseries association
         with OpenBar():
@@ -547,6 +549,8 @@ class TestAnalysisApiEnergyConsumption:
                 assert ret.status_code == 401
             else:
                 assert ret.status_code == 409
+                ret_data = ret.json
+                assert ret_data["message"] == 'Building has no "Dummy" property.'
 
         # Without user <-> timeseries association
         with OpenBar():

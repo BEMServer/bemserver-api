@@ -37,7 +37,7 @@ def get_energy_consumption_breakdown_for_site(args, site_id):
     if ratio_prop:
         ratio = site.get_property_value(ratio_prop)
         if ratio is None:
-            abort(409, message='Site has no "{ratio_prop}" property.')
+            abort(409, message=f'Site has no "{ratio_prop}" property.')
     else:
         ratio = 1
 
@@ -73,7 +73,7 @@ def get_energy_consumption_breakdown_for_building(args, building_id):
     if ratio_prop:
         ratio = building.get_property_value(ratio_prop)
         if ratio is None:
-            abort(409, message='Building has no "{ratio_prop}" property.')
+            abort(409, message=f'Building has no "{ratio_prop}" property.')
     else:
         ratio = 1
 
