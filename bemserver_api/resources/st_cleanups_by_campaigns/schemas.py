@@ -4,7 +4,8 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.scheduled_tasks import ST_CleanupByCampaign
 
-from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api import AutoSchema, Schema
+from bemserver_api.extensions import ma_fields
 
 
 class ST_CleanupByCampaignSchema(AutoSchema):
@@ -31,7 +32,7 @@ class ST_CleanupByCampaignQueryArgsSchema(Schema):
 
 
 class ST_CleanupByCampaignFullQueryArgsSchema(Schema):
-    sort = SortField(("campaign_name",))
+    sort = ma_fields.SortField(("campaign_name",))
     is_enabled = ma.fields.Bool()
     campaign_id = ma.fields.Int()
     in_campaign_name = ma.fields.Str(

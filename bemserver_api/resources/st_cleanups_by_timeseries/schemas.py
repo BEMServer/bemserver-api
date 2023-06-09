@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.scheduled_tasks import ST_CleanupByTimeseries
 
-from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api import AutoSchema, Schema
 from bemserver_api.extensions import ma_fields
 
 
@@ -29,7 +29,7 @@ class ST_CleanupByTimeseriesQueryArgsSchema(Schema):
 
 
 class ST_CleanupByTimeseriesFullQueryArgsSchema(Schema):
-    sort = SortField(
+    sort = ma_fields.SortField(
         (
             "timeseries_name",
             "last_timestamp",

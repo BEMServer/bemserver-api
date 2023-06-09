@@ -5,7 +5,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Event, EventLevelEnum
 
-from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api import AutoSchema, Schema
 from bemserver_api.extensions import ma_fields
 
 
@@ -24,7 +24,7 @@ class EventPutSchema(EventSchema):
 
 
 class EventQueryArgsSchema(Schema):
-    sort = SortField(("timestamp", "level"))
+    sort = ma_fields.SortField(("timestamp", "level"))
     campaign_id = ma.fields.Integer()
     campaign_scope_id = ma.fields.Integer()
     user_id = ma.fields.Integer()

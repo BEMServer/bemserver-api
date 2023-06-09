@@ -4,7 +4,8 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.scheduled_tasks import ST_DownloadWeatherDataBySite
 
-from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api import AutoSchema, Schema
+from bemserver_api.extensions import ma_fields
 
 
 class ST_DownloadWeatherDataBySiteSchema(AutoSchema):
@@ -32,7 +33,7 @@ class ST_DownloadWeatherDataBySiteQueryArgsSchema(Schema):
 
 
 class ST_DownloadWeatherDataBySiteFullQueryArgsSchema(Schema):
-    sort = SortField(
+    sort = ma_fields.SortField(
         (
             "campaign_id",
             "site_name",
