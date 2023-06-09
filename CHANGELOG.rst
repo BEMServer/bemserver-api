@@ -1,6 +1,18 @@
 Changelog
 ---------
 
+0.21.0 (2023-06-09)
++++++++++++++++++++
+
+Bug fixes:
+
+- Fix error message for no ratio in breakdown
+
+Other changes:
+
+- Remove official Python 3.11 support
+- Require bemserver-core 0.16.0
+
 0.20.1 (2023-05-22)
 +++++++++++++++++++
 
