@@ -10,7 +10,7 @@ with open("README.rst", encoding="utf-8") as f:
 
 setup(
     name="bemserver-api",
-    version="0.20.1",
+    version="0.21.0",
     description="BEMServer API",
     long_description=long_description,
     url="https://github.com/BEMServer/bemserver-api",
