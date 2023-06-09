@@ -1,6 +1,6 @@
 """Test integrity error"""
 import sqlalchemy as sqla
-import psycopg2.errors as ppe
+import psycopg.errors as ppe
 import flask
 
 import pytest
