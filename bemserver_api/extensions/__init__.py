@@ -5,6 +5,5 @@ from .smorest import (  # noqa
     Schema,
     AutoSchema,
     SQLCursorPage,
-    SortField,
 )
 from .integrity_error import catch_integrity_error  # noqa

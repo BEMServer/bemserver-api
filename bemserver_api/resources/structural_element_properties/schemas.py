@@ -6,7 +6,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.model import StructuralElementProperty
 from bemserver_core.common import PropertyType
 
-from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api import AutoSchema, Schema
 from bemserver_api.extensions import ma_fields
 
 
@@ -26,7 +26,7 @@ class StructuralElementPropertyPutSchema(StructuralElementPropertySchema):
 
 
 class StructuralElementPropertyQueryArgsSchema(Schema):
-    sort = SortField(("name",))
+    sort = ma_fields.SortField(("name",))
     name = ma.fields.Str()
     value_type = ma.fields.Enum(PropertyType)
     unit_symbol = ma_fields.UnitSymbol()

@@ -4,7 +4,7 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import Notification
 
-from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api import AutoSchema, Schema
 from bemserver_api.extensions import ma_fields
 from ..events.schemas import EventSchema
 
@@ -23,7 +23,7 @@ class NotificationPutSchema(NotificationSchema):
 
 
 class NotificationQueryArgsSchema(Schema):
-    sort = SortField(("timestamp",))
+    sort = ma_fields.SortField(("timestamp",))
     user_id = ma.fields.Integer()
     event_id = ma.fields.Integer()
     campaign_id = ma.fields.Integer()

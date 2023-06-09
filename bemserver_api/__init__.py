@@ -10,7 +10,6 @@ from .extensions import (  # noqa
     Schema,
     AutoSchema,
     SQLCursorPage,
-    SortField,
     authentication,
 )
 from .resources import register_blueprints

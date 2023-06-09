@@ -4,6 +4,7 @@ import datetime as dt
 import json
 
 import marshmallow as ma
+from webargs.fields import DelimitedList
 
 from bemserver_core.common import ureg
 from bemserver_core.exceptions import BEMServerCoreUndefinedUnitError
@@ -64,3 +65,18 @@ class UnitSymbol(ma.fields.String):
         except BEMServerCoreUndefinedUnitError as exc:
             raise ma.ValidationError("Undefined unit.") from exc
         return value
+
+
+class SortField(DelimitedList):
+    """Field used to specify sort order fields
+
+    :param list fields: List of fields to sort upon, by order of priority (the
+    first field is the first sort key). Each field is a field name, optionally
+    prefixed with "+" or "-".
+    """
+
+    def __init__(self, fields, **kwargs):
+        validator = ma.validate.OneOf(
+            [v for f in fields for v in [f, f"+{f}", f"-{f}"]]
+        )
+        super().__init__(ma.fields.String(validate=validator), **kwargs)

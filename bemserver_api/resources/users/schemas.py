@@ -4,7 +4,8 @@ import marshmallow_sqlalchemy as msa
 
 from bemserver_core.model import User
 
-from bemserver_api import AutoSchema, Schema, SortField
+from bemserver_api import AutoSchema, Schema
+from bemserver_api.extensions import ma_fields
 
 
 class UserSchema(AutoSchema):
@@ -21,7 +22,7 @@ class UserSchema(AutoSchema):
 
 
 class UserQueryArgsSchema(Schema):
-    sort = SortField(("name", "email", "is_admin", "is_active"))
+    sort = ma_fields.SortField(("name", "email", "is_admin", "is_active"))
     name = ma.fields.Str()
     email = ma.fields.Str()
     is_admin = ma.fields.Boolean()
