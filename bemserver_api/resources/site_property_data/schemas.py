@@ -6,6 +6,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.model import SitePropertyData
 
 from bemserver_api import AutoSchema, Schema
+from ..site_properties.schemas import SitePropertySchema
 
 
 class SitePropertyDataSchema(AutoSchema):
@@ -13,6 +14,10 @@ class SitePropertyDataSchema(AutoSchema):
         model = SitePropertyData
 
     id = msa.auto_field(dump_only=True)
+    site_property = ma.fields.Nested(
+        SitePropertySchema(exclude=("id",)),
+        dump_only=True,
+    )
 
 
 class SitePropertyDataQueryArgsSchema(Schema):
