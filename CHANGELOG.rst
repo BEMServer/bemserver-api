@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+0.22.0 (unreleased)
++++++++++++++++++++
+
+Features:
+
+- Embed property in property data for Site/Building/... resources
+
+
 0.21.0 (2023-06-09)
 +++++++++++++++++++
 
