@@ -258,7 +258,7 @@ def get(args):
 @blp.response(200, content_type="application/json", example=PAYLOAD_BY_ID_JSON_EXAMPLE)
 @blp.alt_response(200, content_type="text/csv", example=PAYLOAD_BY_ID_CSV_EXAMPLE)
 def get_aggregate(args):
-    """Get aggregated timeseries data as CSV file
+    """Get aggregated timeseries data
 
     Returns data in either JSON or CSV format.
 
