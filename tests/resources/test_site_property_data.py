@@ -37,6 +37,7 @@ class TestSitePropertyDataApi:
             assert ret.status_code == 201
             ret_val = ret.json
             spd_1_id = ret_val.pop("id")
+            ret_val.pop("site_property")
             spd_1_etag = ret.headers["ETag"]
             assert ret_val == spd_1
 
@@ -66,6 +67,7 @@ class TestSitePropertyDataApi:
             assert ret.headers["ETag"] == spd_1_etag
             ret_val = ret.json
             ret_val.pop("id")
+            ret_val.pop("site_property")
             assert ret_val == spd_1
 
             # PUT
@@ -78,6 +80,7 @@ class TestSitePropertyDataApi:
             assert ret.status_code == 200
             ret_val = ret.json
             ret_val.pop("id")
+            ret_val.pop("site_property")
             spd_1_etag = ret.headers["ETag"]
             assert ret_val == spd_1
 
@@ -194,6 +197,7 @@ class TestSitePropertyDataApi:
             assert len(ret_val) == 1
             spd_1 = ret_val[0]
             assert spd_1.pop("id") == spd_1_id
+            spd_1.pop("site_property")
 
             # POST
             spd_3 = {

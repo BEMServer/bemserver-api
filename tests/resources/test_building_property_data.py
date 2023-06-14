@@ -39,6 +39,7 @@ class TestBuildingPropertyDataApi:
             assert ret.status_code == 201
             ret_val = ret.json
             bpd_1_id = ret_val.pop("id")
+            ret_val.pop("building_property")
             bpd_1_etag = ret.headers["ETag"]
             assert ret_val == bpd_1
 
@@ -68,6 +69,7 @@ class TestBuildingPropertyDataApi:
             assert ret.headers["ETag"] == bpd_1_etag
             ret_val = ret.json
             ret_val.pop("id")
+            ret_val.pop("building_property")
             assert ret_val == bpd_1
 
             # PUT
@@ -80,6 +82,7 @@ class TestBuildingPropertyDataApi:
             assert ret.status_code == 200
             ret_val = ret.json
             ret_val.pop("id")
+            ret_val.pop("building_property")
             bpd_1_etag = ret.headers["ETag"]
             assert ret_val == bpd_1
 
@@ -196,6 +199,7 @@ class TestBuildingPropertyDataApi:
             assert len(ret_val) == 1
             bpd_1 = ret_val[0]
             assert bpd_1.pop("id") == bpd_1_id
+            bpd_1.pop("building_property")
 
             # POST
             bpd_3 = {

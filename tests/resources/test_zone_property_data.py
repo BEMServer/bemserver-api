@@ -36,6 +36,7 @@ class TestZonePropertyDataApi:
             assert ret.status_code == 201
             ret_val = ret.json
             zpd_1_id = ret_val.pop("id")
+            ret_val.pop("zone_property")
             zpd_1_etag = ret.headers["ETag"]
             assert ret_val == zpd_1
 
@@ -65,6 +66,7 @@ class TestZonePropertyDataApi:
             assert ret.headers["ETag"] == zpd_1_etag
             ret_val = ret.json
             ret_val.pop("id")
+            ret_val.pop("zone_property")
             assert ret_val == zpd_1
 
             # PUT
@@ -77,6 +79,7 @@ class TestZonePropertyDataApi:
             assert ret.status_code == 200
             ret_val = ret.json
             ret_val.pop("id")
+            ret_val.pop("zone_property")
             zpd_1_etag = ret.headers["ETag"]
             assert ret_val == zpd_1
 
@@ -185,6 +188,7 @@ class TestZonePropertyDataApi:
             assert len(ret_val) == 1
             zpd_1 = ret_val[0]
             assert zpd_1.pop("id") == zpd_1_id
+            zpd_1.pop("zone_property")
 
             # POST
             zpd_3 = {

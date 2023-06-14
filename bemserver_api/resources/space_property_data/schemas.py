@@ -6,6 +6,7 @@ import marshmallow_sqlalchemy as msa
 from bemserver_core.model import SpacePropertyData
 
 from bemserver_api import AutoSchema, Schema
+from ..space_properties.schemas import SpacePropertySchema
 
 
 class SpacePropertyDataSchema(AutoSchema):
@@ -13,6 +14,10 @@ class SpacePropertyDataSchema(AutoSchema):
         model = SpacePropertyData
 
     id = msa.auto_field(dump_only=True)
+    space_property = ma.fields.Nested(
+        SpacePropertySchema(exclude=("id",)),
+        dump_only=True,
+    )
 
 
 class SpacePropertyDataQueryArgsSchema(Schema):
