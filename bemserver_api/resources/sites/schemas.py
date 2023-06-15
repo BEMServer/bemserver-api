@@ -58,7 +58,10 @@ class GetDegreeDaysQueryArgsSchema(Schema):
             "description": "End date (excluded from the interval)",
         },
     )
-    period = ma.fields.String(validate=ma.validate.OneOf(("day", "month", "year")))
+    period = ma.fields.String(
+        required=True,
+        validate=ma.validate.OneOf(("day", "month", "year")),
+    )
     type_ = ma.fields.String(
         data_key="type",
         validate=ma.validate.OneOf(("heating", "cooling")),
