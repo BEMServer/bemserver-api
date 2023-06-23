@@ -36,7 +36,7 @@ psutil==5.9.5
     # via mirakuru
 psycopg==3.1.9
     # via pytest-postgresql
-pytest==7.3.2
+pytest==7.4.0
     # via
     #   -r requirements/tests.in
     #   pytest-cov
