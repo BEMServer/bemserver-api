@@ -123,7 +123,9 @@ def download_weather_data(args, item_id):
     if item is None:
         abort(404)
     try:
-        wdp.get_weather_data_for_site(item, args["start_time"], args["end_time"])
+        wdp.get_weather_data_for_site(
+            item, args["start_time"], args["end_time"], args["forecast"]
+        )
     except (
         BEMServerCoreSettingsError,
         BEMServerCoreWeatherProcessMissingCoordinatesError,

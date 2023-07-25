@@ -272,6 +272,7 @@ class TestSitesDownloadWeatherDataApi:
     ):
         creds = users["Chuck"]["creds"]
         site_1_id = sites[0]
+        site_2_id = sites[1]
 
         start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.timezone.utc)
         end_dt = dt.datetime(2020, 1, 1, 2, 0, tzinfo=dt.timezone.utc)
@@ -288,8 +289,10 @@ class TestSitesDownloadWeatherDataApi:
             ],
             "index": [f"{start_dt.timestamp():0.0f}", f"{oik_end_dt.timestamp():0.0f}"],
             "data": [
+                # Model may be era5 or gfs depending on forecast
+                # but this is ignored so don't bother
                 ["(43.47394, -1.50940)", "era5", 694.09, 1.0, 2.45, 0.78],
-                ["(43.47394, -1.50940)", "era5", 694.09, 1.0, 2.59, 0.78],
+                ["(43.47394, -1.50940)", "era5", 694.09, 1.0, 2.59, 0.79],
             ],
         }
         resp_json = {
@@ -320,10 +323,12 @@ class TestSitesDownloadWeatherDataApi:
                 "lon": -1.50940,
                 "start": start_dt.isoformat(),
                 "end": oik_end_dt.isoformat(),
+                "model": "era5",
                 "api-key": "dummy-key",
             },
             timeout=60,
         )
+        mock_get.reset_mock()
 
         with OpenBar():
             air_temp_ts = Timeseries.get_by_id(timeseries[0])
@@ -344,6 +349,52 @@ class TestSitesDownloadWeatherDataApi:
             tz="UTC",
         )
         expected_data_df = pd.DataFrame({"Timeseries 0": [2.45, 2.59]}, index=index)
+        assert_frame_equal(data_df, expected_data_df, check_names=False)
+
+        with AuthHeader(creds):
+            ret = client.put(
+                f"{SITES_URL}{site_2_id}/download_weather_data",
+                query_string={
+                    "start_time": start_dt.isoformat(),
+                    "end_time": end_dt.isoformat(),
+                    "forecast": True,
+                },
+            )
+            assert ret.status_code == 204
+
+        mock_get.assert_called_with(
+            url="https://api.oikolab.com/weather",
+            params={
+                "param": ["relative_humidity"],
+                "lat": 44.84325,
+                "lon": -0.56262,
+                "start": start_dt.isoformat(),
+                "end": oik_end_dt.isoformat(),
+                "model": "gfs",
+                "api-key": "dummy-key",
+            },
+            timeout=60,
+        )
+
+        with OpenBar():
+            rh_ts = Timeseries.get_by_id(timeseries[1])
+            ds_clean = TimeseriesDataState.get(name="Clean").first()
+            data_df = tsdio.get_timeseries_data(
+                start_dt,
+                end_dt,
+                (rh_ts,),
+                ds_clean,
+                col_label="name",
+            )
+        index = pd.DatetimeIndex(
+            [
+                "2020-01-01T00:00:00+00:00",
+                "2020-01-01T01:00:00+00:00",
+            ],
+            name="timestamp",
+            tz="UTC",
+        )
+        expected_data_df = pd.DataFrame({"Timeseries 1": [78.0, 79.0]}, index=index)
         assert_frame_equal(data_df, expected_data_df, check_names=False)
 
     @pytest.mark.usefixtures("weather_timeseries_by_sites")

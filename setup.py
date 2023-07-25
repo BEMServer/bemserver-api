@@ -38,7 +38,7 @@ setup(
         "flask_smorest>=0.42.0,<0.43",
         "apispec>=6.1.0,<7.0",
         "flask-httpauth>=4.7.0,<5.0",
-        "bemserver-core>=0.16.0,<0.17",
+        "bemserver-core>=0.16.2,<0.17",
     ],
     packages=find_packages(exclude=["tests*"]),
     include_package_data=True,
