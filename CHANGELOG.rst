@@ -1,12 +1,17 @@
 Changelog
 ---------
 
-0.22.0 (unreleased)
+0.22.0 (2023-07-25)
 +++++++++++++++++++
 
 Features:
 
 - Embed property in property data for Site/Building/... resources
+- Add forecast argument to get weather data resource
+
+Bug fixes
+
+- Make period required in degree days resource
 
 
 0.21.0 (2023-06-09)
