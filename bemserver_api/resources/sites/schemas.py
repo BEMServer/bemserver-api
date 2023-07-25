@@ -43,6 +43,12 @@ class DownloadWeatherDataQueryArgsSchema(Schema):
             "description": "End datetime (excluded from the interval)",
         },
     )
+    forecast = ma.fields.Boolean(
+        load_default=False,
+        metadata={
+            "description": "Whether to get reanalysis (default) or forecast data",
+        },
+    )
 
 
 class GetDegreeDaysQueryArgsSchema(Schema):
