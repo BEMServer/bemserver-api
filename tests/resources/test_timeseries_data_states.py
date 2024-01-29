@@ -1,4 +1,5 @@
 """Timeseries data states tests"""
+
 from tests.common import AuthHeader
 
 

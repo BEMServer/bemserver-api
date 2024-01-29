@@ -1,4 +1,5 @@
 """Energy consumption API schemas"""
+
 import marshmallow as ma
 
 from bemserver_api import Schema

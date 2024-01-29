@@ -1,4 +1,5 @@
 """Energy production timeseries by buildings API schemas"""
+
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 

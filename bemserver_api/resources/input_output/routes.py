@@ -1,4 +1,5 @@
 """Input/Output resources"""
+
 import io
 
 from flask_smorest import abort

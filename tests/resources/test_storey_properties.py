@@ -1,4 +1,5 @@
 """Storey properties routes tests"""
+
 from tests.common import AuthHeader
 
 

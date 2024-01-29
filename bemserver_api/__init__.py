@@ -1,4 +1,5 @@
 """BEMServer API"""
+
 import flask
 
 from bemserver_core import BEMServerCore

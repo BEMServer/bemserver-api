@@ -1,4 +1,5 @@
 """Analysis resources"""
+
 from bemserver_api import Blueprint
 
 from .completeness.routes import blp as completeness_blp

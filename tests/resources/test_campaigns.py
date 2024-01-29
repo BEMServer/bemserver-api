@@ -1,4 +1,5 @@
 """Campaigns routes tests"""
+
 import datetime as dt
 
 import pytest

@@ -1,4 +1,5 @@
 """Spaces routes tests"""
+
 import pytest
 
 from tests.common import AuthHeader

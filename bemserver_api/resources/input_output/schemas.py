@@ -1,4 +1,5 @@
 """Input/Output API schemas"""
+
 import marshmallow as ma
 from flask_smorest.fields import Upload
 

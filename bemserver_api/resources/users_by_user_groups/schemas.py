@@ -1,4 +1,5 @@
 """Users by user groups API schemas"""
+
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 

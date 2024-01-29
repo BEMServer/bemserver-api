@@ -1,4 +1,5 @@
 """Timeseries property data tests"""
+
 import copy
 import pytest
 

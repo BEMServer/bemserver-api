@@ -1,4 +1,5 @@
 """Energy consumption timeseries by sites routes tests"""
+
 import pytest
 
 from tests.common import AuthHeader

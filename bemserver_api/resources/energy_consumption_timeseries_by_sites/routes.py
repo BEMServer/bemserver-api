@@ -1,4 +1,5 @@
 """Energy consumption timeseries by sites resources"""
+
 from flask.views import MethodView
 from flask_smorest import abort
 

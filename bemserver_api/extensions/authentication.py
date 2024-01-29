@@ -1,4 +1,5 @@
 """Authentication"""
+
 from functools import wraps
 
 import sqlalchemy as sqla

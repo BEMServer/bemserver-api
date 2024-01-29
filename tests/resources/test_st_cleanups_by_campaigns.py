@@ -1,4 +1,5 @@
 """STCleanupByCampaigns routes tests"""
+
 import pytest
 from copy import deepcopy
 

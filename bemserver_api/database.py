@@ -1,4 +1,5 @@
 """Database access"""
+
 from bemserver_core.database import db
 
 

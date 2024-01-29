@@ -1,4 +1,5 @@
 """Site resources"""
+
 from textwrap import dedent
 import http
 

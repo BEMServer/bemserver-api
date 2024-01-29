@@ -1,4 +1,5 @@
 """Timeseries data API schemas"""
+
 import marshmallow as ma
 
 from bemserver_core.input_output.timeseries_data_io import AGGREGATION_FUNCTIONS

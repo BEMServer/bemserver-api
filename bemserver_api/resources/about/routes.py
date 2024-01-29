@@ -1,4 +1,5 @@
 """About resources"""
+
 import bemserver_core
 import bemserver_api
 from bemserver_api import Blueprint
