@@ -48,14 +48,14 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
-flask==2.3.2
+flask==3.0.2
     # via
     #   bemserver-api (setup.py)
     #   flask-httpauth
     #   flask-smorest
 flask-httpauth==4.8.0
     # via bemserver-api (setup.py)
-flask-smorest==0.42.0
+flask-smorest==0.43.0
     # via bemserver-api (setup.py)
 greenlet==2.0.2
     # via sqlalchemy
@@ -148,7 +148,7 @@ wcwidth==0.2.6
     # via prompt-toolkit
 webargs==8.2.0
     # via flask-smorest
-werkzeug==2.3.6
+werkzeug==3.0.1
     # via
     #   flask
     #   flask-smorest
