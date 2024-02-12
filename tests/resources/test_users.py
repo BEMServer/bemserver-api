@@ -1,4 +1,5 @@
 """Users routes tests"""
+
 from tests.common import AuthHeader
 
 

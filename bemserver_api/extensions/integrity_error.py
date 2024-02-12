@@ -2,6 +2,7 @@
 
 Catch integrity errors in resources and return appropriate error code.
 """
+
 import contextlib
 
 import sqlalchemy as sqla

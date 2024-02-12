@@ -1,4 +1,5 @@
 """Timeseries by storeys routes tests"""
+
 import pytest
 
 from tests.common import AuthHeader

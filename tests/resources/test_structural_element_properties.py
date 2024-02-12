@@ -1,4 +1,5 @@
 """Structural element properties routes tests"""
+
 import copy
 
 from tests.common import AuthHeader

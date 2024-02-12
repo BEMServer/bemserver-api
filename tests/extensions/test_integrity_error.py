@@ -1,4 +1,5 @@
 """Test integrity error"""
+
 import sqlalchemy as sqla
 import psycopg.errors as ppe
 import flask

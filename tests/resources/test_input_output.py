@@ -1,4 +1,5 @@
 """Input / Output tests"""
+
 import contextlib
 import io
 

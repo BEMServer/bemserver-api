@@ -1,4 +1,5 @@
 """Completeness resources"""
+
 from flask_smorest import abort
 
 from bemserver_core.process.completeness import compute_completeness

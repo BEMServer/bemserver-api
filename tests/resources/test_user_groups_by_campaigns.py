@@ -1,4 +1,5 @@
 """User groups by campaigns routes tests"""
+
 import pytest
 
 from tests.common import AuthHeader

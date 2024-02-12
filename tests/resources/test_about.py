@@ -1,4 +1,5 @@
 """About routes tests"""
+
 import contextlib
 
 import bemserver_core

@@ -1,4 +1,5 @@
 """Test authentication extension"""
+
 from flask import jsonify
 
 from bemserver_api import Blueprint

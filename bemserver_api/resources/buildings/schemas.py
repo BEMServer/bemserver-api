@@ -1,4 +1,5 @@
 """Buildings API schemas"""
+
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 

@@ -1,4 +1,5 @@
 """Timeseries data tests"""
+
 import contextlib
 import datetime as dt
 

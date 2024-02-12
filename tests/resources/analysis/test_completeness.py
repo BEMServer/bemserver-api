@@ -1,4 +1,5 @@
 """Completeness tests"""
+
 import contextlib
 
 import pytest

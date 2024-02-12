@@ -1,4 +1,5 @@
 """Timeseries by events resources"""
+
 from flask.views import MethodView
 from flask_smorest import abort
 

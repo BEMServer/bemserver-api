@@ -1,4 +1,5 @@
 """Custom marshmallow fields"""
+
 from pathlib import Path
 import datetime as dt
 import json

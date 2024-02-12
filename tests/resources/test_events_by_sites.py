@@ -1,4 +1,5 @@
 """Events by sites routes tests"""
+
 import pytest
 
 from tests.common import AuthHeader

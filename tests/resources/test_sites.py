@@ -1,4 +1,5 @@
 """Sites routes tests"""
+
 import math
 import datetime as dt
 import json
@@ -600,9 +601,11 @@ class TestSitesDownloadWeatherDataApi:
             if unit == "°F":
                 month_avg_temp = month_avg_temp * 9 / 5 + 32
             expected_d = pd.Series(
-                (month_avg_temp - base)
-                if type_ == "cooling"
-                else (base - month_avg_temp),
+                (
+                    (month_avg_temp - base)
+                    if type_ == "cooling"
+                    else (base - month_avg_temp)
+                ),
                 index=expected_d_index,
                 dtype="float",
             )

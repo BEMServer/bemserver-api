@@ -1,4 +1,5 @@
 """Notifications tests"""
+
 import datetime as dt
 
 from tests.common import AuthHeader

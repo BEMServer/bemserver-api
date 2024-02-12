@@ -1,4 +1,5 @@
 """Energy consumption resources"""
+
 from flask_smorest import abort
 
 from bemserver_core.process.energy_consumption import (

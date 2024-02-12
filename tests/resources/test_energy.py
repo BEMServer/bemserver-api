@@ -1,4 +1,5 @@
 """Energy tests"""
+
 import pytest
 
 from tests.common import AuthHeader

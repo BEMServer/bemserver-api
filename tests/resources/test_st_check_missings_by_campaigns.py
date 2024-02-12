@@ -1,4 +1,5 @@
 """STCheckMissingByCampaigns routes tests"""
+
 from copy import deepcopy
 
 import pytest

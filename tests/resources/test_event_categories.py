@@ -1,4 +1,5 @@
 """Event categories tests"""
+
 from tests.common import AuthHeader
 
 

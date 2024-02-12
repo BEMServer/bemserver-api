@@ -1,4 +1,5 @@
 """REST API extension"""
+
 from copy import deepcopy
 from functools import wraps
 import http

@@ -1,4 +1,5 @@
 """BEMServer API extensions"""
+
 from .smorest import (  # noqa
     Api,
     Blueprint,

@@ -1,4 +1,5 @@
 """Timeseries data resources"""
+
 from textwrap import dedent
 
 import flask

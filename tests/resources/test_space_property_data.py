@@ -1,4 +1,5 @@
 """Space property data routes tests"""
+
 import copy
 import pytest
 

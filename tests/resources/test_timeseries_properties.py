@@ -1,4 +1,5 @@
 """Timeseries properties tests"""
+
 import copy
 
 from tests.common import AuthHeader
