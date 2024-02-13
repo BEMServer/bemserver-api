@@ -1,6 +1,7 @@
 """BEMServer API"""
 
 import flask
+from werkzeug.middleware.profiler import ProfilerMiddleware
 
 from bemserver_core import BEMServerCore
 
@@ -39,5 +40,10 @@ def create_app():
     register_blueprints(api)
 
     BEMServerCore()
+
+    if profile_dir := app.config["PROFILE_DIR"]:
+        app.wsgi_app = ProfilerMiddleware(
+            app.wsgi_app, stream=None, profile_dir=profile_dir
+        )
 
     return app
