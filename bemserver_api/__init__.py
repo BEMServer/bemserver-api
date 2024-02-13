@@ -22,16 +22,11 @@ API_VERSION = __version__
 OPENAPI_VERSION = "3.1.0"
 
 
-def create_app(config_override=None):
-    """Create application
-
-    :param type config_override: Config class overriding default config.
-        Used for tests.
-    """
+def create_app():
+    """Create application"""
     app = flask.Flask(__name__)
     app.config.from_object("bemserver_api.settings.Config")
     app.config.from_envvar("BEMSERVER_API_SETTINGS_FILE", silent=True)
-    app.config.from_object(config_override)
 
     database.init_app(app)
     api = Api(
