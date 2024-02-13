@@ -1,6 +1,19 @@
 Changelog
 ---------
 
+0.23.0 (2024-02-13)
++++++++++++++++++++
+
+Features:
+
+- Add profiling feature
+
+Other features:
+
+- Require bemserver-core 0.17.1
+- Require Flask 3.0.2
+- Support Python 3.11 and Python 3.12
+
 0.22.0 (2023-07-25)
 +++++++++++++++++++
 
