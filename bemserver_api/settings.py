@@ -17,3 +17,6 @@ class Config:
         "allow-spec-file-download": "true",
         "show-components": "true",
     }
+
+    # Profiling
+    PROFILE_DIR = ""
