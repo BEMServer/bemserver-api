@@ -36,7 +36,7 @@ pre-commit==3.3.3
     # via -r requirements/dev.in
 psutil==5.9.5
     # via mirakuru
-psycopg==3.1.9
+psycopg==3.1.18
     # via pytest-postgresql
 pytest==7.4.0
     # via

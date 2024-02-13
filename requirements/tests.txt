@@ -20,7 +20,7 @@ port-for==0.6.3
     # via pytest-postgresql
 psutil==5.9.5
     # via mirakuru
-psycopg==3.1.9
+psycopg==3.1.18
     # via pytest-postgresql
 pytest==7.4.0
     # via

@@ -555,7 +555,7 @@ class TestSitesDownloadWeatherDataApi:
             ds_clean = TimeseriesDataState.get(name="Clean").first()
 
             index = pd.date_range(
-                start_d, end_d, freq="H", tz="UTC", inclusive="left", name="timestamp"
+                start_d, end_d, freq="h", tz="UTC", inclusive="left", name="timestamp"
             )
             weather_df = pd.DataFrame(index=index)
             weather_df[air_temp_ts_id] = index.month
@@ -564,7 +564,7 @@ class TestSitesDownloadWeatherDataApi:
 
             # Introduce a bias to check that computation method uses min/max
             weather_df[air_temp_ts_id] += 5
-            weather_df[air_temp_ts_id][index.hour == 1] -= 10
+            weather_df.loc[index.hour == 1, air_temp_ts_id] -= 10
 
             tsdio.set_timeseries_data(weather_df, data_state=ds_clean)
             db.session.commit()
@@ -660,7 +660,7 @@ class TestSitesDownloadWeatherDataApi:
             assert ret.status_code == 200
             ret_data = ret.json
 
-            expected_y = expected_d.resample("AS").sum()
+            expected_y = expected_d.resample("YS").sum()
             loaded_dd = pd.Series(ret_data["degree_days"])
             loaded_dd.index = pd.DatetimeIndex(loaded_dd.index)
             assert_series_equal(
@@ -790,7 +790,7 @@ class TestSitesDownloadWeatherDataApi:
             ds_clean = TimeseriesDataState.get(name="Clean").first()
 
             index = pd.date_range(
-                start_d, end_d, freq="H", tz="UTC", inclusive="left", name="timestamp"
+                start_d, end_d, freq="h", tz="UTC", inclusive="left", name="timestamp"
             )
             weather_df = pd.DataFrame(index=index)
             weather_df[air_temp_ts_id] = index.month
