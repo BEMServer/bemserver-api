@@ -8,7 +8,7 @@ Features:
 
 - Add profiling feature
 
-Other features:
+Other changes:
 
 - Require bemserver-core 0.17.1
 - Require Flask 3.0.2
