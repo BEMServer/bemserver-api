@@ -59,7 +59,7 @@ flask-smorest==0.43.0
     # via bemserver-api (setup.py)
 greenlet==3.0.3
     # via sqlalchemy
-idna==3.6
+idna==3.7
     # via requests
 itsdangerous==2.1.2
     # via flask
