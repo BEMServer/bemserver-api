@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.24.0 (unreleased)
++++++++++++++++++++
+
+Features:
+
+- Remove bemserver_api.__version__
+
 0.23.0 (2024-02-13)
 +++++++++++++++++++
 
