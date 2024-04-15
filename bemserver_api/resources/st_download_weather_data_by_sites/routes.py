@@ -1,21 +1,19 @@
 """ST_DownloadWeatherDataBySite resources"""
 
+from bemserver_core.scheduled_tasks import ST_DownloadWeatherDataBySite
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.scheduled_tasks import ST_DownloadWeatherDataBySite
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    ST_DownloadWeatherDataBySiteSchema,
-    ST_DownloadWeatherDataBySiteQueryArgsSchema,
-    ST_DownloadWeatherDataBySitePutSchema,
-    ST_DownloadWeatherDataBySiteFullSchema,
     ST_DownloadWeatherDataBySiteFullQueryArgsSchema,
+    ST_DownloadWeatherDataBySiteFullSchema,
+    ST_DownloadWeatherDataBySitePutSchema,
+    ST_DownloadWeatherDataBySiteQueryArgsSchema,
+    ST_DownloadWeatherDataBySiteSchema,
 )
-
 
 blp = Blueprint(
     "ST_DownloadWeatherDataBySite",

@@ -1,18 +1,16 @@
 """Timeseries by sites resources"""
 
+from bemserver_core.model import TimeseriesBySite
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import TimeseriesBySite
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
 from .schemas import (
-    TimeseriesBySiteSchema,
     TimeseriesBySiteQueryArgsSchema,
+    TimeseriesBySiteSchema,
 )
-
 
 blp = Blueprint(
     "TimeseriesBySite",

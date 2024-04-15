@@ -1,13 +1,11 @@
 """Energies resources"""
 
-from flask.views import MethodView
-
 from bemserver_core.model import Energy
+from flask.views import MethodView
 
 from bemserver_api import Blueprint
 
 from .schemas import EnergySchema
-
 
 blp = Blueprint(
     "Energy",

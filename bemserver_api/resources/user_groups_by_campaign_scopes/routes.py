@@ -1,18 +1,16 @@
 """User groups by campaign scopes resources"""
 
+from bemserver_core.model import UserGroupByCampaignScope
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import UserGroupByCampaignScope
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    UserGroupByCampaignScopeSchema,
     UserGroupByCampaignScopeQueryArgsSchema,
+    UserGroupByCampaignScopeSchema,
 )
-
 
 blp = Blueprint(
     "UserGroupByCampaignScope",

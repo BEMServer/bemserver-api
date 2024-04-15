@@ -1,11 +1,12 @@
 """Site property data API schemas"""
 
 import marshmallow as ma
-import marshmallow_sqlalchemy as msa
 
+import marshmallow_sqlalchemy as msa
 from bemserver_core.model import SitePropertyData
 
 from bemserver_api import AutoSchema, Schema
+
 from ..site_properties.schemas import SitePropertySchema
 
 

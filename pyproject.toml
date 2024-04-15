@@ -1,0 +1,87 @@
+[project]
+name = "bemserver-api"
+version = "0.23.0"
+description = "BEMServer API"
+readme = "README.rst"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Jérôme Lafréchoux", email = "jlafrechoux@nobatek.inef4.com" },
+  { name = "David Frédérique", email = "dfrederique@nobatek.inef4.com" },
+]
+maintainers = [
+  { name = "Jérôme Lafréchoux", email = "jlafrechoux@nobatek.inef4.com" },
+  { name = "David Frédérique", email = "dfrederique@nobatek.inef4.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Topic :: Scientific/Engineering",
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.9"
+dependencies = [
+  "flask>=3.0.2,<4.0",
+  "python-dotenv>=0.9.0",
+  "marshmallow>=3.18.0,<4.0",
+  "sqlalchemy>=2.0,<3.0",
+  "marshmallow-sqlalchemy>=0.29.0,<0.30",
+  "flask_smorest>=0.43.0,<0.44",
+  "apispec>=6.1.0,<7.0",
+  "flask-httpauth>=4.7.0,<5.0",
+  "bemserver-core>=0.17.1,<0.18",
+]
+
+[project.urls]
+Issues = "https://github.com/bemserver/bemserver-api/issues"
+Source = "https://github.com/bemserver/bemserver-api"
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.sdist]
+include = [
+  "docs/",
+  "tests/",
+  "CHANGELOG.rst",
+  "tox.ini",
+]
+
+[tool.ruff]
+src = ["src"]
+fix = true
+show-fixes = true
+output-format = "full"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = [
+  "B",  # flake8-bugbear
+  "E",  # pycodestyle error
+  "F",  # pyflakes
+  "I",  # isort
+  "UP", # pyupgrade
+  "W",  # pycodestyle warning
+]
+
+[tool.ruff.lint.isort]
+section-order = ["future", "standard-library", "testing", "db", "marshmallow", "science", "third-party", "core", "first-party", "local-folder"]
+
+[tool.ruff.lint.isort.sections]
+testing = ["pytest", "pytest-postgresql"]
+db = ["psycopg", "sqlalchemy", "alembic"]
+pallets = ["werkzeug", "flask", "flask-httpauth"]
+marshmallow = ["marshmallow", "marshmallow-sqlalchemy", "webargs", "apispec", "flask-smorest"]
+science = ["numpy", "pandas"]
+core = ["bemserver-core"]
+
+[tool.pytest.ini_options]
+norecursedirs = ".git .tox docs env venv"
+addopts = "-v --tb=short"

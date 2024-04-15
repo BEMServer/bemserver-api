@@ -1,21 +1,19 @@
 """ST_CleanupByCampaign resources"""
 
+from bemserver_core.scheduled_tasks import ST_CleanupByCampaign
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.scheduled_tasks import ST_CleanupByCampaign
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    ST_CleanupByCampaignSchema,
-    ST_CleanupByCampaignQueryArgsSchema,
-    ST_CleanupByCampaignPutSchema,
-    ST_CleanupByCampaignFullSchema,
     ST_CleanupByCampaignFullQueryArgsSchema,
+    ST_CleanupByCampaignFullSchema,
+    ST_CleanupByCampaignPutSchema,
+    ST_CleanupByCampaignQueryArgsSchema,
+    ST_CleanupByCampaignSchema,
 )
-
 
 blp = Blueprint(
     "ST_CleanupByCampaign",

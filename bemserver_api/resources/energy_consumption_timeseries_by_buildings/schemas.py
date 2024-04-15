@@ -1,11 +1,12 @@
 """Energy consumption timeseries by buildings API schemas"""
 
 import marshmallow as ma
-import marshmallow_sqlalchemy as msa
 
+import marshmallow_sqlalchemy as msa
 from bemserver_core.model import EnergyConsumptionTimeseriesByBuilding
 
 from bemserver_api import AutoSchema, Schema
+
 from ..timeseries.schemas import TimeseriesSchema
 
 

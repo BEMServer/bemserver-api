@@ -2,7 +2,6 @@
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 SITE_PROPERTIES_URL = "/site_properties/"

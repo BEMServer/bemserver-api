@@ -4,7 +4,6 @@ import pytest
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 ZONES_URL = "/zones/"

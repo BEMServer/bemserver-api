@@ -1,19 +1,17 @@
 """Structural element properties resources"""
 
+from bemserver_core.model import StructuralElementProperty
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import StructuralElementProperty
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    StructuralElementPropertySchema,
     StructuralElementPropertyPutSchema,
     StructuralElementPropertyQueryArgsSchema,
+    StructuralElementPropertySchema,
 )
-
 
 blp = Blueprint(
     "StructuralElementProperty",

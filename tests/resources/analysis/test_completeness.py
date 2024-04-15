@@ -6,7 +6,6 @@ import pytest
 
 from tests.common import AuthHeader
 
-
 COMPLETENESS_URL = "/analysis/completeness"
 
 

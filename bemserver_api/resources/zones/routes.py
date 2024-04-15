@@ -1,15 +1,13 @@
 """Zone resources"""
 
+from bemserver_core.model import Zone
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import Zone
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import ZoneSchema, ZonePutSchema, ZoneQueryArgsSchema
-
+from .schemas import ZonePutSchema, ZoneQueryArgsSchema, ZoneSchema
 
 blp = Blueprint(
     "Zone", __name__, url_prefix="/zones", description="Operations on zones"

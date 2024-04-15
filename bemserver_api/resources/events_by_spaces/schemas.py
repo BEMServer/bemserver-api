@@ -1,15 +1,16 @@
 """Events by spaces API schemas"""
 
 import marshmallow as ma
-import marshmallow_sqlalchemy as msa
 
+import marshmallow_sqlalchemy as msa
 from bemserver_core.model import EventBySpace
 
 from bemserver_api import AutoSchema, Schema
-from ..sites.schemas import SiteSchema
+
 from ..buildings.schemas import BuildingSchema
-from ..storeys.schemas import StoreySchema
+from ..sites.schemas import SiteSchema
 from ..spaces.schemas import SpaceSchema
+from ..storeys.schemas import StoreySchema
 
 
 class EventBySpaceSchema(AutoSchema):

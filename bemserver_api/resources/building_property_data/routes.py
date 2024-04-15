@@ -1,19 +1,17 @@
 """Building property data resources"""
 
+from bemserver_core.exceptions import PropertyTypeInvalidError
+from bemserver_core.model import BuildingPropertyData
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import BuildingPropertyData
-from bemserver_core.exceptions import PropertyTypeInvalidError
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    BuildingPropertyDataSchema,
     BuildingPropertyDataQueryArgsSchema,
+    BuildingPropertyDataSchema,
 )
-
 
 blp = Blueprint(
     "BuildingPropertyData",

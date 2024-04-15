@@ -1,33 +1,32 @@
 """Site resources"""
 
-from textwrap import dedent
 import http
+from textwrap import dedent
 
-from flask.views import MethodView
-from flask_smorest import abort
-
-from bemserver_core.model import Site
-from bemserver_core.process.weather import wdp
-from bemserver_core.process.degree_days import compute_dd_for_site
 from bemserver_core.exceptions import (
+    BEMServerCoreDegreeDayProcessMissingTemperatureError,
+    BEMServerCoreDimensionalityError,
     BEMServerCoreSettingsError,
     BEMServerCoreWeatherAPIAuthenticationError,
     BEMServerCoreWeatherProcessMissingCoordinatesError,
-    BEMServerCoreDimensionalityError,
-    BEMServerCoreDegreeDayProcessMissingTemperatureError,
 )
+from bemserver_core.model import Site
+from bemserver_core.process.degree_days import compute_dd_for_site
+from bemserver_core.process.weather import wdp
+from flask.views import MethodView
+from flask_smorest import abort
+
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    SiteSchema,
-    SitePutSchema,
-    SiteQueryArgsSchema,
+    DegreeDaysSchema,
     DownloadWeatherDataQueryArgsSchema,
     GetDegreeDaysQueryArgsSchema,
-    DegreeDaysSchema,
+    SitePutSchema,
+    SiteQueryArgsSchema,
+    SiteSchema,
 )
-
 
 DEGREE_DAYS_EXAMPLE = dedent(
     """\

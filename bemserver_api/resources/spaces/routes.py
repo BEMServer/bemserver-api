@@ -1,15 +1,13 @@
 """Space resources"""
 
+from bemserver_core.model import Space
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import Space
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import SpaceSchema, SpacePutSchema, SpaceQueryArgsSchema
-
+from .schemas import SpacePutSchema, SpaceQueryArgsSchema, SpaceSchema
 
 blp = Blueprint(
     "Space", __name__, url_prefix="/spaces", description="Operations on spaces"

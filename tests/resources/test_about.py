@@ -2,13 +2,11 @@
 
 import contextlib
 
-import bemserver_core
-import bemserver_api
-
 import pytest
 
+import bemserver_api
+import bemserver_core
 from tests.common import AuthHeader
-
 
 ABOUT_URL = "/about/"
 

@@ -4,7 +4,6 @@ import pytest
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 TIMESERIES_BY_EVENTS_URL = "/timeseries_by_events/"

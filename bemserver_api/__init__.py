@@ -1,21 +1,19 @@
 """BEMServer API"""
 
 import flask
-from werkzeug.middleware.profiler import ProfilerMiddleware
-
 from bemserver_core import BEMServerCore
+from werkzeug.middleware.profiler import ProfilerMiddleware
 
 from . import database
 from .extensions import (  # noqa
     Api,
+    AutoSchema,
     Blueprint,
     Schema,
-    AutoSchema,
     SQLCursorPage,
     authentication,
 )
 from .resources import register_blueprints
-
 
 __version__ = "0.23.0"
 

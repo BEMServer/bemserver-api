@@ -1,18 +1,19 @@
 """REST API extension"""
 
+import http
 from copy import deepcopy
 from functools import wraps
-import http
 
 import marshmallow as ma
-import flask_smorest
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec.ext.marshmallow.common import resolve_schema_cls
+
+import flask_smorest
 import marshmallow_sqlalchemy as msa
 
-from .ma_fields import Timezone
-from .authentication import auth
 from . import integrity_error
+from .authentication import auth
+from .ma_fields import Timezone
 
 
 def resolver(schema):

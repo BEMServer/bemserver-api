@@ -1,8 +1,8 @@
 """ST_CheckOutliersByCampaign API schemas"""
 
 import marshmallow as ma
-import marshmallow_sqlalchemy as msa
 
+import marshmallow_sqlalchemy as msa
 from bemserver_core.scheduled_tasks import ST_CheckOutliersByCampaign
 
 from bemserver_api import AutoSchema, Schema

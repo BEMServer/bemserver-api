@@ -1,6 +1,6 @@
-import marshmallow as ma
-
 import pytest
+
+import marshmallow as ma
 
 from bemserver_api.extensions.ma_fields import Timezone, UnitSymbol
 

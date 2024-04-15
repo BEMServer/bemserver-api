@@ -1,19 +1,17 @@
 """Even categories by users resources"""
 
+from bemserver_core.model import EventCategoryByUser
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import EventCategoryByUser
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    EventCategoryByUserSchema,
     EventCategoryByUserPutSchema,
     EventCategoryByUserQueryArgsSchema,
+    EventCategoryByUserSchema,
 )
-
 
 blp = Blueprint(
     "EventCategoryByUser",

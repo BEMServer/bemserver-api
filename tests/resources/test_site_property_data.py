@@ -1,10 +1,10 @@
 """Site property data routes tests"""
 
 import copy
+
 import pytest
 
 from tests.common import AuthHeader
-
 
 DUMMY_ID = "69"
 

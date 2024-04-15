@@ -1,7 +1,6 @@
 """Energy end uses API schemas"""
 
 import marshmallow_sqlalchemy as msa
-
 from bemserver_core.model import EnergyEndUse
 
 from bemserver_api import AutoSchema

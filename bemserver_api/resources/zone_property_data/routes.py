@@ -1,19 +1,17 @@
 """Zone property data resources"""
 
+from bemserver_core.exceptions import PropertyTypeInvalidError
+from bemserver_core.model import ZonePropertyData
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import ZonePropertyData
-from bemserver_core.exceptions import PropertyTypeInvalidError
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    ZonePropertyDataSchema,
     ZonePropertyDataQueryArgsSchema,
+    ZonePropertyDataSchema,
 )
-
 
 blp = Blueprint(
     "ZonePropertyData",

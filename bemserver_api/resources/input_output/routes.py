@@ -2,22 +2,20 @@
 
 import io
 
-from flask_smorest import abort
-
-from bemserver_core.model import Campaign
-from bemserver_core.input_output import sites_csv_io, timeseries_csv_io
 from bemserver_core.database import db
 from bemserver_core.exceptions import BEMServerCoreIOError
+from bemserver_core.input_output import sites_csv_io, timeseries_csv_io
+from bemserver_core.model import Campaign
+from flask_smorest import abort
 
 from bemserver_api import Blueprint
 
 from .schemas import (
-    SitesCSVUploadQueryArgsSchema,
     SitesCSVUploadFileSchema,
-    TimeseriesCSVUploadQueryArgsSchema,
+    SitesCSVUploadQueryArgsSchema,
     TimeseriesCSVUploadFileSchema,
+    TimeseriesCSVUploadQueryArgsSchema,
 )
-
 
 blp = Blueprint(
     "Input/Output", __name__, url_prefix="/io", description="Input/Output operations"

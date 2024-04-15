@@ -1,6 +1,7 @@
 """Input/Output API schemas"""
 
 import marshmallow as ma
+
 from flask_smorest.fields import Upload
 
 from bemserver_api import Schema

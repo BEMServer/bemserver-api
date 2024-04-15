@@ -1,22 +1,20 @@
 """Sites routes tests"""
 
-import math
 import datetime as dt
 import json
+import math
 from unittest.mock import patch
+
+import pytest
 
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 
-import pytest
-
-from bemserver_core.model import Timeseries, TimeseriesDataState
-from bemserver_core.input_output import tsdio
-from bemserver_core.authorization import OpenBar
 from bemserver_api.database import db
-
+from bemserver_core.authorization import OpenBar
+from bemserver_core.input_output import tsdio
+from bemserver_core.model import Timeseries, TimeseriesDataState
 from tests.common import AuthHeader
-
 
 DUMMY_ID = "69"
 

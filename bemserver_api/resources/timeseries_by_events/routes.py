@@ -1,19 +1,17 @@
 """Timeseries by events resources"""
 
+from bemserver_core.exceptions import BEMServerCoreCampaignScopeError
+from bemserver_core.model import TimeseriesByEvent
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import TimeseriesByEvent
-from bemserver_core.exceptions import BEMServerCoreCampaignScopeError
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
 from .schemas import (
-    TimeseriesByEventSchema,
     TimeseriesByEventQueryArgsSchema,
+    TimeseriesByEventSchema,
 )
-
 
 blp = Blueprint(
     "TimeseriesByEvent",

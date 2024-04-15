@@ -2,7 +2,6 @@
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 TIMESERIES_DATA_STATES_URL = "/timeseries_data_states/"

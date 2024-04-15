@@ -1,15 +1,13 @@
 """Events resources"""
 
+from bemserver_core.model import Event
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import Event
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
-from .schemas import EventSchema, EventPutSchema, EventQueryArgsSchema
-
+from .schemas import EventPutSchema, EventQueryArgsSchema, EventSchema
 
 blp = Blueprint(
     "Event", __name__, url_prefix="/events", description="Operations on events"

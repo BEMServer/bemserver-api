@@ -3,7 +3,7 @@
 import marshmallow as ma
 
 from bemserver_core.input_output.timeseries_data_io import AGGREGATION_FUNCTIONS
-from bemserver_core.time_utils import PERIODS, FIXED_SIZE_PERIODS
+from bemserver_core.time_utils import FIXED_SIZE_PERIODS, PERIODS
 
 from bemserver_api import Schema
 from bemserver_api.extensions import ma_fields

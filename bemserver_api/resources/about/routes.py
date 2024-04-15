@@ -1,11 +1,11 @@
 """About resources"""
 
 import bemserver_core
+
 import bemserver_api
 from bemserver_api import Blueprint
 
 from .schemas import AboutSchema
-
 
 blp = Blueprint(
     "About", __name__, url_prefix="/about", description="Informations about BEMServer"

@@ -1,13 +1,11 @@
 """Energy end uses resources"""
 
-from flask.views import MethodView
-
 from bemserver_core.model import EnergyEndUse
+from flask.views import MethodView
 
 from bemserver_api import Blueprint
 
 from .schemas import EnergyEndUseSchema
-
 
 blp = Blueprint(
     "EnergyEndUse",

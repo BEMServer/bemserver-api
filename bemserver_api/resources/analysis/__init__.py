@@ -5,7 +5,6 @@ from bemserver_api import Blueprint
 from .completeness.routes import blp as completeness_blp
 from .energy_consumption.routes import blp as energy_consumption_blp
 
-
 blp = Blueprint(
     "Analysis", __name__, url_prefix="/analysis", description="Data analysis operations"
 )

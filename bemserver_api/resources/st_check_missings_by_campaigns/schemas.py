@@ -1,8 +1,8 @@
 """ST_CheckMissingByCampaign API schemas"""
 
 import marshmallow as ma
-import marshmallow_sqlalchemy as msa
 
+import marshmallow_sqlalchemy as msa
 from bemserver_core.scheduled_tasks import ST_CheckMissingByCampaign
 
 from bemserver_api import AutoSchema, Schema
