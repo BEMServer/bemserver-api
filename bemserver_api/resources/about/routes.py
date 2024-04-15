@@ -1,6 +1,6 @@
 """About resources"""
 
-import bemserver_core
+import importlib
 
 import bemserver_api
 from bemserver_api import Blueprint
@@ -22,7 +22,7 @@ def about():
     """
     return {
         "versions": {
-            "bemserver_core": bemserver_core.__version__,
-            "bemserver_api": bemserver_api.__version__,
+            "bemserver_core": importlib.metadata.version("bemserver-core"),
+            "bemserver_api": bemserver_api.API_VERSION,
         }
     }

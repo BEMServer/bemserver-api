@@ -1,11 +1,10 @@
 """About routes tests"""
 
 import contextlib
+import importlib
 
 import pytest
 
-import bemserver_api
-import bemserver_core
 from tests.common import AuthHeader
 
 ABOUT_URL = "/about/"
@@ -29,7 +28,7 @@ class TestAboutApi:
             assert ret.status_code == 200
             assert ret.json == {
                 "versions": {
-                    "bemserver_core": bemserver_core.__version__,
-                    "bemserver_api": bemserver_api.__version__,
+                    "bemserver_core": importlib.metadata.version("bemserver-core"),
+                    "bemserver_api": importlib.metadata.version("bemserver-api"),
                 }
             }
