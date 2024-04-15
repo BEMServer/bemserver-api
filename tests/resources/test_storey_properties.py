@@ -2,7 +2,6 @@
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 STOREY_PROPERTIES_URL = "/storey_properties/"

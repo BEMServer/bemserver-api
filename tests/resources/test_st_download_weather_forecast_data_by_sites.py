@@ -6,7 +6,6 @@ import pytest
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 ST_DOWNLOAD_WEATHER_FORECAST_DATA_BY_SITES_URL = (

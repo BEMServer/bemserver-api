@@ -1,19 +1,16 @@
 """Energy consumption resources"""
 
-from flask_smorest import abort
-
-from bemserver_core.process.energy_consumption import (
-    compute_energy_consumption_breakdown_for_site,
-    compute_energy_consumption_breakdown_for_building,
-)
-from bemserver_core.model import Site, Building
 from bemserver_core.exceptions import BEMServerCoreDimensionalityError
-
+from bemserver_core.model import Building, Site
+from bemserver_core.process.energy_consumption import (
+    compute_energy_consumption_breakdown_for_building,
+    compute_energy_consumption_breakdown_for_site,
+)
+from flask_smorest import abort
 
 from bemserver_api import Blueprint
 
-from .schemas import EnergyConsumptionSchema, EnergyConsumptionQueryArgsSchema
-
+from .schemas import EnergyConsumptionQueryArgsSchema, EnergyConsumptionSchema
 
 blp = Blueprint(
     "Energy consumption",

@@ -5,10 +5,9 @@ import datetime as dt
 
 import pytest
 
-from bemserver_core.model import Timeseries
-from bemserver_core.authorization import OpenBar
 from bemserver_api.database import db
-
+from bemserver_core.authorization import OpenBar
+from bemserver_core.model import Timeseries
 from tests.common import AuthHeader
 
 TIMESERIES_DATA_URL = "/timeseries_data/"

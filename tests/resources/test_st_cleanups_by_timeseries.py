@@ -4,7 +4,6 @@ import pytest
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 ST_CLEANUPS_BY_TIMESERIES_URL = "/st_cleanups_by_timeseries/"

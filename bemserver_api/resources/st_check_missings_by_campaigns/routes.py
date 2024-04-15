@@ -1,21 +1,19 @@
 """ST_CheckMissingByCampaign resources"""
 
+from bemserver_core.scheduled_tasks import ST_CheckMissingByCampaign
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.scheduled_tasks import ST_CheckMissingByCampaign
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    ST_CheckMissingByCampaignSchema,
-    ST_CheckMissingByCampaignQueryArgsSchema,
-    ST_CheckMissingByCampaignPutSchema,
-    ST_CheckMissingByCampaignFullSchema,
     ST_CheckMissingByCampaignFullQueryArgsSchema,
+    ST_CheckMissingByCampaignFullSchema,
+    ST_CheckMissingByCampaignPutSchema,
+    ST_CheckMissingByCampaignQueryArgsSchema,
+    ST_CheckMissingByCampaignSchema,
 )
-
 
 blp = Blueprint(
     "ST_CheckMissingByCampaign",

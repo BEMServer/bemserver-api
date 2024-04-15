@@ -3,33 +3,31 @@
 from textwrap import dedent
 
 import flask
-from flask_smorest import abort
-
-from bemserver_core.model import Timeseries, TimeseriesDataState, Campaign
-from bemserver_core.input_output import tsdio, tsdcsvio, tsdjsonio
 from bemserver_core.database import db
 from bemserver_core.exceptions import (
-    TimeseriesNotFoundError,
-    TimeseriesDataIOError,
     BEMServerCoreDimensionalityError,
+    TimeseriesDataIOError,
+    TimeseriesNotFoundError,
 )
+from bemserver_core.input_output import tsdcsvio, tsdio, tsdjsonio
+from bemserver_core.model import Campaign, Timeseries, TimeseriesDataState
+from flask_smorest import abort
 
 from bemserver_api import Blueprint
 
 from .schemas import (
-    TimeseriesDataGetStatsByIDBaseQueryArgsSchema,
-    TimeseriesDataGetStatsByNameBaseQueryArgsSchema,
-    TimeseriesDataStatsByIDSchema,
-    TimeseriesDataStatsByNameSchema,
-    TimeseriesDataGetByIDQueryArgsSchema,
     TimeseriesDataDeleteByIDQueryArgsSchema,
-    TimeseriesDataGetByNameQueryArgsSchema,
     TimeseriesDataDeleteByNameQueryArgsSchema,
     TimeseriesDataGetByIDAggregateQueryArgsSchema,
+    TimeseriesDataGetByIDQueryArgsSchema,
     TimeseriesDataGetByNameAggregateQueryArgsSchema,
+    TimeseriesDataGetByNameQueryArgsSchema,
+    TimeseriesDataGetStatsByIDBaseQueryArgsSchema,
+    TimeseriesDataGetStatsByNameBaseQueryArgsSchema,
     TimeseriesDataPostQueryArgsSchema,
+    TimeseriesDataStatsByIDSchema,
+    TimeseriesDataStatsByNameSchema,
 )
-
 
 STATS_BY_ID_EXAMPLE = dedent(
     """\

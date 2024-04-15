@@ -5,8 +5,9 @@ Catch integrity errors in resources and return appropriate error code.
 
 import contextlib
 
-import sqlalchemy as sqla
 import psycopg.errors as ppe
+import sqlalchemy as sqla
+
 from flask_smorest import abort
 
 

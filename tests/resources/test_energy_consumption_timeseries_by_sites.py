@@ -4,7 +4,6 @@ import pytest
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 ENERGY_CONSUMPTION_TIMESERIES_BY_SITES_URL = "/energy_consumption_timeseries_by_sites/"

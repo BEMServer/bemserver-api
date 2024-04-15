@@ -1,15 +1,13 @@
 """User groups resources"""
 
+from bemserver_core.model import UserGroup
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import UserGroup
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import UserGroupSchema, UserGroupQueryArgsSchema
-
+from .schemas import UserGroupQueryArgsSchema, UserGroupSchema
 
 blp = Blueprint(
     "UserGroup",

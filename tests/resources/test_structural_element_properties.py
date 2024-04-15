@@ -4,7 +4,6 @@ import copy
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 STRUCTURAL_ELEMENT_PROPERTIES_URL = "/structural_element_properties/"

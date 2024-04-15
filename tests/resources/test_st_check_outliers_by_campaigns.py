@@ -6,7 +6,6 @@ import pytest
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 ST_CHECK_OUTLIERS_BY_CAMPAIGNS_URL = "/st_check_outliers_by_campaigns/"

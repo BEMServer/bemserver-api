@@ -4,7 +4,6 @@ import pytest
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 WEATHER_TIMESERIES_BY_SITES_URL = "/weather_timeseries_by_sites/"

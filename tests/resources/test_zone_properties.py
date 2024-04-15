@@ -2,7 +2,6 @@
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 ZONE_PROPERTIES_URL = "/zone_properties/"

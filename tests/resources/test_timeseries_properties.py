@@ -4,7 +4,6 @@ import copy
 
 from tests.common import AuthHeader
 
-
 DUMMY_ID = "69"
 
 TIMESERIES_PROPERTIES_URL = "/timeseries_properties/"

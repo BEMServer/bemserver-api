@@ -1,11 +1,12 @@
 """Space property data API schemas"""
 
 import marshmallow as ma
-import marshmallow_sqlalchemy as msa
 
+import marshmallow_sqlalchemy as msa
 from bemserver_core.model import SpacePropertyData
 
 from bemserver_api import AutoSchema, Schema
+
 from ..space_properties.schemas import SpacePropertySchema
 
 

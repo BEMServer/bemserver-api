@@ -1,8 +1,8 @@
 """Buildings API schemas"""
 
 import marshmallow as ma
-import marshmallow_sqlalchemy as msa
 
+import marshmallow_sqlalchemy as msa
 from bemserver_core.model import Building
 
 from bemserver_api import AutoSchema, Schema

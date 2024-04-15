@@ -1,28 +1,26 @@
 """Energy consumption tests"""
 
-from copy import deepcopy
-import datetime as dt
 import contextlib
-
-import pandas as pd
+import datetime as dt
+from copy import deepcopy
 
 import pytest
 
+import pandas as pd
+
+from bemserver_core.authorization import OpenBar
 from bemserver_core.database import db
 from bemserver_core.model import (
-    UserGroupByCampaignScope,
+    Energy,
+    EnergyConsumptionTimeseriesByBuilding,
+    EnergyConsumptionTimeseriesBySite,
+    EnergyEndUse,
     Timeseries,
     TimeseriesDataState,
-    Energy,
-    EnergyEndUse,
-    EnergyConsumptionTimeseriesBySite,
-    EnergyConsumptionTimeseriesByBuilding,
+    UserGroupByCampaignScope,
 )
-from bemserver_core.authorization import OpenBar
-
 from tests.common import AuthHeader
 from tests.utils import create_timeseries_data
-
 
 ENERGY_CONSUMPTION_URL = "/analysis/energy_consumption/"
 

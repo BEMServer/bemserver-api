@@ -1,19 +1,17 @@
 """ST_CleanupByTimeseries resources"""
 
+from bemserver_core.scheduled_tasks import ST_CleanupByTimeseries
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.scheduled_tasks import ST_CleanupByTimeseries
 
 from bemserver_api import Blueprint
 
 from .schemas import (
-    ST_CleanupByTimeseriesSchema,
-    ST_CleanupByTimeseriesQueryArgsSchema,
-    ST_CleanupByTimeseriesFullSchema,
     ST_CleanupByTimeseriesFullQueryArgsSchema,
+    ST_CleanupByTimeseriesFullSchema,
+    ST_CleanupByTimeseriesQueryArgsSchema,
+    ST_CleanupByTimeseriesSchema,
 )
-
 
 blp = Blueprint(
     "ST_CleanupByTimeseries",

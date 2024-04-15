@@ -1,21 +1,19 @@
 """ST_CheckOutliersByCampaign resources"""
 
+from bemserver_core.scheduled_tasks import ST_CheckOutliersByCampaign
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.scheduled_tasks import ST_CheckOutliersByCampaign
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    ST_CheckOutliersByCampaignSchema,
-    ST_CheckOutliersByCampaignQueryArgsSchema,
-    ST_CheckOutliersByCampaignPutSchema,
-    ST_CheckOutliersByCampaignFullSchema,
     ST_CheckOutliersByCampaignFullQueryArgsSchema,
+    ST_CheckOutliersByCampaignFullSchema,
+    ST_CheckOutliersByCampaignPutSchema,
+    ST_CheckOutliersByCampaignQueryArgsSchema,
+    ST_CheckOutliersByCampaignSchema,
 )
-
 
 blp = Blueprint(
     "ST_CheckOutliersByCampaign",

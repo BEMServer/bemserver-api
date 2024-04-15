@@ -1,25 +1,23 @@
 """BEMServer API"""
 
-import flask
-from werkzeug.middleware.profiler import ProfilerMiddleware
+import importlib
 
+import flask
 from bemserver_core import BEMServerCore
+from werkzeug.middleware.profiler import ProfilerMiddleware
 
 from . import database
 from .extensions import (  # noqa
     Api,
+    AutoSchema,
     Blueprint,
     Schema,
-    AutoSchema,
     SQLCursorPage,
     authentication,
 )
 from .resources import register_blueprints
 
-
-__version__ = "0.23.0"
-
-API_VERSION = __version__
+API_VERSION = importlib.metadata.version("bemserver-api")
 OPENAPI_VERSION = "3.1.0"
 
 

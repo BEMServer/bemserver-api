@@ -1,18 +1,16 @@
 """Energy production timeseries by buildings resources"""
 
+from bemserver_core.model import EnergyProductionTimeseriesByBuilding
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import EnergyProductionTimeseriesByBuilding
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
 from .schemas import (
-    EnergyProductionTimeseriesByBuildingSchema,
     EnergyProductionTimeseriesByBuildingQueryArgsSchema,
+    EnergyProductionTimeseriesByBuildingSchema,
 )
-
 
 blp = Blueprint(
     "EnergyProductionTimeseriesByBuilding",

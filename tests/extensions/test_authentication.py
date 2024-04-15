@@ -1,10 +1,8 @@
 """Test authentication extension"""
 
-from flask import jsonify
-
 from bemserver_api import Blueprint
-
 from bemserver_core.authorization import get_current_user
+from flask import jsonify
 
 
 class TestAuthentication:

@@ -1,10 +1,10 @@
 """STCleanupByCampaigns routes tests"""
 
-import pytest
 from copy import deepcopy
 
-from tests.common import AuthHeader
+import pytest
 
+from tests.common import AuthHeader
 
 DUMMY_ID = "69"
 

@@ -1,13 +1,11 @@
 """Energy end uses resources"""
 
-from flask.views import MethodView
-
 from bemserver_core.model import EnergyProductionTechnology
+from flask.views import MethodView
 
 from bemserver_api import Blueprint
 
 from .schemas import EnergyProductionTechnologySchema
-
 
 blp = Blueprint(
     "EnergyProductionTechnology",

@@ -1,5 +1,5 @@
-from contextvars import ContextVar
 from contextlib import AbstractContextManager
+from contextvars import ContextVar
 
 from bemserver_api.settings import Config
 

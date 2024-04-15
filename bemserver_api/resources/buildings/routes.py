@@ -1,15 +1,13 @@
 """Building resources"""
 
+from bemserver_core.model import Building
 from flask.views import MethodView
 from flask_smorest import abort
-
-from bemserver_core.model import Building
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
 
-from .schemas import BuildingSchema, BuildingPutSchema, BuildingQueryArgsSchema
-
+from .schemas import BuildingPutSchema, BuildingQueryArgsSchema, BuildingSchema
 
 blp = Blueprint(
     "Building", __name__, url_prefix="/buildings", description="Operations on buildings"

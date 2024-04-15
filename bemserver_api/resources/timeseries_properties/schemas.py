@@ -1,10 +1,10 @@
 """Timeseries properties API schemas"""
 
 import marshmallow as ma
-import marshmallow_sqlalchemy as msa
 
-from bemserver_core.model import TimeseriesProperty
+import marshmallow_sqlalchemy as msa
 from bemserver_core.common import PropertyType
+from bemserver_core.model import TimeseriesProperty
 
 from bemserver_api import AutoSchema, Schema
 from bemserver_api.extensions import ma_fields

@@ -1,15 +1,14 @@
 """Custom marshmallow fields"""
 
-from pathlib import Path
 import datetime as dt
 import json
+from pathlib import Path
 
 import marshmallow as ma
 from webargs.fields import DelimitedList
 
 from bemserver_core.common import ureg
 from bemserver_core.exceptions import BEMServerCoreUndefinedUnitError
-
 
 TIMEZONES_FILE = Path(__file__).parent / "timezones.json"
 

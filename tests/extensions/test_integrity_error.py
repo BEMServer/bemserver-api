@@ -1,11 +1,11 @@
 """Test integrity error"""
 
-import sqlalchemy as sqla
-import psycopg.errors as ppe
-import flask
-
 import pytest
 
+import psycopg.errors as ppe
+import sqlalchemy as sqla
+
+import flask
 from bemserver_api import Api, Blueprint
 
 

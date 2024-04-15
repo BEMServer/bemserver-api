@@ -14,6 +14,10 @@ BEMServer API
     :target: https://github.com/bemserver/bemserver-api/actions?query=workflow%3ATests
     :alt: Build status
 
+.. image:: https://results.pre-commit.ci/badge/github/bemserver/bemserver-api/dev.svg
+   :target: https://results.pre-commit.ci/latest/github/bemserver/bemserver-api/dev
+   :alt: pre-commit.ci status
+
 .. image:: https://codecov.io/gh/BEMServer/bemserver-api/branch/master/graph/badge.svg?token=4LRLMRA2S2
     :target: https://codecov.io/gh/bemserver/bemserver-api
     :alt: Code coverage
