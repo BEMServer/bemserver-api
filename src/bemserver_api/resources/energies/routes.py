@@ -1,7 +1,8 @@
 """Energies resources"""
 
-from bemserver_core.model import Energy
 from flask.views import MethodView
+
+from bemserver_core.model import Energy
 
 from bemserver_api import Blueprint
 

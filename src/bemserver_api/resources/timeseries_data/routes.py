@@ -3,6 +3,9 @@
 from textwrap import dedent
 
 import flask
+
+from flask_smorest import abort
+
 from bemserver_core.database import db
 from bemserver_core.exceptions import (
     BEMServerCoreDimensionalityError,
@@ -11,7 +14,6 @@ from bemserver_core.exceptions import (
 )
 from bemserver_core.input_output import tsdcsvio, tsdio, tsdjsonio
 from bemserver_core.model import Campaign, Timeseries, TimeseriesDataState
-from flask_smorest import abort
 
 from bemserver_api import Blueprint
 

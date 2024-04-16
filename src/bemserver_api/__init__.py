@@ -3,8 +3,9 @@
 import importlib
 
 import flask
-from bemserver_core import BEMServerCore
 from werkzeug.middleware.profiler import ProfilerMiddleware
+
+from bemserver_core import BEMServerCore
 
 from . import database
 from .extensions import (  # noqa

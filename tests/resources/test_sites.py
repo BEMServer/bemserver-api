@@ -10,11 +10,13 @@ import pytest
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 
-from bemserver_api.database import db
+from tests.common import AuthHeader
+
 from bemserver_core.authorization import OpenBar
 from bemserver_core.input_output import tsdio
 from bemserver_core.model import Timeseries, TimeseriesDataState
-from tests.common import AuthHeader
+
+from bemserver_api.database import db
 
 DUMMY_ID = "69"
 

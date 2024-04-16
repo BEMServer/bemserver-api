@@ -1,8 +1,10 @@
 """ST_DownloadWeatherDataBySite resources"""
 
-from bemserver_core.scheduled_tasks import ST_DownloadWeatherDataBySite
 from flask.views import MethodView
+
 from flask_smorest import abort
+
+from bemserver_core.scheduled_tasks import ST_DownloadWeatherDataBySite
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db

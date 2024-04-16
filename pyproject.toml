@@ -72,15 +72,15 @@ select = [
 ]
 
 [tool.ruff.lint.isort]
-section-order = ["future", "standard-library", "testing", "db", "marshmallow", "science", "third-party", "core", "first-party", "local-folder"]
+section-order = ["future", "standard-library", "testing", "db", "pallets", "marshmallow", "science", "third-party", "core", "first-party", "local-folder"]
 
 [tool.ruff.lint.isort.sections]
-testing = ["pytest", "pytest-postgresql"]
+testing = ["pytest", "pytest_postgresql"]
 db = ["psycopg", "sqlalchemy", "alembic"]
-pallets = ["werkzeug", "flask", "flask-httpauth"]
-marshmallow = ["marshmallow", "marshmallow-sqlalchemy", "webargs", "apispec", "flask-smorest"]
+pallets = ["werkzeug", "flask", "flask_httpauth"]
+marshmallow = ["marshmallow", "marshmallow_sqlalchemy", "webargs", "apispec", "flask_smorest"]
 science = ["numpy", "pandas"]
-core = ["bemserver-core"]
+core = ["bemserver_core"]
 
 [tool.pytest.ini_options]
 norecursedirs = ".git .tox docs env venv"

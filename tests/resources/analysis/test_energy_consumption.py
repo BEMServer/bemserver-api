@@ -8,6 +8,9 @@ import pytest
 
 import pandas as pd
 
+from tests.common import AuthHeader
+from tests.utils import create_timeseries_data
+
 from bemserver_core.authorization import OpenBar
 from bemserver_core.database import db
 from bemserver_core.model import (
@@ -19,8 +22,6 @@ from bemserver_core.model import (
     TimeseriesDataState,
     UserGroupByCampaignScope,
 )
-from tests.common import AuthHeader
-from tests.utils import create_timeseries_data
 
 ENERGY_CONSUMPTION_URL = "/analysis/energy_consumption/"
 

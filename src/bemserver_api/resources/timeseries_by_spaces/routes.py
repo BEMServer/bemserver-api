@@ -1,8 +1,10 @@
 """Timeseries by spaces resources"""
 
-from bemserver_core.model import TimeseriesBySpace
 from flask.views import MethodView
+
 from flask_smorest import abort
+
+from bemserver_core.model import TimeseriesBySpace
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db

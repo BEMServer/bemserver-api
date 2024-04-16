@@ -4,12 +4,11 @@ import http
 from copy import deepcopy
 from functools import wraps
 
+import flask_smorest
 import marshmallow as ma
+import marshmallow_sqlalchemy as msa
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec.ext.marshmallow.common import resolve_schema_cls
-
-import flask_smorest
-import marshmallow_sqlalchemy as msa
 
 from . import integrity_error
 from .authentication import auth

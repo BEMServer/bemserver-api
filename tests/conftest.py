@@ -5,15 +5,16 @@ import datetime as dt
 from unittest import mock
 
 import pytest
+from pytest_postgresql import factories as ppf
 
 import flask.testing
-from bemserver_api import create_app
+
 from bemserver_core import common, model, scheduled_tasks
 from bemserver_core.authorization import OpenBar
 from bemserver_core.commands import setup_db
 from bemserver_core.database import db
-from pytest_postgresql import factories as ppf
 
+from bemserver_api import create_app
 from tests.common import AUTH_HEADER, TestConfig
 
 

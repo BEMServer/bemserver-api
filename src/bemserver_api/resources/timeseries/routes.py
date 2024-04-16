@@ -1,8 +1,10 @@
 """Timeseries resources"""
 
-from bemserver_core.model import Timeseries
 from flask.views import MethodView
+
 from flask_smorest import abort
+
+from bemserver_core.model import Timeseries
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db

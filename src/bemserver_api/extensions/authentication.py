@@ -4,10 +4,12 @@ from functools import wraps
 
 import sqlalchemy as sqla
 
+from flask_httpauth import HTTPBasicAuth
+
+from flask_smorest import abort
+
 from bemserver_core.authorization import BEMServerAuthorizationError, CurrentUser
 from bemserver_core.model.users import User
-from flask_httpauth import HTTPBasicAuth
-from flask_smorest import abort
 
 from bemserver_api.database import db
 

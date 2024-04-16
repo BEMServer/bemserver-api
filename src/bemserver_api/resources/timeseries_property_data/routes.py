@@ -1,9 +1,11 @@
 """Timeseries property data resources"""
 
+from flask.views import MethodView
+
+from flask_smorest import abort
+
 from bemserver_core.exceptions import PropertyTypeInvalidError
 from bemserver_core.model import TimeseriesPropertyData
-from flask.views import MethodView
-from flask_smorest import abort
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db

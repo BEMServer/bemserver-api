@@ -1,8 +1,8 @@
 """ST_DownloadWeatherForecastDataBySite API schemas"""
 
 import marshmallow as ma
-
 import marshmallow_sqlalchemy as msa
+
 from bemserver_core.scheduled_tasks import ST_DownloadWeatherForecastDataBySite
 
 from bemserver_api import AutoSchema, Schema

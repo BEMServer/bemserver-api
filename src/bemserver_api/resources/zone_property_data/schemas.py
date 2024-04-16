@@ -1,8 +1,8 @@
 """Zone property data API schemas"""
 
 import marshmallow as ma
-
 import marshmallow_sqlalchemy as msa
+
 from bemserver_core.model import ZonePropertyData
 
 from bemserver_api import AutoSchema, Schema

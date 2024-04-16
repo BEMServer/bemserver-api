@@ -1,8 +1,8 @@
 """Storey properties API schemas"""
 
 import marshmallow as ma
-
 import marshmallow_sqlalchemy as msa
+
 from bemserver_core.model import StoreyProperty
 
 from bemserver_api import AutoSchema, Schema

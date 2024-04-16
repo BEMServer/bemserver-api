@@ -1,8 +1,8 @@
 """Structural element properties API schemas"""
 
 import marshmallow as ma
-
 import marshmallow_sqlalchemy as msa
+
 from bemserver_core.common import PropertyType
 from bemserver_core.model import StructuralElementProperty
 

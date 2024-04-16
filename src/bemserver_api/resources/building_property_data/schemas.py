@@ -1,8 +1,8 @@
 """Building property data API schemas"""
 
 import marshmallow as ma
-
 import marshmallow_sqlalchemy as msa
+
 from bemserver_core.model import BuildingPropertyData
 
 from bemserver_api import AutoSchema, Schema

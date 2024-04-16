@@ -1,9 +1,10 @@
 """Completeness resources"""
 
+from flask_smorest import abort
+
 from bemserver_core.exceptions import TimeseriesNotFoundError
 from bemserver_core.model import Timeseries, TimeseriesDataState
 from bemserver_core.process.completeness import compute_completeness
-from flask_smorest import abort
 
 from bemserver_api import Blueprint
 

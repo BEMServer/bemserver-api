@@ -1,8 +1,10 @@
 """Space resources"""
 
-from bemserver_core.model import Space
 from flask.views import MethodView
+
 from flask_smorest import abort
+
+from bemserver_core.model import Space
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db

@@ -1,8 +1,8 @@
 """Timeseries by spaces API schemas"""
 
 import marshmallow as ma
-
 import marshmallow_sqlalchemy as msa
+
 from bemserver_core.model import TimeseriesBySpace
 
 from bemserver_api import AutoSchema, Schema

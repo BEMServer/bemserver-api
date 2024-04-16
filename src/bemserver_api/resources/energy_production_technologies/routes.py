@@ -1,7 +1,8 @@
 """Energy end uses resources"""
 
-from bemserver_core.model import EnergyProductionTechnology
 from flask.views import MethodView
+
+from bemserver_core.model import EnergyProductionTechnology
 
 from bemserver_api import Blueprint
 

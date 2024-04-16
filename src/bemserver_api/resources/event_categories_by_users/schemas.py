@@ -1,8 +1,8 @@
 """Even categories by users API schemas"""
 
 import marshmallow as ma
-
 import marshmallow_sqlalchemy as msa
+
 from bemserver_core.model import EventCategoryByUser, EventLevelEnum
 
 from bemserver_api import AutoSchema, Schema
