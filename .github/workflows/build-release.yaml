@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/bemserver-core
+      url: https://pypi.org/p/bemserver-api
     permissions:
       id-token: write
     steps:
