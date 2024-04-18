@@ -8,6 +8,10 @@ Features:
 
 - Remove bemserver_api.__version__
 
+Other changes:
+
+- Change license to MIT
+
 0.23.0 (2024-02-13)
 +++++++++++++++++++
 
