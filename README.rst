@@ -18,7 +18,7 @@ BEMServer API
    :target: https://results.pre-commit.ci/latest/github/bemserver/bemserver-api/main
    :alt: pre-commit.ci status
 
-.. image:: https://codecov.io/gh/BEMServer/bemserver-api/branch/main/graph/badge.svg?token=4LRLMRA2S2
+.. image:: https://codecov.io/gh/BEMServer/bemserver-api/branch/main/graph/badge.svg
     :target: https://codecov.io/gh/bemserver/bemserver-api
     :alt: Code coverage
 
