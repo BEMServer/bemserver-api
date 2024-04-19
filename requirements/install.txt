@@ -31,6 +31,7 @@ certifi==2024.2.2
 cffi==1.16.0
     # via
     #   argon2-cffi-bindings
+    #   cryptography
     #   oso
 charset-normalizer==3.3.2
     # via requests
@@ -48,6 +49,8 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
+cryptography==42.0.5
+    # via joserfc
 flask==3.0.2
     # via
     #   bemserver-api (pyproject.toml)
@@ -62,6 +65,8 @@ itsdangerous==2.1.2
     # via flask
 jinja2==3.1.4
     # via flask
+joserfc==0.9.0
+    # via bemserver-api (pyproject.toml)
 kombu==5.3.5
     # via celery
 mako==1.3.2

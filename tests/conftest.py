@@ -9,12 +9,15 @@ from pytest_postgresql import factories as ppf
 
 import flask.testing
 
+from joserfc import jwt
+
 from bemserver_core import common, model, scheduled_tasks
 from bemserver_core.authorization import OpenBar
 from bemserver_core.commands import setup_db
 from bemserver_core.database import db
 
-from bemserver_api import create_app
+import bemserver_api
+from bemserver_api.extensions.authentication import auth
 from tests.common import AUTH_HEADER, TestConfig
 
 
@@ -65,9 +68,10 @@ class TestClient(flask.testing.FlaskClient):
 
 
 @pytest.fixture(params=(TestConfig,))
-def app(request, bsc_config):
-    application = create_app()
-    application.config.from_object(TestConfig)
+def app(request, bsc_config, monkeypatch):
+    with monkeypatch.context() as mp_ctx:
+        mp_ctx.setattr(bemserver_api.settings, "Config", request.param)
+        application = bemserver_api.create_app()
     application.test_client_class = TestClient
     setup_db()
     yield application
@@ -92,8 +96,12 @@ def users(app, request):
             )
             user.set_password(password)
             creds = base64.b64encode(f"{email}:{password}".encode()).decode()
-            invalid_creds = base64.b64encode(f"{email}:bad_pwd".encode()).decode()
-            ret[name] = {"user": user, "creds": creds, "invalid_creds": invalid_creds}
+            ret[name] = {
+                "user": user,
+                "creds": "Basic " + creds,
+                "jwt": "Bearer "
+                + jwt.encode(auth.HEADER, {"email": user.email}, TestConfig.SECRET_KEY),
+            }
         db.session.commit()
         # Set id after commit
         for user in ret.values():

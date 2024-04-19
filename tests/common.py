@@ -6,6 +6,11 @@ from bemserver_api.settings import Config
 
 class TestConfig(Config):
     TESTING = True
+    SECRET_KEY = "Test secret"
+    AUTH_METHODS = [
+        "Bearer",
+        "Basic",
+    ]
 
 
 AUTH_HEADER = ContextVar("auth_header", default=None)
@@ -16,7 +21,7 @@ class AuthHeader(AbstractContextManager):
         self.creds = creds
 
     def __enter__(self):
-        self.token = AUTH_HEADER.set("Basic " + self.creds)
+        self.token = AUTH_HEADER.set(self.creds)
 
     def __exit__(self, *args, **kwargs):
         AUTH_HEADER.reset(self.token)

@@ -4,6 +4,12 @@
 class Config:
     """Default configuration"""
 
+    # Authentication
+    SECRET_KEY = ""
+    AUTH_METHODS = [
+        "Bearer",
+    ]
+
     # API parameters
     API_TITLE = "BEMServer API"
     OPENAPI_JSON_PATH = "api-spec.json"
