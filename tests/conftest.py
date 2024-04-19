@@ -78,29 +78,53 @@ def app(request, bsc_config, monkeypatch):
     db.session.remove()
 
 
-USERS = (
-    ("Chuck", "N0rris", "chuck@test.com", True, True),
-    ("Active", "@ctive", "active@test.com", False, True),
-    ("Inactive", "in@ctive", "inactive@test.com", False, False),
-)
+USERS = {
+    "Chuck": {
+        "email": "chuck@test.com",
+        "password": "N0rris",
+        "is_admin": True,
+        "is_active": True,
+    },
+    "Active": {
+        "email": "active@test.com",
+        "password": "@ctive",
+        "is_admin": False,
+        "is_active": True,
+    },
+    "Inactive": {
+        "email": "inactive@test.com",
+        "password": "in@ctive",
+        "is_admin": False,
+        "is_active": False,
+    },
+}
+
+for user in USERS.values():
+    user["hba_creds"] = (
+        "Basic "
+        + base64.b64encode(f'{user["email"]}:{user["password"]}'.encode()).decode()
+    )
+    user["creds"] = "Bearer " + jwt.encode(
+        auth.HEADER, {"email": user["email"]}, TestConfig.SECRET_KEY
+    )
 
 
 @pytest.fixture(params=(USERS,))
 def users(app, request):
     with OpenBar():
         ret = {}
-        for user in request.param:
-            name, password, email, is_admin, is_active = user
+        for name, elems in request.param.items():
             user = model.User.new(
-                name=name, email=email, is_admin=is_admin, is_active=is_active
+                name=name,
+                email=elems["email"],
+                is_admin=elems["is_admin"],
+                is_active=elems["is_active"],
             )
-            user.set_password(password)
+            user.set_password(elems["password"])
             ret[name] = {
                 "user": user,
-                "hba_creds": "Basic "
-                + base64.b64encode(f"{email}:{password}".encode()).decode(),
-                "creds": "Bearer "
-                + jwt.encode(auth.HEADER, {"email": user.email}, TestConfig.SECRET_KEY),
+                "hba_creds": elems["hba_creds"],
+                "creds": elems["creds"],
             }
         db.session.commit()
         # Set id after commit
