@@ -71,10 +71,6 @@ class Blueprint(flask_smorest.Blueprint):
         return doc
 
     @staticmethod
-    def current_user():
-        return auth.current_user()
-
-    @staticmethod
     def catch_integrity_error(func=None):
         """Catch DB integrity errors"""
 

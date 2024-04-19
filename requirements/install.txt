@@ -51,10 +51,7 @@ click-repl==0.3.0
 flask==3.0.2
     # via
     #   bemserver-api (pyproject.toml)
-    #   flask-httpauth
     #   flask-smorest
-flask-httpauth==4.8.0
-    # via bemserver-api (pyproject.toml)
 flask-smorest==0.43.0
     # via bemserver-api (pyproject.toml)
 greenlet==3.0.3

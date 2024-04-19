@@ -32,7 +32,6 @@ dependencies = [
   "marshmallow-sqlalchemy>=0.29.0,<0.30",
   "flask_smorest>=0.43.0,<0.44",
   "apispec>=6.1.0,<7.0",
-  "flask-httpauth>=4.7.0,<5.0",
   "bemserver-core>=0.17.1,<0.18",
 ]
 
@@ -77,7 +76,7 @@ section-order = ["future", "standard-library", "testing", "db", "pallets", "mars
 [tool.ruff.lint.isort.sections]
 testing = ["pytest", "pytest_postgresql"]
 db = ["psycopg", "sqlalchemy", "alembic"]
-pallets = ["werkzeug", "flask", "flask_httpauth"]
+pallets = ["werkzeug", "flask"]
 marshmallow = ["marshmallow", "marshmallow_sqlalchemy", "webargs", "apispec", "flask_smorest"]
 science = ["numpy", "pandas"]
 core = ["bemserver_core"]
