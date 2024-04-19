@@ -7,11 +7,24 @@ import pytest
 
 from joserfc import jwt
 from joserfc.errors import ExpiredTokenError, MissingClaimError
+from tests.common import TestConfig
 
 from bemserver_core.authorization import get_current_user
 
 from bemserver_api import Blueprint
 from bemserver_api.extensions.authentication import auth
+
+
+class HBATestConfig(TestConfig):
+    AUTH_METHODS = [
+        "Basic",
+    ]
+
+
+class JWTTestConfig(TestConfig):
+    AUTH_METHODS = [
+        "Bearer",
+    ]
 
 
 class TestAuthentication:
@@ -43,12 +56,14 @@ class TestAuthentication:
         with pytest.raises(MissingClaimError):
             auth.validate_token(token)
 
+    @pytest.mark.parametrize("app", (HBATestConfig,), indirect=True)
     def test_auth_login_required_http_basic_auth(self, app, users):
-        active_user_creds = users["Active"]["creds"]
-        active_user_invalid_creds = base64.b64encode(
+        active_user_hba_creds = users["Active"]["hba_creds"]
+        active_user_invalid_hba_creds = base64.b64encode(
             f'{users["Active"]["user"].email}:bad_pwd'.encode()
         ).decode()
-        inactive_user_creds = users["Inactive"]["creds"]
+        inactive_user_hba_creds = users["Inactive"]["hba_creds"]
+        active_user_jwt = users["Active"]["creds"]
         api = app.extensions["flask-smorest"]["apis"][""]["ext_obj"]
         blp = Blueprint("AuthTest", __name__, url_prefix="/auth_test")
 
@@ -79,29 +94,36 @@ class TestAuthentication:
         assert resp.status_code == 401
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
-        creds = base64.b64encode(b"Dummy").decode()
-        headers = {"Authorization": "Basic " + creds}
+        hba_creds = base64.b64encode(b"Dummy").decode()
+        headers = {"Authorization": "Basic " + hba_creds}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 401
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
+
+        # Wrong scheme
+        headers = {"Authorization": active_user_jwt}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
         # Inactive user
-        headers = {"Authorization": inactive_user_creds}
+        headers = {"Authorization": inactive_user_hba_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 403
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
         # Active user with invalid creds (bad password)
-        headers = {"Authorization": active_user_invalid_creds}
+        headers = {"Authorization": active_user_invalid_hba_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
         # Active user
-        headers = {"Authorization": active_user_creds}
+        headers = {"Authorization": active_user_hba_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 200
         resp = client.get("/auth_test/no_auth", headers=headers)
@@ -122,12 +144,14 @@ class TestAuthentication:
         assert "401" not in no_auth_spec["get"]["responses"]
         assert "security" not in no_auth_spec["get"]
 
+    @pytest.mark.parametrize("app", (JWTTestConfig,), indirect=True)
     def test_auth_login_required_jwt(self, app, users):
-        active_user_jwt = users["Active"]["jwt"]
-        active_user_invalid_jwt = jwt.encode(
+        active_user_jwt_creds = users["Active"]["creds"]
+        active_user_invalid_jwt_creds = jwt.encode(
             auth.HEADER, {"email": "dummy@dummy.com"}, "Dummy"
         )
-        inactive_user_jwt = users["Inactive"]["jwt"]
+        inactive_user_jwt_creds = users["Inactive"]["creds"]
+        active_user_hba_creds = users["Active"]["hba_creds"]
         api = app.extensions["flask-smorest"]["apis"][""]["ext_obj"]
         blp = Blueprint("AuthTest", __name__, url_prefix="/auth_test")
 
@@ -165,22 +189,29 @@ class TestAuthentication:
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
+        # Wrong scheme
+        headers = {"Authorization": active_user_hba_creds}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 401
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
+
         # Inactive user
-        headers = {"Authorization": inactive_user_jwt}
+        headers = {"Authorization": inactive_user_jwt_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 403
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
         # Active user with invalid jwt (bad password)
-        headers = {"Authorization": active_user_invalid_jwt}
+        headers = {"Authorization": active_user_invalid_jwt_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
         # Active user
-        headers = {"Authorization": active_user_jwt}
+        headers = {"Authorization": active_user_jwt_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 200
         resp = client.get("/auth_test/no_auth", headers=headers)

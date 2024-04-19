@@ -95,11 +95,11 @@ def users(app, request):
                 name=name, email=email, is_admin=is_admin, is_active=is_active
             )
             user.set_password(password)
-            creds = base64.b64encode(f"{email}:{password}".encode()).decode()
             ret[name] = {
                 "user": user,
-                "creds": "Basic " + creds,
-                "jwt": "Bearer "
+                "hba_creds": "Basic "
+                + base64.b64encode(f"{email}:{password}".encode()).decode(),
+                "creds": "Bearer "
                 + jwt.encode(auth.HEADER, {"email": user.email}, TestConfig.SECRET_KEY),
             }
         db.session.commit()
