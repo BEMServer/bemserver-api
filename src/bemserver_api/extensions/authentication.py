@@ -64,34 +64,34 @@ class Auth:
         try:
             token = self.decode(creds)
         except (ValueError, JoseError) as exc:
-            raise (BEMServerAPIAuthenticationError) from exc
+            raise BEMServerAPIAuthenticationError from exc
         try:
             self.validate_token(token)
         except JoseError as exc:
-            raise (BEMServerAPIAuthenticationError) from exc
+            raise BEMServerAPIAuthenticationError from exc
 
         user_email = token.claims["email"]
-        user = db.session.execute(
-            sqla.select(User).where(User.email == user_email)
-        ).scalar()
-        if user is None:
-            raise (BEMServerAPIAuthenticationError)
-        return user
+        return self.get_user_by_email(user_email)
 
-    @staticmethod
-    def get_user_http_basic_auth(creds):
+    def get_user_http_basic_auth(self, creds):
         """Check password and return User instance"""
         try:
             enc_email, enc_password = base64.b64decode(creds).split(b":", maxsplit=1)
             user_email = enc_email.decode()
             password = enc_password.decode()
         except (ValueError, TypeError) as exc:
-            raise (BEMServerAPIAuthenticationError) from exc
+            raise BEMServerAPIAuthenticationError from exc
+        user = self.get_user_by_email(user_email)
+        if not user.check_password(password):
+            raise BEMServerAPIAuthenticationError
+        return user
+
+    def get_user_by_email(self, user_email):
         user = db.session.execute(
             sqla.select(User).where(User.email == user_email)
         ).scalar()
-        if user is None or not user.check_password(password):
-            raise (BEMServerAPIAuthenticationError)
+        if user is None:
+            raise BEMServerAPIAuthenticationError
         return user
 
     def get_user(self):
