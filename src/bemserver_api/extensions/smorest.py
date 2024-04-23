@@ -9,6 +9,9 @@ import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec.ext.marshmallow.common import resolve_schema_cls
+from flask_smorest import abort
+
+from bemserver_api.exceptions import BEMServerAPIAuthenticationError
 
 from . import integrity_error
 from .authentication import auth
@@ -40,6 +43,7 @@ class Api(flask_smorest.Api):
     def init_app(self, app, *, spec_kwargs=None):
         super().init_app(app, spec_kwargs=spec_kwargs)
         self.register_field(Timezone, "string", "iana-tz")
+        self.register_blueprint(auth_blp)
         self.spec.components.security_scheme(
             "BasicAuthentication", {"type": "http", "scheme": "basic"}
         )
@@ -132,3 +136,31 @@ class SQLCursorPage(flask_smorest.Page):
     @property
     def item_count(self):
         return self.collection.count()
+
+
+auth_blp = Blueprint(
+    "Auth", __name__, url_prefix="/auth", description="Authentication operations"
+)
+
+
+class GetJWTArgsSchema(Schema):
+    email = ma.fields.Email(required=True)
+    password = ma.fields.String(validate=ma.validate.Length(1, 80), required=True)
+
+
+class GetJWTRespSchema(Schema):
+    token = ma.fields.String()
+
+
+@auth_blp.route("/token", methods=["POST"])
+@auth_blp.arguments(GetJWTArgsSchema)
+@auth_blp.response(201, GetJWTRespSchema)
+def get_token(creds):
+    """Get an authentication token"""
+    try:
+        user = auth.get_user_by_email(creds["email"])
+    except BEMServerAPIAuthenticationError:
+        abort(401, "Authentication error")
+    if not user.check_password(creds["password"]):
+        abort(401, "Authentication error")
+    return {"token": auth.encode(user)}
