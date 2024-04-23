@@ -11,7 +11,7 @@ import flask
 from flask_smorest import abort
 
 from joserfc import jwt
-from joserfc.errors import JoseError
+from joserfc.errors import ExpiredTokenError, JoseError
 from joserfc.jwk import OctKey
 
 from bemserver_core.authorization import BEMServerAuthorizationError, CurrentUser
@@ -34,10 +34,13 @@ class Auth:
 
     def __init__(self, app=None):
         self.key = None
+        self.app = None
+        self.get_user_funcs = None
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app):
+        self.app = app
         self.key = OctKey.import_key(app.config["SECRET_KEY"])
         self.get_user_funcs = {
             k: getattr(self, v)
@@ -60,18 +63,27 @@ class Auth:
         claims_requests = jwt.JWTClaimsRegistry(email={"essential": True})
         claims_requests.validate(token.claims)
 
+    @staticmethod
+    def get_user_by_email(user_email):
+        return db.session.execute(
+            sqla.select(User).where(User.email == user_email)
+        ).scalar()
+
     def get_user_jwt(self, creds):
         try:
             token = self.decode(creds)
         except (ValueError, JoseError) as exc:
-            raise BEMServerAPIAuthenticationError from exc
+            raise BEMServerAPIAuthenticationError(code="malformed_token") from exc
         try:
             self.validate_token(token)
+        except ExpiredTokenError as exc:
+            raise BEMServerAPIAuthenticationError(code="expired_token") from exc
         except JoseError as exc:
-            raise BEMServerAPIAuthenticationError from exc
-
+            raise BEMServerAPIAuthenticationError(code="invalid_token") from exc
         user_email = token.claims["email"]
-        return self.get_user_by_email(user_email)
+        if (user := self.get_user_by_email(user_email)) is None:
+            raise BEMServerAPIAuthenticationError(code="invalid_token")
+        return user
 
     def get_user_http_basic_auth(self, creds):
         """Check password and return User instance"""
@@ -80,31 +92,24 @@ class Auth:
             user_email = enc_email.decode()
             password = enc_password.decode()
         except (ValueError, TypeError) as exc:
-            raise BEMServerAPIAuthenticationError from exc
-        user = self.get_user_by_email(user_email)
+            raise BEMServerAPIAuthenticationError(code="malformed_credentials") from exc
+        if (user := self.get_user_by_email(user_email)) is None:
+            raise BEMServerAPIAuthenticationError(code="invalid_credentials")
         if not user.check_password(password):
-            raise BEMServerAPIAuthenticationError
-        return user
-
-    def get_user_by_email(self, user_email):
-        user = db.session.execute(
-            sqla.select(User).where(User.email == user_email)
-        ).scalar()
-        if user is None:
-            raise BEMServerAPIAuthenticationError
+            raise BEMServerAPIAuthenticationError(code="invalid_credentials")
         return user
 
     def get_user(self):
         if (auth_header := flask.request.headers.get("Authorization")) is None:
-            raise BEMServerAPIAuthenticationError
+            raise BEMServerAPIAuthenticationError(code="missing_authentication")
         try:
             scheme, creds = auth_header.split(" ", maxsplit=1)
-        except ValueError as exc:
-            raise BEMServerAPIAuthenticationError from exc
+        except ValueError:
+            abort(400)
         try:
             func = self.get_user_funcs[scheme]
         except KeyError as exc:
-            raise BEMServerAPIAuthenticationError from exc
+            raise BEMServerAPIAuthenticationError(code="invalid_scheme") from exc
         return func(creds.encode("utf-8"))
 
     def login_required(self, f=None, **kwargs):
@@ -120,8 +125,17 @@ class Auth:
             def wrapper(*args, **func_kwargs):
                 try:
                     user = self.get_user()
-                except BEMServerAPIAuthenticationError:
-                    abort(401, "Authentication error")
+                except BEMServerAPIAuthenticationError as exc:
+                    abort(
+                        401,
+                        "Authentication error",
+                        errors={"authentication": exc.code},
+                        headers={
+                            "WWW-Authenticate": ", ".join(
+                                self.app.config["AUTH_METHODS"]
+                            )
+                        },
+                    )
                 with CurrentUser(user):
                     try:
                         resp = func(*args, **func_kwargs)

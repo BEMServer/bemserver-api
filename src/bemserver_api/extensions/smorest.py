@@ -4,14 +4,13 @@ import http
 from copy import deepcopy
 from functools import wraps
 
+import flask
+
 import flask_smorest
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec.ext.marshmallow.common import resolve_schema_cls
-from flask_smorest import abort
-
-from bemserver_api.exceptions import BEMServerAPIAuthenticationError
 
 from . import integrity_error
 from .authentication import auth
@@ -171,15 +170,34 @@ class GetJWTRespSchema(Schema):
     token = ma.fields.String()
 
 
+class GetJWTErrorSchema(Schema):
+    error = ma.fields.String()
+
+
 @auth_blp.route("/token", methods=["POST"])
 @auth_blp.arguments(GetJWTArgsSchema)
-@auth_blp.response(201, GetJWTRespSchema)
+@auth_blp.response(
+    201,
+    GetJWTRespSchema,
+    example={
+        "token": (
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.u"
+            "JKHM4XyWv1bC_-rpkjK19GUy0Fgrkm_pGHi8XghjWM"
+        )
+    },
+    description="Token created",
+)
+@auth_blp.alt_response(
+    # No 401, here. See https://stackoverflow.com/a/67359937
+    200,
+    schema=GetJWTErrorSchema,
+    description="Wrong credentials",
+    example={"error": "Wrong username or password"},
+    success=True,
+)
 def get_token(creds):
     """Get an authentication token"""
-    try:
-        user = auth.get_user_by_email(creds["email"])
-    except BEMServerAPIAuthenticationError:
-        abort(401, "Authentication error")
-    if not user.check_password(creds["password"]):
-        abort(401, "Authentication error")
+    user = auth.get_user_by_email(creds["email"])
+    if user is None or not user.check_password(creds["password"]):
+        return flask.jsonify({"error": "Wrong username or password"})
     return {"token": auth.encode(user)}

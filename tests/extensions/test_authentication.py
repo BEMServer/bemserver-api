@@ -35,7 +35,7 @@ class TestAuthentication:
         token = auth.decode(text)
 
         assert token.header == {"typ": "JWT", "alg": "HS256"}
-        assert token.claims["email"] == "active@test.com"
+        assert token.claims["email"] == user_1.email
         assert "exp" in token.claims
         auth.validate_token(token)
 
@@ -85,6 +85,8 @@ class TestAuthentication:
         headers = {}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Basic"
+        assert resp.json["errors"]["authentication"] == "missing_authentication"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
@@ -92,12 +94,16 @@ class TestAuthentication:
         headers = {"Authorization": "Basic Dummy"}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Basic"
+        assert resp.json["errors"]["authentication"] == "malformed_credentials"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
         hba_creds = base64.b64encode(b"Dummy").decode()
         headers = {"Authorization": "Basic " + hba_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Basic"
+        assert resp.json["errors"]["authentication"] == "malformed_credentials"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
@@ -105,6 +111,8 @@ class TestAuthentication:
         headers = {"Authorization": active_user_jwt}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Basic"
+        assert resp.json["errors"]["authentication"] == "invalid_scheme"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
@@ -115,10 +123,12 @@ class TestAuthentication:
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
-        # Active user with invalid creds (bad password)
-        headers = {"Authorization": active_user_invalid_hba_creds}
+        # Active user with invalid creds (wrong password)
+        headers = {"Authorization": "Basic " + active_user_invalid_hba_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Basic"
+        assert resp.json["errors"]["authentication"] == "invalid_credentials"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
@@ -149,6 +159,7 @@ class TestAuthentication:
 
     @pytest.mark.parametrize("app", (JWTTestConfig,), indirect=True)
     def test_auth_login_required_jwt(self, app, users):
+        user_1 = users["Active"]["user"]
         active_user_jwt_creds = users["Active"]["creds"]
         active_user_invalid_jwt_creds = jwt.encode(
             auth.HEADER, {"email": "dummy@dummy.com"}, "Dummy"
@@ -176,19 +187,27 @@ class TestAuthentication:
         headers = {}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Bearer"
+        assert resp.json["errors"]["authentication"] == "missing_authentication"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
-        # Broken auth headers
+        # Malformed token
         headers = {"Authorization": "Bearer Dummy"}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Bearer"
+        assert resp.json["errors"]["authentication"] == "malformed_token"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
+
+        # Missing claims
         creds = jwt.encode(auth.HEADER, {}, app.config["SECRET_KEY"])
         headers = {"Authorization": "Bearer " + creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Bearer"
+        assert resp.json["errors"]["authentication"] == "invalid_token"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
@@ -196,6 +215,31 @@ class TestAuthentication:
         headers = {"Authorization": active_user_hba_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Bearer"
+        assert resp.json["errors"]["authentication"] == "invalid_scheme"
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
+
+        # Bad signature
+        headers = {"Authorization": "Bearer " + active_user_invalid_jwt_creds}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Bearer"
+        assert resp.json["errors"]["authentication"] == "malformed_token"
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
+
+        # Expired token
+        headers = {
+            "Authorization": "Bearer "
+            + jwt.encode(
+                auth.HEADER, {"email": user_1.email, "exp": 0}, app.config["SECRET_KEY"]
+            )
+        }
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Bearer"
+        assert resp.json["errors"]["authentication"] == "expired_token"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
@@ -203,13 +247,6 @@ class TestAuthentication:
         headers = {"Authorization": inactive_user_jwt_creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 403
-        resp = client.get("/auth_test/no_auth", headers=headers)
-        assert resp.status_code == 204
-
-        # Active user with invalid jwt (bad password)
-        headers = {"Authorization": active_user_invalid_jwt_creds}
-        resp = client.get("/auth_test/auth", headers=headers)
-        assert resp.status_code == 401
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 

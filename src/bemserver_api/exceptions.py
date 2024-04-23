@@ -7,3 +7,6 @@ class BEMServerAPIError(Exception):
 
 class BEMServerAPIAuthenticationError(BEMServerAPIError):
     """AuthenticationError error"""
+
+    def __init__(self, code):
+        self.code = code

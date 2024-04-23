@@ -15,10 +15,10 @@ class TestSmorest:
         client = app.test_client()
         payload = {"email": user_1.email, "password": "dummy"}
         resp = client.post("/auth/token", json=payload)
-        assert resp.status_code == 401
+        assert resp.status_code == 200
 
         # Wrong email
         client = app.test_client()
         payload = {"email": "dummy@dummy.com", "password": "dummy"}
         resp = client.post("/auth/token", json=payload)
-        assert resp.status_code == 401
+        assert resp.status_code == 200
