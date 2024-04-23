@@ -30,6 +30,18 @@ def resolver(schema):
     return name
 
 
+SECURITY_SCHEMES = {
+    "Bearer": (
+        "BearerAuthentication",
+        {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"},
+    ),
+    "Basic": (
+        "BasicAuthentication",
+        {"type": "http", "scheme": "basic"},
+    ),
+}
+
+
 class Api(flask_smorest.Api):
     """Api class"""
 
@@ -44,9 +56,8 @@ class Api(flask_smorest.Api):
         super().init_app(app, spec_kwargs=spec_kwargs)
         self.register_field(Timezone, "string", "iana-tz")
         self.register_blueprint(auth_blp)
-        self.spec.components.security_scheme(
-            "BasicAuthentication", {"type": "http", "scheme": "basic"}
-        )
+        for scheme in app.config["AUTH_METHODS"]:
+            self.spec.components.security_scheme(*SECURITY_SCHEMES[scheme])
 
 
 class Blueprint(flask_smorest.Blueprint):
@@ -71,7 +82,10 @@ class Blueprint(flask_smorest.Blueprint):
     def _prepare_auth_doc(doc, doc_info, *, app, **kwargs):
         if doc_info.get("auth", False):
             doc.setdefault("responses", {})["401"] = http.HTTPStatus(401).name
-            doc["security"] = [{"BasicAuthentication": []}]
+            doc["security"] = [
+                {SECURITY_SCHEMES[scheme][0]: []}
+                for scheme in app.config["AUTH_METHODS"]
+            ]
         return doc
 
     @staticmethod
