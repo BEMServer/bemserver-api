@@ -131,6 +131,7 @@ class TestAuthentication:
 
         # Check OpenAPI spec
         spec = api.spec.to_dict()
+        assert spec["security"] == [{"BasicAuthentication": []}]
         assert spec["components"]["securitySchemes"] == {
             "BasicAuthentication": {
                 "type": "http",
@@ -141,10 +142,10 @@ class TestAuthentication:
         assert auth_spec["get"]["responses"]["401"] == {
             "$ref": "#/components/responses/UNAUTHORIZED"
         }
-        assert auth_spec["get"]["security"] == [{"BasicAuthentication": []}]
+        assert "security" not in auth_spec["get"]
         no_auth_spec = spec["paths"]["/auth_test/no_auth"]
         assert "401" not in no_auth_spec["get"]["responses"]
-        assert "security" not in no_auth_spec["get"]
+        assert no_auth_spec["get"]["security"] == []
 
     @pytest.mark.parametrize("app", (JWTTestConfig,), indirect=True)
     def test_auth_login_required_jwt(self, app, users):
@@ -221,6 +222,7 @@ class TestAuthentication:
 
         # Check OpenAPI spec
         spec = api.spec.to_dict()
+        assert spec["security"] == [{"BearerAuthentication": []}]
         assert spec["components"]["securitySchemes"] == {
             "BearerAuthentication": {
                 "type": "http",
@@ -232,7 +234,7 @@ class TestAuthentication:
         assert auth_spec["get"]["responses"]["401"] == {
             "$ref": "#/components/responses/UNAUTHORIZED"
         }
-        assert auth_spec["get"]["security"] == [{"BearerAuthentication": []}]
+        assert "security" not in auth_spec["get"]
         no_auth_spec = spec["paths"]["/auth_test/no_auth"]
         assert "401" not in no_auth_spec["get"]["responses"]
-        assert "security" not in no_auth_spec["get"]
+        assert no_auth_spec["get"]["security"] == []

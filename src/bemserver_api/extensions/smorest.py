@@ -53,6 +53,10 @@ class Api(flask_smorest.Api):
         super().__init__(app=app, spec_kwargs=spec_kwargs)
 
     def init_app(self, app, *, spec_kwargs=None):
+        spec_kwargs = spec_kwargs or {}
+        spec_kwargs["security"] = [
+            {SECURITY_SCHEMES[scheme][0]: []} for scheme in app.config["AUTH_METHODS"]
+        ]
         super().init_app(app, spec_kwargs=spec_kwargs)
         self.register_field(Timezone, "string", "iana-tz")
         self.register_blueprint(auth_blp)
@@ -82,10 +86,8 @@ class Blueprint(flask_smorest.Blueprint):
     def _prepare_auth_doc(doc, doc_info, *, app, **kwargs):
         if doc_info.get("auth", False):
             doc.setdefault("responses", {})["401"] = http.HTTPStatus(401).name
-            doc["security"] = [
-                {SECURITY_SCHEMES[scheme][0]: []}
-                for scheme in app.config["AUTH_METHODS"]
-            ]
+        else:
+            doc["security"] = []
         return doc
 
     @staticmethod
@@ -153,7 +155,10 @@ class SQLCursorPage(flask_smorest.Page):
 
 
 auth_blp = Blueprint(
-    "Auth", __name__, url_prefix="/auth", description="Authentication operations"
+    "Authentication",
+    __name__,
+    url_prefix="/auth",
+    description="Authentication operations",
 )
 
 
