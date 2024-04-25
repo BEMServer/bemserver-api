@@ -167,37 +167,35 @@ class GetJWTArgsSchema(Schema):
 
 
 class GetJWTRespSchema(Schema):
+    status = ma.fields.String(validate=ma.validate.OneOf(("success", "failure")))
     token = ma.fields.String()
-
-
-class GetJWTErrorSchema(Schema):
-    error = ma.fields.String()
 
 
 @auth_blp.route("/token", methods=["POST"])
 @auth_blp.arguments(GetJWTArgsSchema)
 @auth_blp.response(
-    201,
-    GetJWTRespSchema,
-    example={
-        "token": (
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.u"
-            "JKHM4XyWv1bC_-rpkjK19GUy0Fgrkm_pGHi8XghjWM"
-        )
-    },
-    description="Token created",
-)
-@auth_blp.alt_response(
-    # No 401, here. See https://stackoverflow.com/a/67359937
     200,
-    schema=GetJWTErrorSchema,
-    description="Wrong credentials",
-    example={"error": "Wrong username or password"},
-    success=True,
+    GetJWTRespSchema,
+    examples={
+        "success": {
+            "value": {
+                "status": "success",
+                "token": (
+                    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.u"
+                    "JKHM4XyWv1bC_-rpkjK19GUy0Fgrkm_pGHi8XghjWM"
+                ),
+            },
+        },
+        "failure": {
+            "value": {
+                "status": "failure",
+            },
+        },
+    },
 )
 def get_token(creds):
     """Get an authentication token"""
     user = auth.get_user_by_email(creds["email"])
     if user is None or not user.check_password(creds["password"]):
-        return flask.jsonify({"error": "Wrong username or password"})
-    return {"token": auth.encode(user)}
+        return flask.jsonify({"status": "failure"})
+    return {"status": "success", "token": auth.encode(user)}

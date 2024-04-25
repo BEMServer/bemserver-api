@@ -8,7 +8,8 @@ class TestSmorest:
         client = app.test_client()
         payload = {"email": user_1.email, "password": "@ctive"}
         resp = client.post("/auth/token", json=payload)
-        assert resp.status_code == 201
+        assert resp.status_code == 200
+        assert resp.json["status"] == "success"
         assert "token" in resp.json
 
         # Wrong password
@@ -16,9 +17,11 @@ class TestSmorest:
         payload = {"email": user_1.email, "password": "dummy"}
         resp = client.post("/auth/token", json=payload)
         assert resp.status_code == 200
+        assert resp.json == {"status": "failure"}
 
         # Wrong email
         client = app.test_client()
         payload = {"email": "dummy@dummy.com", "password": "dummy"}
         resp = client.post("/auth/token", json=payload)
         assert resp.status_code == 200
+        assert resp.json == {"status": "failure"}
