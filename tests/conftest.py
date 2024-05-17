@@ -9,15 +9,13 @@ from pytest_postgresql import factories as ppf
 
 import flask.testing
 
-from joserfc import jwt
-
 from bemserver_core import common, model, scheduled_tasks
 from bemserver_core.authorization import OpenBar
 from bemserver_core.commands import setup_db
 from bemserver_core.database import db
 
 import bemserver_api
-from bemserver_api.extensions.authentication import auth
+from bemserver_api.extensions.authentication import auth, jwt
 from tests.common import AUTH_HEADER, TestConfig
 
 
@@ -104,8 +102,11 @@ for user in USERS.values():
         "Basic "
         + base64.b64encode(f'{user["email"]}:{user["password"]}'.encode()).decode()
     )
-    user["creds"] = "Bearer " + jwt.encode(
-        auth.HEADER, {"email": user["email"]}, TestConfig.SECRET_KEY
+    user["creds"] = (
+        "Bearer "
+        + jwt.encode(
+            auth.HEADER, {"email": user["email"]}, TestConfig.SECRET_KEY
+        ).decode()
     )
 
 

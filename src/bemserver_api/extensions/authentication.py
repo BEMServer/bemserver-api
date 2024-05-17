@@ -10,15 +10,17 @@ import flask
 
 from flask_smorest import abort
 
-from joserfc import jwt
-from joserfc.errors import ExpiredTokenError, JoseError
-from joserfc.jwk import OctKey
+from authlib.jose import JsonWebToken
+from authlib.jose.errors import ExpiredTokenError, JoseError
 
 from bemserver_core.authorization import BEMServerAuthorizationError, CurrentUser
 from bemserver_core.model.users import User
 
 from bemserver_api.database import db
 from bemserver_api.exceptions import BEMServerAPIAuthenticationError
+
+# https://docs.authlib.org/en/latest/jose/jwt.html#jwt-with-limited-algorithms
+jwt = JsonWebToken(["HS256"])
 
 
 class Auth:
@@ -41,7 +43,7 @@ class Auth:
 
     def init_app(self, app):
         self.app = app
-        self.key = OctKey.import_key(app.config["SECRET_KEY"])
+        self.key = app.config["SECRET_KEY"]
         self.get_user_funcs = {
             k: getattr(self, v)
             for k, v in self.GET_USER_FUNCS.items()
@@ -57,11 +59,7 @@ class Auth:
         return jwt.encode(self.HEADER, claims, self.key)
 
     def decode(self, text):
-        return jwt.decode(text, self.key)
-
-    def validate_token(self, token):
-        claims_requests = jwt.JWTClaimsRegistry(email={"essential": True})
-        claims_requests.validate(token.claims)
+        return jwt.decode(text, self.key, claims_options={"email": {"essential": True}})
 
     @staticmethod
     def get_user_by_email(user_email):
@@ -71,16 +69,13 @@ class Auth:
 
     def get_user_jwt(self, creds):
         try:
-            token = self.decode(creds)
-        except (ValueError, JoseError) as exc:
-            raise BEMServerAPIAuthenticationError(code="malformed_token") from exc
-        try:
-            self.validate_token(token)
+            claims = self.decode(creds)
+            claims.validate()
         except ExpiredTokenError as exc:
             raise BEMServerAPIAuthenticationError(code="expired_token") from exc
         except JoseError as exc:
             raise BEMServerAPIAuthenticationError(code="invalid_token") from exc
-        user_email = token.claims["email"]
+        user_email = claims["email"]
         if (user := self.get_user_by_email(user_email)) is None:
             raise BEMServerAPIAuthenticationError(code="invalid_token")
         return user

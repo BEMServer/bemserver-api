@@ -18,6 +18,8 @@ argon2-cffi-bindings==21.2.0
     # via argon2-cffi
 async-timeout==4.0.3
     # via redis
+authlib==1.3.0
+    # via bemserver-api (pyproject.toml)
 bemserver-core==0.17.1
     # via bemserver-api (pyproject.toml)
 billiard==4.2.0
@@ -50,7 +52,7 @@ click-plugins==1.1.1
 click-repl==0.3.0
     # via celery
 cryptography==42.0.5
-    # via joserfc
+    # via authlib
 flask==3.0.2
     # via
     #   bemserver-api (pyproject.toml)
@@ -65,8 +67,6 @@ itsdangerous==2.1.2
     # via flask
 jinja2==3.1.4
     # via flask
-joserfc==0.9.0
-    # via bemserver-api (pyproject.toml)
 kombu==5.3.5
     # via celery
 mako==1.3.2

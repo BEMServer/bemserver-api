@@ -5,14 +5,18 @@ import datetime as dt
 
 import pytest
 
-from joserfc import jwt
-from joserfc.errors import ExpiredTokenError, MissingClaimError
+from authlib.jose.errors import (
+    BadSignatureError,
+    DecodeError,
+    ExpiredTokenError,
+    MissingClaimError,
+)
 from tests.common import TestConfig
 
 from bemserver_core.authorization import get_current_user
 
 from bemserver_api import Blueprint
-from bemserver_api.extensions.authentication import auth
+from bemserver_api.extensions.authentication import auth, jwt
 
 
 class HBATestConfig(TestConfig):
@@ -32,29 +36,32 @@ class TestAuthentication:
         user_1 = users["Active"]["user"]
 
         text = auth.encode(user_1)
-        token = auth.decode(text)
+        claims = auth.decode(text)
 
-        assert token.header == {"typ": "JWT", "alg": "HS256"}
-        assert token.claims["email"] == user_1.email
-        assert "exp" in token.claims
-        auth.validate_token(token)
+        assert claims["email"] == user_1.email
+        assert "exp" in claims
+        claims.validate()
 
     def test_auth_decode_error(self, app):
-        with pytest.raises(ValueError):
+        with pytest.raises(DecodeError):
             auth.decode("dummy")
+
+        text = jwt.encode(auth.HEADER, {"email": "test@test.com"}, "Dummy")
+        with pytest.raises(BadSignatureError):
+            auth.decode(text)
 
     def test_auth_validation_error(self, app):
         text = jwt.encode(auth.HEADER, {"email": "test@test.com", "exp": 0}, auth.key)
-        token = auth.decode(text)
+        claims = auth.decode(text)
         with pytest.raises(ExpiredTokenError):
-            auth.validate_token(token)
+            claims.validate()
 
         text = jwt.encode(
             auth.HEADER, {"exp": dt.datetime.now(tz=dt.timezone.utc)}, auth.key
         )
-        token = auth.decode(text)
+        claims = auth.decode(text)
         with pytest.raises(MissingClaimError):
-            auth.validate_token(token)
+            claims.validate()
 
     @pytest.mark.parametrize("app", (HBATestConfig,), indirect=True)
     def test_auth_login_required_http_basic_auth(self, app, users):
@@ -163,7 +170,7 @@ class TestAuthentication:
         active_user_jwt_creds = users["Active"]["creds"]
         active_user_invalid_jwt_creds = jwt.encode(
             auth.HEADER, {"email": "dummy@dummy.com"}, "Dummy"
-        )
+        ).decode()
         inactive_user_jwt_creds = users["Inactive"]["creds"]
         active_user_hba_creds = users["Active"]["hba_creds"]
         api = app.extensions["flask-smorest"]["apis"][""]["ext_obj"]
@@ -197,12 +204,12 @@ class TestAuthentication:
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
         assert resp.headers["WWW-Authenticate"] == "Bearer"
-        assert resp.json["errors"]["authentication"] == "malformed_token"
+        assert resp.json["errors"]["authentication"] == "invalid_token"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
         # Missing claims
-        creds = jwt.encode(auth.HEADER, {}, app.config["SECRET_KEY"])
+        creds = jwt.encode(auth.HEADER, {}, app.config["SECRET_KEY"]).decode()
         headers = {"Authorization": "Bearer " + creds}
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
@@ -225,7 +232,7 @@ class TestAuthentication:
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
         assert resp.headers["WWW-Authenticate"] == "Bearer"
-        assert resp.json["errors"]["authentication"] == "malformed_token"
+        assert resp.json["errors"]["authentication"] == "invalid_token"
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
@@ -234,7 +241,7 @@ class TestAuthentication:
             "Authorization": "Bearer "
             + jwt.encode(
                 auth.HEADER, {"email": user_1.email, "exp": 0}, app.config["SECRET_KEY"]
-            )
+            ).decode()
         }
         resp = client.get("/auth_test/auth", headers=headers)
         assert resp.status_code == 401
