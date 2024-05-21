@@ -196,6 +196,6 @@ class GetJWTRespSchema(Schema):
 def get_token(creds):
     """Get an authentication token"""
     user = auth.get_user_by_email(creds["email"])
-    if user is None or not user.check_password(creds["password"]):
+    if user is None or not user.check_password(creds["password"]) or not user.is_active:
         return flask.jsonify({"status": "failure"})
     return {"status": "success", "token": auth.encode(user).decode("utf-8")}
