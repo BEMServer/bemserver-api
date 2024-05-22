@@ -12,6 +12,8 @@ import marshmallow_sqlalchemy as msa
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec.ext.marshmallow.common import resolve_schema_cls
 
+from bemserver_core.authorization import get_current_user
+
 from . import integrity_error
 from .authentication import auth
 from .ma_fields import Timezone
@@ -58,7 +60,8 @@ class Api(flask_smorest.Api):
         ]
         super().init_app(app, spec_kwargs=spec_kwargs)
         self.register_field(Timezone, "string", "iana-tz")
-        self.register_blueprint(auth_blp)
+        if "Bearer" in app.config["AUTH_METHODS"]:
+            self.register_blueprint(auth_blp)
         for scheme in app.config["AUTH_METHODS"]:
             self.spec.components.security_scheme(*SECURITY_SCHEMES[scheme])
 
@@ -168,7 +171,8 @@ class GetJWTArgsSchema(Schema):
 
 class GetJWTRespSchema(Schema):
     status = ma.fields.String(validate=ma.validate.OneOf(("success", "failure")))
-    token = ma.fields.String()
+    access_token = ma.fields.String()
+    refresh_token = ma.fields.String()
 
 
 @auth_blp.route("/token", methods=["POST"])
@@ -180,9 +184,17 @@ class GetJWTRespSchema(Schema):
         "success": {
             "value": {
                 "status": "success",
-                "token": (
-                    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.e30.u"
-                    "JKHM4XyWv1bC_-rpkjK19GUy0Fgrkm_pGHi8XghjWM"
+                "access_token": (
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJl"
+                    "bWFpbCI6ImFjdGl2ZUB0ZXN0LmNvbSIsImV4cCI6M"
+                    "TcxNjM2OTg4OCwidHlwZSI6ImFjY2VzcyJ9.YT-50"
+                    "7Qo9oncWKKRJhRXBbpLrOCYoJOMxbk1IaAQef4"
+                ),
+                "refresh_token": (
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJl"
+                    "bWFpbCI6ImFjdGl2ZUB0ZXN0LmNvbSIsImV4cCI6M"
+                    "TcyMTU1MzEzNSwidHlwZSI6InJlZnJlc2gifQ._kc"
+                    "SHTzcngWIt-LRX6yBx8ftpekT_Dqo8qbPyfgFjSQ"
                 ),
             },
         },
@@ -194,8 +206,47 @@ class GetJWTRespSchema(Schema):
     },
 )
 def get_token(creds):
-    """Get an authentication token"""
+    """Get access and refresh tokens"""
     user = auth.get_user_by_email(creds["email"])
     if user is None or not user.check_password(creds["password"]) or not user.is_active:
         return flask.jsonify({"status": "failure"})
-    return {"status": "success", "token": auth.encode(user).decode("utf-8")}
+    return {
+        "status": "success",
+        "access_token": auth.encode(user).decode("utf-8"),
+        "refresh_token": auth.encode(user, token_type="refresh").decode("utf-8"),
+    }
+
+
+@auth_blp.route("/token/refresh", methods=["POST"])
+@auth_blp.login_required(refresh=True)
+@auth_blp.response(
+    200,
+    GetJWTRespSchema,
+    examples={
+        "success": {
+            "value": {
+                "status": "success",
+                "access_token": (
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJl"
+                    "bWFpbCI6ImFjdGl2ZUB0ZXN0LmNvbSIsImV4cCI6M"
+                    "TcxNjM2OTg4OCwidHlwZSI6ImFjY2VzcyJ9.YT-50"
+                    "7Qo9oncWKKRJhRXBbpLrOCYoJOMxbk1IaAQef4"
+                ),
+                "refresh_token": (
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJl"
+                    "bWFpbCI6ImFjdGl2ZUB0ZXN0LmNvbSIsImV4cCI6M"
+                    "TcyMTU1MzEzNSwidHlwZSI6InJlZnJlc2gifQ._kc"
+                    "SHTzcngWIt-LRX6yBx8ftpekT_Dqo8qbPyfgFjSQ"
+                ),
+            },
+        },
+    },
+)
+def refresh_token():
+    """Refresh access and refresh tokens"""
+    user = get_current_user()
+    return {
+        "status": "success",
+        "access_token": auth.encode(user).decode("utf-8"),
+        "refresh_token": auth.encode(user, token_type="refresh").decode("utf-8"),
+    }

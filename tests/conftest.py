@@ -15,8 +15,7 @@ from bemserver_core.commands import setup_db
 from bemserver_core.database import db
 
 import bemserver_api
-from bemserver_api.extensions.authentication import auth, jwt
-from tests.common import AUTH_HEADER, TestConfig
+from tests.common import AUTH_HEADER, TestConfig, make_token
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -102,12 +101,7 @@ for user in USERS.values():
         "Basic "
         + base64.b64encode(f'{user["email"]}:{user["password"]}'.encode()).decode()
     )
-    user["creds"] = (
-        "Bearer "
-        + jwt.encode(
-            auth.HEADER, {"email": user["email"]}, TestConfig.SECRET_KEY
-        ).decode()
-    )
+    user["creds"] = "Bearer " + make_token(user["email"], "access")
 
 
 @pytest.fixture(params=(USERS,))

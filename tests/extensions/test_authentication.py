@@ -2,6 +2,7 @@
 
 import base64
 import datetime as dt
+from unittest import mock
 
 import pytest
 
@@ -32,32 +33,86 @@ class JWTTestConfig(TestConfig):
 
 
 class TestAuthentication:
-    def test_auth_encode_decode(self, app, users):
+    @mock.patch("bemserver_api.extensions.authentication.datetime")
+    @mock.patch("bemserver_api.extensions.authentication.jwt.encode")
+    def test_auth_encode(self, mock_encode, mock_dt, app, users):
+        dt_now = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
+        mock_dt.now.return_value = dt_now
+
+        user_1 = users["Active"]["user"]
+
+        auth.encode(user_1)
+        mock_encode.assert_called()
+        call_1 = mock_encode.call_args[0]
+        assert call_1[0] == {"alg": "HS256"}
+        assert call_1[1] == {
+            "email": "active@test.com",
+            "exp": dt_now + dt.timedelta(seconds=60 * 15),
+            "type": "access",
+        }
+        assert call_1[2] == "Test secret"
+
+        auth.encode(user_1, token_type="refresh")
+        mock_encode.assert_called()
+        call_1 = mock_encode.call_args[0]
+        assert call_1[0] == {"alg": "HS256"}
+        assert call_1[1] == {
+            "email": "active@test.com",
+            "exp": dt_now + dt.timedelta(seconds=60 * 60 * 24 * 60),
+            "type": "refresh",
+        }
+        assert call_1[2] == "Test secret"
+
+    def test_auth_decode(self, app, users):
         user_1 = users["Active"]["user"]
 
         text = auth.encode(user_1)
         claims = auth.decode(text)
-
         assert claims["email"] == user_1.email
         assert "exp" in claims
+        assert claims["type"] == "access"
+        claims.validate()
+
+        text = auth.encode(user_1, token_type="refresh")
+        claims = auth.decode(text)
+        assert claims["email"] == user_1.email
+        assert "exp" in claims
+        assert claims["type"] == "refresh"
         claims.validate()
 
     def test_auth_decode_error(self, app):
         with pytest.raises(DecodeError):
             auth.decode("dummy")
 
-        text = jwt.encode(auth.HEADER, {"email": "test@test.com"}, "Dummy")
+        text = jwt.encode(
+            auth.HEADER, {"email": "test@test.com", "type": "access"}, "Dummy"
+        )
         with pytest.raises(BadSignatureError):
             auth.decode(text)
 
     def test_auth_validation_error(self, app):
-        text = jwt.encode(auth.HEADER, {"email": "test@test.com", "exp": 0}, auth.key)
+        text = jwt.encode(
+            auth.HEADER,
+            {"email": "test@test.com", "type": "access", "exp": 0},
+            auth.key,
+        )
         claims = auth.decode(text)
         with pytest.raises(ExpiredTokenError):
             claims.validate()
 
         text = jwt.encode(
-            auth.HEADER, {"exp": dt.datetime.now(tz=dt.timezone.utc)}, auth.key
+            auth.HEADER,
+            {"exp": dt.datetime.now(tz=dt.timezone.utc), "type": "access"},
+            auth.key,
+        )
+        claims = auth.decode(text)
+        with pytest.raises(MissingClaimError):
+            claims.validate()
+
+        text = jwt.encode(
+            auth.HEADER,
+            {"exp": dt.datetime.now(tz=dt.timezone.utc), "email": "test@test.com"},
+            auth.key,
         )
         claims = auth.decode(text)
         with pytest.raises(MissingClaimError):
@@ -169,7 +224,7 @@ class TestAuthentication:
         user_1 = users["Active"]["user"]
         active_user_jwt_creds = users["Active"]["creds"]
         active_user_invalid_jwt_creds = jwt.encode(
-            auth.HEADER, {"email": "dummy@dummy.com"}, "Dummy"
+            auth.HEADER, {"email": "dummy@dummy.com", "type": "access"}, "Dummy"
         ).decode()
         inactive_user_jwt_creds = users["Inactive"]["creds"]
         active_user_hba_creds = users["Active"]["hba_creds"]
@@ -240,7 +295,9 @@ class TestAuthentication:
         headers = {
             "Authorization": "Bearer "
             + jwt.encode(
-                auth.HEADER, {"email": user_1.email, "exp": 0}, app.config["SECRET_KEY"]
+                auth.HEADER,
+                {"email": user_1.email, "exp": 0, "type": "access"},
+                app.config["SECRET_KEY"],
             ).decode()
         }
         resp = client.get("/auth_test/auth", headers=headers)
