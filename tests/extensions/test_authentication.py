@@ -273,6 +273,27 @@ class TestAuthentication:
         resp = client.get("/auth_test/no_auth", headers=headers)
         assert resp.status_code == 204
 
+        # Unknown user
+        creds = jwt.encode(
+            auth.HEADER,
+            {"email": "dummy@dummy.com", "type": "access"},
+            app.config["SECRET_KEY"],
+        ).decode()
+        headers = {"Authorization": "Bearer " + creds}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 401
+        assert resp.headers["WWW-Authenticate"] == "Bearer"
+        assert resp.json["errors"]["authentication"] == "invalid_token"
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
+
+        # Broken header
+        headers = {"Authorization": "dummy"}
+        resp = client.get("/auth_test/auth", headers=headers)
+        assert resp.status_code == 400
+        resp = client.get("/auth_test/no_auth", headers=headers)
+        assert resp.status_code == 204
+
         # Wrong scheme
         headers = {"Authorization": active_user_hba_creds}
         resp = client.get("/auth_test/auth", headers=headers)
