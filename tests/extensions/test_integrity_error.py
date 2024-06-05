@@ -5,9 +5,7 @@ import pytest
 import psycopg.errors as ppe
 import sqlalchemy as sqla
 
-import flask
-
-from bemserver_api import Api, Blueprint
+from bemserver_api import Blueprint
 
 
 class TestIntegrityError:
@@ -28,11 +26,8 @@ class TestIntegrityError:
             ),
         ),
     )
-    def test_blp_integrity_error(self, error, message):
-        app = flask.Flask("Test")
-        api = Api(
-            app, spec_kwargs={"title": "Test", "version": "1", "openapi_version": "3"}
-        )
+    def test_blp_integrity_error(self, app, error, message):
+        api = app.extensions["flask-smorest"]["apis"][""]["ext_obj"]
 
         blp = Blueprint("Test", __name__, url_prefix="/test")
 

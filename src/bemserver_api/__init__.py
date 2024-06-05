@@ -36,6 +36,7 @@ def create_app():
         }
     )
     api.init_app(app)
+    authentication.auth.init_app(app)
     register_blueprints(api)
 
     BEMServerCore()

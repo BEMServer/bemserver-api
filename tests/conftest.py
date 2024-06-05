@@ -14,8 +14,8 @@ from bemserver_core.authorization import OpenBar
 from bemserver_core.commands import setup_db
 from bemserver_core.database import db
 
-from bemserver_api import create_app
-from tests.common import AUTH_HEADER, TestConfig
+import bemserver_api
+from tests.common import AUTH_HEADER, TestConfig, make_token
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -65,35 +65,62 @@ class TestClient(flask.testing.FlaskClient):
 
 
 @pytest.fixture(params=(TestConfig,))
-def app(request, bsc_config):
-    application = create_app()
-    application.config.from_object(TestConfig)
+def app(request, bsc_config, monkeypatch):
+    with monkeypatch.context() as mp_ctx:
+        mp_ctx.setattr(bemserver_api.settings, "Config", request.param)
+        application = bemserver_api.create_app()
     application.test_client_class = TestClient
     setup_db()
     yield application
     db.session.remove()
 
 
-USERS = (
-    ("Chuck", "N0rris", "chuck@test.com", True, True),
-    ("Active", "@ctive", "active@test.com", False, True),
-    ("Inactive", "in@ctive", "inactive@test.com", False, False),
-)
+USERS = {
+    "Chuck": {
+        "email": "chuck@test.com",
+        "password": "N0rris",
+        "is_admin": True,
+        "is_active": True,
+    },
+    "Active": {
+        "email": "active@test.com",
+        "password": "@ctive",
+        "is_admin": False,
+        "is_active": True,
+    },
+    "Inactive": {
+        "email": "inactive@test.com",
+        "password": "in@ctive",
+        "is_admin": False,
+        "is_active": False,
+    },
+}
+
+for user in USERS.values():
+    user["hba_creds"] = (
+        "Basic "
+        + base64.b64encode(f'{user["email"]}:{user["password"]}'.encode()).decode()
+    )
+    user["creds"] = "Bearer " + make_token(user["email"], "access")
 
 
 @pytest.fixture(params=(USERS,))
 def users(app, request):
     with OpenBar():
         ret = {}
-        for user in request.param:
-            name, password, email, is_admin, is_active = user
+        for name, elems in request.param.items():
             user = model.User.new(
-                name=name, email=email, is_admin=is_admin, is_active=is_active
+                name=name,
+                email=elems["email"],
+                is_admin=elems["is_admin"],
+                is_active=elems["is_active"],
             )
-            user.set_password(password)
-            creds = base64.b64encode(f"{email}:{password}".encode()).decode()
-            invalid_creds = base64.b64encode(f"{email}:bad_pwd".encode()).decode()
-            ret[name] = {"user": user, "creds": creds, "invalid_creds": invalid_creds}
+            user.set_password(elems["password"])
+            ret[name] = {
+                "user": user,
+                "hba_creds": elems["hba_creds"],
+                "creds": elems["creds"],
+            }
         db.session.commit()
         # Set id after commit
         for user in ret.values():
