@@ -1,16 +1,18 @@
 Changelog
 ---------
 
-0.24.0 (unreleased)
+0.24.0 (2024-06-06)
 +++++++++++++++++++
 
 Features:
 
+- Add JWT authentication
 - Remove bemserver_api.__version__
 
 Other changes:
 
 - Change license to MIT
+- Require bemserver-core 0.18.0
 
 0.23.0 (2024-02-13)
 +++++++++++++++++++
