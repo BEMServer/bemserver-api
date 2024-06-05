@@ -3,6 +3,7 @@
 import http
 from copy import deepcopy
 from functools import wraps
+from textwrap import dedent
 
 import flask
 
@@ -156,11 +157,21 @@ class SQLCursorPage(flask_smorest.Page):
         return self.collection.count()
 
 
+AUTH_BLP_DESC = dedent("""Authentication operations
+
+The following resources are used to get and refresh tokens. When authenticating, first
+get a couple of access (short-lived) and refresh (long-lived) tokens using login and
+password. When or before access token expires, refresh tokens to get a new pair of
+tokens with new expiration dates. If refresh token is expired, get a new pair of tokens
+using login and password again.
+""")
+
+
 auth_blp = Blueprint(
     "Authentication",
     __name__,
     url_prefix="/auth",
-    description="Authentication operations",
+    description=AUTH_BLP_DESC,
 )
 
 
@@ -206,7 +217,12 @@ class GetJWTRespSchema(Schema):
     },
 )
 def get_token(creds):
-    """Get access and refresh tokens"""
+    """Get access and refresh tokens
+
+    Use login and password to get a pair of access and refresh tokens.
+
+    No authentication header needed. Credentials must be passed in request payload.
+    """
     user = auth.get_user_by_email(creds["email"])
     if user is None or not user.check_password(creds["password"]) or not user.is_active:
         return flask.jsonify({"status": "failure"})
@@ -243,7 +259,14 @@ def get_token(creds):
     },
 )
 def refresh_token():
-    """Refresh access and refresh tokens"""
+    """Refresh access and refresh tokens
+
+    When access token is expired, call this resource using the refresh token to get a
+    new pair of tokens.
+
+    As opposed to all other resources, this resource must be accessed using the refresh
+    token, not the access token.
+    """
     user = get_current_user()
     return {
         "status": "success",
