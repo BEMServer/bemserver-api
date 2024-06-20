@@ -215,11 +215,13 @@ def get(args):
 
     Returns data in either JSON or CSV format.
 
-    JSON: each key is a timestamp ID as string. For each timeseries, values are
-    passed a {timestamp: value} mappings.
+    JSON: Each key is a timeseries ID as string. For each timeseries, values are
+    passed as {timestamp: value} mappings.
 
-    CSV: the first column is the timestamp as timezone aware datetime and each
-    other column is a timeseries data. Column headers are timeseries IDs.
+    CSV: The first column is the timestamp and each other column is a timeseries data.
+    Column headers are timeseries IDs.
+
+    In both cases, timestamps are timezone aware datetimes.
     """
     mime_type = flask.request.headers.get("Accept", "application/json")
 
@@ -263,11 +265,13 @@ def get_aggregate(args):
 
     Returns data in either JSON or CSV format.
 
-    JSON: each key is a timestamp ID as string. For each timeseries, values are
-    passed a {timestamp: value} mappings.
+    JSON: Each key is a timeseries ID as string. For each timeseries, values are
+    passed as {timestamp: value} mappings.
 
-    CSV: the first column is the timestamp as timezone aware datetime and each
-    other column is a timeseries data. Column headers are timeseries IDs.
+    CSV: The first column is the timestamp and each other column is a timeseries data.
+    Column headers are timeseries IDs.
+
+    In both cases, timestamps are timezone aware datetimes.
     """
     mime_type = flask.request.headers.get("Accept", "application/json")
 
@@ -333,8 +337,13 @@ def post(args):
 
     Loads data in either JSON or CSV format.
 
-    JSON: each key is a timestamp ID as string. For each timeseries, values are
+    JSON: Each key is a timeseries ID as string. For each timeseries, values are
     passed as {timestamp: value} mappings.
+
+    CSV: The first column is the timestamp and each other column is a timeseries data.
+    Column headers are timeseries IDs.
+
+    In both cases, timestamps are timezone aware datetimes.
     """
     mime_type = flask.request.headers.get("content-type", "application/json")
 
@@ -411,11 +420,13 @@ def get_for_campaign(args, campaign_id):
 
     Returns data in either JSON or CSV format.
 
-    JSON: each key is a timestamp name as string. For each timeseries, values
-    are passed a {timestamp: value} mappings.
+    JSON: Each key is a timeseries name as string. For each timeseries, values are
+    passed as {timestamp: value} mappings.
 
-    CSV: the first column is the timestamp as timezone aware datetime and each
-    other column is a timeseries data. Column headers are timeseries names.
+    CSV: The first column is the timestamp and each other column is a timeseries data.
+    Column headers are timeseries names.
+
+    In both cases, timestamps are timezone aware datetimes.
     """
     mime_type = flask.request.headers.get("Accept", "application/json")
 
@@ -462,11 +473,13 @@ def get_aggregate_for_campaign(args, campaign_id):
 
     Returns data in either JSON or CSV format.
 
-    JSON: each key is a timestamp name as string. For each timeseries, values
-    are passed a {timestamp: value} mappings.
+    JSON: Each key is a timeseries name as string. For each timeseries, values are
+    passed as {timestamp: value} mappings.
 
-    CSV: the first column is the timestamp as timezone aware datetime and each
-    other column is a timeseries data. Column headers are timeseries names.
+    CSV: The first column is the timestamp and each other column is a timeseries data.
+    Column headers are timeseries names.
+
+    In both cases, timestamps are timezone aware datetimes.
     """
     mime_type = flask.request.headers.get("Accept", "application/json")
 
@@ -533,8 +546,13 @@ def post_for_campaign(args, campaign_id):
 
     Loads data in either JSON or CSV format.
 
-    JSON: each key is a timestamp ID as string. For each timeseries, values are
+    JSON: Each key is a timeseries name as string. For each timeseries, values are
     passed as {timestamp: value} mappings.
+
+    CSV: The first column is the timestamp and each other column is a timeseries data.
+    Column headers are timeseries names.
+
+    In both cases, timestamps are timezone aware datetimes.
     """
     mime_type = flask.request.headers.get("content-type", "application/json")
 
