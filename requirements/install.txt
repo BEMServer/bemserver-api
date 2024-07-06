@@ -28,7 +28,7 @@ blinker==1.8.2
     # via flask
 celery==5.4.0
     # via bemserver-core
-certifi==2024.6.2
+certifi==2024.7.4
     # via requests
 cffi==1.16.0
     # via
