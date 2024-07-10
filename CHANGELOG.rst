@@ -1,6 +1,17 @@
 Changelog
 ---------
 
+0.24.1 (2024-07-10)
++++++++++++++++++++
+
+Features:
+
+- Allow filtering by property data when querying timeseries
+
+Other changes:
+
+- Require bemserver-core 0.18.1
+
 0.24.0 (2024-06-06)
 +++++++++++++++++++
 
