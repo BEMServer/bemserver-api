@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+0.24.2 (2024-07-10)
++++++++++++++++++++
+
+Bug fixes:
+
+- Fix auto-documentation of DictStr fields
+
 0.24.1 (2024-07-10)
 +++++++++++++++++++
 
