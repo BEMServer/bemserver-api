@@ -162,6 +162,42 @@ class TestTimeseriesApi:
             ret = client.get(f"{TIMESERIES_URL}{timeseries_1_id}")
             assert ret.status_code == 404
 
+    @pytest.mark.usefixtures("timeseries_properties")
+    @pytest.mark.usefixtures("timeseries_property_data")
+    def test_timeseries_filter_by_properties_data_api(self, app, users):
+        creds = users["Chuck"]["creds"]
+
+        client = app.test_client()
+
+        with AuthHeader(creds):
+            ret = client.get(TIMESERIES_URL)
+            ret_val = ret.json
+            assert len(ret_val) == 2
+
+            ret = client.get(
+                TIMESERIES_URL, query_string={"properties": '{"Min": "12"}'}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+
+            # Invalid property name
+            ret = client.get(
+                TIMESERIES_URL, query_string={"properties": '{"Dummy": "12"}'}
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert not ret_val
+
+            # Not dicts of strings
+            ret = client.get(
+                TIMESERIES_URL, query_string={"properties": '{12: "Dummy"}'}
+            )
+            assert ret.status_code == 422
+            ret_val = ret.json
+            ret = client.get(TIMESERIES_URL, query_string={"properties": '{"Min": 12}'})
+            assert ret.status_code == 422
+
     @pytest.mark.usefixtures("timeseries_by_spaces")
     @pytest.mark.usefixtures("timeseries_by_zones")
     @pytest.mark.usefixtures("timeseries_by_events")
