@@ -2,7 +2,7 @@ import pytest
 
 import marshmallow as ma
 
-from bemserver_api.extensions.ma_fields import Timezone, UnitSymbol
+from bemserver_api.extensions.ma_fields import DictStr, Timezone, UnitSymbol
 
 
 class TestMaFields:
@@ -25,3 +25,13 @@ class TestMaFields:
             field.deserialize("wh")
         with pytest.raises(ma.ValidationError):
             field.deserialize("dummy")
+
+    def test_ma_fields_dictstr(self):
+        field = DictStr()
+        assert field.deserialize('{"lol": "rofl"}') == {"lol": "rofl"}
+        with pytest.raises(ma.ValidationError, match="Not a valid string."):
+            field.deserialize(12)
+        with pytest.raises(ma.ValidationError, match="Not a valid utf-8 string."):
+            field.deserialize(b"\xf3")
+        with pytest.raises(ma.ValidationError, match="Not a valid json object."):
+            field.deserialize("{'lol': 'rofl'}")

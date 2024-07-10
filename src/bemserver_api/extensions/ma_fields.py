@@ -80,3 +80,25 @@ class SortField(DelimitedList):
             [v for f in fields for v in [f, f"+{f}", f"-{f}"]]
         )
         super().__init__(ma.fields.String(validate=validator), **kwargs)
+
+
+class DictStr(ma.fields.Dict):
+    default_error_messages = {
+        "invalid": "Not a valid string.",
+        "invalid_utf8": "Not a valid utf-8 string.",
+        "invalid_json": "Not a valid json object.",
+    }
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        if not isinstance(value, (str, bytes)):
+            raise self.make_error("invalid")
+        try:
+            if isinstance(value, bytes):
+                value = value.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise self.make_error("invalid_utf8") from exc
+        try:
+            value = json.loads(value)
+        except json.decoder.JSONDecodeError as exc:
+            raise self.make_error("invalid_json") from exc
+        return super()._deserialize(value, attr, data, **kwargs)
