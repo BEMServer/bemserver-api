@@ -230,14 +230,13 @@ def timeseries(request, app, campaigns, campaign_scopes):
     with OpenBar():
         ts_l = []
         for i in range(request.param):
-            ts_i = model.Timeseries(
+            ts_i = model.Timeseries.new(
                 name=f"Timeseries {i}",
                 description=f"Test timeseries #{i}",
                 campaign_id=campaigns[i % len(campaigns)],
                 campaign_scope_id=campaign_scopes[i % len(campaign_scopes)],
             )
             ts_l.append(ts_i)
-        db.session.add_all(ts_l)
         db.session.commit()
         return [ts.id for ts in ts_l]
 
@@ -246,22 +245,23 @@ def timeseries(request, app, campaigns, campaign_scopes):
 def timeseries_property_data(request, app, timeseries_properties, timeseries):
     with OpenBar():
         tspd_l = []
-        for ts in timeseries:
-            tspd_l.append(
-                model.TimeseriesPropertyData(
-                    timeseries_id=ts,
-                    property_id=timeseries_properties[0],
-                    value=12,
+        for idx, ts in enumerate(timeseries):
+            if idx % 2 == 0:
+                tspd_l.append(
+                    model.TimeseriesPropertyData.new(
+                        timeseries_id=ts,
+                        property_id=timeseries_properties[0],
+                        value=12,
+                    )
                 )
-            )
-            tspd_l.append(
-                model.TimeseriesPropertyData(
-                    timeseries_id=ts,
-                    property_id=timeseries_properties[1],
-                    value=42,
+            else:
+                tspd_l.append(
+                    model.TimeseriesPropertyData.new(
+                        timeseries_id=ts,
+                        property_id=timeseries_properties[1],
+                        value=42,
+                    )
                 )
-            )
-        db.session.add_all(tspd_l)
         db.session.commit()
         return [tspd.id for tspd in tspd_l]
 
@@ -271,12 +271,11 @@ def timeseries_by_data_states(request, app, timeseries):
     with OpenBar():
         ts_l = []
         for i in range(request.param):
-            ts_i = model.TimeseriesByDataState(
+            ts_i = model.TimeseriesByDataState.new(
                 timeseries_id=timeseries[i % len(timeseries)],
                 data_state_id=1,
             )
             ts_l.append(ts_i)
-        db.session.add_all(ts_l)
         db.session.commit()
         return [ts.id for ts in ts_l]
 

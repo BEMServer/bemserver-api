@@ -154,7 +154,7 @@ class TestTimeseriesPropertyDataApi:
         tsp_1_id = timeseries_properties[0]
         ts_1_id = timeseries[0]
         tspd_1_id = timeseries_property_data[0]
-        tspd_3_id = timeseries_property_data[2]
+        tspd_2_id = timeseries_property_data[1]
 
         creds = users["Active"]["creds"]
 
@@ -165,7 +165,7 @@ class TestTimeseriesPropertyDataApi:
             ret = client.get(TIMESERIES_PROPERTY_DATA_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            assert len(ret_val) == 2
+            assert len(ret_val) == 1
             assert all([tspd["timeseries_id"] == ts_1_id for tspd in ret_val])
 
             # POST
@@ -188,7 +188,7 @@ class TestTimeseriesPropertyDataApi:
             tspd_1 = ret_val
 
             # GET by id, user not in group
-            ret = client.get(f"{TIMESERIES_PROPERTY_DATA_URL}{tspd_3_id}")
+            ret = client.get(f"{TIMESERIES_PROPERTY_DATA_URL}{tspd_2_id}")
             assert ret.status_code == 403
 
             # PUT

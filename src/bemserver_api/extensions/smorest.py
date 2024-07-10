@@ -10,14 +10,15 @@ import flask
 import flask_smorest
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
-from apispec.ext.marshmallow import MarshmallowPlugin
+from apispec.ext.marshmallow import MarshmallowPlugin as MarshmallowPluginOrig
+from apispec.ext.marshmallow import OpenAPIConverter as OrigOpenAPIConverter
 from apispec.ext.marshmallow.common import resolve_schema_cls
 
 from bemserver_core.authorization import get_current_user
 
 from . import integrity_error
 from .authentication import auth
-from .ma_fields import Timezone
+from .ma_fields import DictStr, Timezone
 
 
 def resolver(schema):
@@ -42,6 +43,35 @@ SECURITY_SCHEMES = {
         {"type": "http", "scheme": "basic"},
     ),
 }
+
+
+class OpenAPIConverter(OrigOpenAPIConverter):
+    def _field2parameter(self, field, *, name, location):
+        ret: dict = {"in": location, "name": name}
+
+        prop = self.field2property(field)
+        if self.openapi_version.major < 3:
+            ret.update(prop)
+        else:
+            if "description" in prop:
+                ret["description"] = prop.pop("description")
+            if "deprecated" in prop:
+                ret["deprecated"] = prop.pop("deprecated")
+            ret["schema"] = prop
+
+        # Document DictStr as "content" parameter
+        # https://github.com/marshmallow-code/apispec/issues/922
+        if isinstance(field, DictStr):
+            ret["content"] = {"application/json": ret.pop("schema")}
+
+        for param_attr_func in self.parameter_attribute_functions:
+            ret.update(param_attr_func(field, ret=ret))
+
+        return ret
+
+
+class MarshmallowPlugin(MarshmallowPluginOrig):
+    Converter = OpenAPIConverter
 
 
 class Api(flask_smorest.Api):

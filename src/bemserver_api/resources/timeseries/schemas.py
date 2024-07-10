@@ -40,6 +40,9 @@ class TimeseriesQueryArgsSchema(Schema):
     space_id = ma.fields.Int()
     zone_id = ma.fields.Int()
     event_id = ma.fields.Int()
+    properties = ma_fields.DictStr(
+        ma.fields.String(), ma.fields.Str(), metadata={"example": {"Min": "0"}}
+    )
 
     @ma.validates_schema
     def validate_conflicting_fields(self, data, **kwargs):
