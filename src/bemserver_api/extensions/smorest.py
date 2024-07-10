@@ -62,7 +62,7 @@ class OpenAPIConverter(OrigOpenAPIConverter):
         # Document DictStr as "content" parameter
         # https://github.com/marshmallow-code/apispec/issues/922
         if isinstance(field, DictStr):
-            ret["content"] = {"application/json": ret.pop("schema")}
+            ret["content"] = {"application/json": {"schema": ret.pop("schema")}}
 
         for param_attr_func in self.parameter_attribute_functions:
             ret.update(param_attr_func(field, ret=ret))
