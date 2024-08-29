@@ -38,18 +38,17 @@ class Auth:
 
     def __init__(self, app=None):
         self.key = None
-        self.app = None
         self.get_user_funcs = None
         if app is not None:
             self.init_app(app)
 
     def init_app(self, app):
-        self.app = app
         self.key = app.config["SECRET_KEY"]
+        self.auth_methods = app.config["AUTH_METHODS"]
         self.get_user_funcs = {
             k: getattr(self, v)
             for k, v in self.GET_USER_FUNCS.items()
-            if k in app.config["AUTH_METHODS"]
+            if k in self.auth_methods
         }
 
     def encode(self, user, token_type="access"):
@@ -144,11 +143,7 @@ class Auth:
                         401,
                         "Authentication error",
                         errors={"authentication": exc.code},
-                        headers={
-                            "WWW-Authenticate": ", ".join(
-                                self.app.config["AUTH_METHODS"]
-                            )
-                        },
+                        headers={"WWW-Authenticate": ", ".join(self.auth_methods)},
                     )
                 with CurrentUser(user):
                     try:
