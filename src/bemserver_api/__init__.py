@@ -29,6 +29,7 @@ def create_app():
     app.config.from_envvar("BEMSERVER_API_SETTINGS_FILE", silent=True)
 
     database.init_app(app)
+    authentication.auth.init_app(app)
     api = Api(
         spec_kwargs={
             "version": API_VERSION,
@@ -36,7 +37,6 @@ def create_app():
         }
     )
     api.init_app(app)
-    authentication.auth.init_app(app)
     register_blueprints(api)
 
     BEMServerCore()
