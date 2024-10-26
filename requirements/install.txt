@@ -146,7 +146,7 @@ wcwidth==0.2.13
     # via prompt-toolkit
 webargs==8.4.0
     # via flask-smorest
-werkzeug==3.0.3
+werkzeug==3.0.6
     # via
     #   flask
     #   flask-smorest
