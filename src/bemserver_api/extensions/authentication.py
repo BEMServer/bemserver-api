@@ -11,6 +11,7 @@ import flask
 
 from flask_smorest import abort
 
+import requests
 from authlib.jose import JsonWebToken
 from authlib.jose.errors import ExpiredTokenError, JoseError
 
@@ -22,6 +23,70 @@ from bemserver_api.exceptions import BEMServerAPIAuthenticationError
 
 # https://docs.authlib.org/en/latest/jose/jwt.html#jwt-with-limited-algorithms
 jwt = JsonWebToken(["HS256"])
+
+
+class OAuth:
+    """OAuth authentication management"""
+
+    def __init__(self, app=None):
+        self.auth_url = None
+        self.token_url = None
+        self.client_id = None
+        self.client_secret = None
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
+        # TODO: .well-known/openid-configuration
+        # f"https://github.com/login/oauth/authorize?client_id={os.environ.get('GITHUB_CLIENT_ID')}"
+        self.auth_url = app.config["OAUTH_AUTH_URL"]
+        # "https://github.com/login/oauth/access_token"
+        self.token_url = app.config["OAUTH_TOKEN_URL"]
+        self.user_info_url = app.config["OAUTH_USER_INFO_URL"]
+        self.client_id = app.config["OAUTH_CLIENT_ID"]
+        self.client_secret = app.config["OAUTH_CLIENT_SECRET"]
+
+    def get_token(self, code):
+        params = {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "code": code,
+        }
+        try:
+            response = requests.post(self.token_url, json=params)
+            response.raise_for_status()
+            access_token = response.json().get("access_token")
+        except Exception as e:
+            print(f"Error fetching token: {e}")
+        return access_token
+
+    def get_user_info(self, token):
+        # TODO: or get_user_email?
+        headers = {"Authorization": f"token {token}"}
+        try:
+            response = requests.get(self.user_info_url, headers=headers)
+            response.raise_for_status()
+            user_info = response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching user info: {e}")
+        return user_info
+
+    def get_user(self, token):
+        user_info = self.get_user_info(token)
+        # TODO: config?
+        # https://openid.net/specs/openid-connect-core-1_0.html#UserInfo
+        user = self.get_user_by_email(user_info["email"])
+        return {
+            "status": "success",
+            "access_token": auth.encode(user).decode("utf-8"),
+            "refresh_token": auth.encode(user, token_type="refresh").decode("utf-8"),
+        }
+
+    @staticmethod
+    def get_user_by_email(user_email):
+        return db.session.execute(
+            sqla.select(User).where(User.email == user_email)
+        ).scalar()
 
 
 class Auth:
