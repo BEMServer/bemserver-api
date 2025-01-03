@@ -96,7 +96,7 @@ class TestInputOutputSites:
 
     @pytest.mark.usefixtures("site_properties")
     @pytest.mark.usefixtures("building_properties")
-    def test_sites_csv_post_sites_buildings(self, app, users, campaigns):
+    def test_sites_csv_post_update(self, app, users, campaigns):
         campaign_1_id = campaigns[0]
 
         creds = users["Chuck"]["creds"]
@@ -113,6 +113,31 @@ class TestInputOutputSites:
             "Name,Description,Site,IFC_ID,Area\n"
             "Building 1,Great building 1,Site 1,,1000\n"
             "Building 2,Great building 2,Site 2,,2000\n"
+        )
+
+        with auth_context:
+            ret = client.post(
+                INPUT_OUTPUT_SITES_URL,
+                query_string={
+                    "campaign_id": campaign_1_id,
+                },
+                data={
+                    "sites_csv": (io.BytesIO(sites_csv.encode()), "sites.csv"),
+                    "buildings_csv": (
+                        io.BytesIO(buildings_csv.encode()),
+                        "buildings.csv",
+                    ),
+                },
+            )
+            assert ret.status_code == 201
+            ret = client.get(BUILDINGS_URL)
+            assert ret.status_code == 200
+            assert len(ret.json) == 2
+
+        sites_csv = "Name,Description,IFC_ID,Area\n" "Site 2,Greatest site 2,,3000\n"
+        buildings_csv = (
+            "Name,Description,Site,IFC_ID,Area\n"
+            "Building 2,Greatest building 2,Site 2,,3000\n"
         )
 
         with auth_context:
@@ -161,8 +186,6 @@ class TestInputOutputSites:
             "Name,Description,Site",
             # Missing column in row
             "Name,Description,Site,IFC_ID\nBuilding 1,,",
-            # Duplicate building
-            "Name,Description,Site,IFC_ID\nBuilding 3,,Site 1,\nBuilding 3,,Site 1,",
             # Unknown site
             "Name,Description,Site,IFC_ID\nBuilding 1,,Dummy",
         ),
@@ -273,6 +296,74 @@ class TestInputOutputTimeseries:
                 assert ret.status_code == 200
                 assert len(ret.json) == 2
 
+    @pytest.mark.usefixtures("sites")
+    @pytest.mark.usefixtures("buildings")
+    @pytest.mark.usefixtures("storeys")
+    @pytest.mark.usefixtures("spaces")
+    @pytest.mark.usefixtures("zones")
+    @pytest.mark.usefixtures("campaign_scopes")
+    def test_timeseries_csv_post_update(self, app, users, campaigns):
+        campaign_1_id = campaigns[0]
+
+        creds = users["Chuck"]["creds"]
+        auth_context = AuthHeader(creds)
+
+        client = app.test_client()
+
+        timeseries_csv = (
+            "Name,Description,Unit,Campaign scope,Site,Building,"
+            "Storey,Space,Zone,Min,Max\n"
+            "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            "Storey 1,Space 1,Zone 1,-10,60\n"
+            "Space_2_Temp,Temperature,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            "Storey 1,Space 1,Zone 1,-10,60\n"
+        )
+
+        with auth_context:
+            ret = client.post(
+                INPUT_OUTPUT_TIMESERIES_URL,
+                query_string={
+                    "campaign_id": campaign_1_id,
+                },
+                data={
+                    "timeseries_csv": (
+                        io.BytesIO(timeseries_csv.encode()),
+                        "timeseries.csv",
+                    ),
+                },
+            )
+            assert ret.status_code == 201
+            ret = client.get(TIMESERIES_URL)
+            assert ret.status_code == 200
+            assert len(ret.json) == 2
+
+        timeseries_csv = (
+            "Name,Description,Unit,Campaign scope,Site,Building,"
+            "Storey,Space,Zone,Min,Max\n"
+            "Space_1_Temp,Temperature 1,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            "Storey 1,Space 1,Zone 1,-10,60\n"
+            "Space_2_Temp,Temperature 2,°C,Campaign 1 - Scope 1,Site 1,Building 1,"
+            ",,,-15,65\n"
+        )
+
+        with auth_context:
+            ret = client.post(
+                INPUT_OUTPUT_TIMESERIES_URL,
+                query_string={
+                    "campaign_id": campaign_1_id,
+                },
+                data={
+                    "timeseries_csv": (
+                        io.BytesIO(timeseries_csv.encode()),
+                        "timeseries.csv",
+                    ),
+                },
+            )
+            assert ret.status_code == 201
+            ret = client.get(TIMESERIES_URL)
+            assert ret.status_code == 200
+            assert len(ret.json) == 2
+
     @pytest.mark.usefixtures("campaign_scopes")
     def test_timeseries_csv_post_invalid_encoding(self, app, users, campaigns):
         campaign_1_id = campaigns[0]
@@ -303,12 +394,6 @@ class TestInputOutputTimeseries:
             # Missing column in header
             (
                 "Name,Description,Unit,Campaign scope,\n"
-                "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,,,,,\n"
-            ),
-            # Duplicate timeseries
-            (
-                "Name,Description,Unit,Campaign scope,Site,Building,Storey,Space,Zone\n"
-                "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,,,,,\n"
                 "Space_1_Temp,Temperature,°C,Campaign 1 - Scope 1,,,,,\n"
             ),
             # Unknown site
