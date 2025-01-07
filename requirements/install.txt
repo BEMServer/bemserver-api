@@ -57,7 +57,7 @@ flask==3.0.3
     # via
     #   bemserver-api (pyproject.toml)
     #   flask-smorest
-flask-smorest==0.43.0
+flask-smorest==0.45.0
     # via bemserver-api (pyproject.toml)
 greenlet==3.0.3
     # via sqlalchemy
@@ -83,7 +83,7 @@ marshmallow==3.21.2
     #   flask-smorest
     #   marshmallow-sqlalchemy
     #   webargs
-marshmallow-sqlalchemy==0.29.0
+marshmallow-sqlalchemy==1.1.1
     # via bemserver-api (pyproject.toml)
 numpy==1.26.4
     # via pandas
@@ -93,7 +93,6 @@ packaging==24.0
     # via
     #   apispec
     #   marshmallow
-    #   marshmallow-sqlalchemy
     #   webargs
 pandas==2.2.2
     # via bemserver-core
