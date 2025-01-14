@@ -27,6 +27,7 @@ def create_app():
     app = flask.Flask(__name__)
     app.config.from_object("bemserver_api.settings.Config")
     app.config.from_envvar("BEMSERVER_API_SETTINGS_FILE", silent=True)
+    app.json.sort_keys = False
 
     database.init_app(app)
     api = Api(
