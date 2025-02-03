@@ -39,7 +39,7 @@ class TestAnalysisApiEnergyConsumption:
         timeseries = []
         for i in range(9):
             ts_i = Timeseries(
-                name=f"Timeseries {i+1}",
+                name=f"Timeseries {i + 1}",
                 campaign_id=campaign_id,
                 campaign_scope_id=campaign_scope_id,
                 unit_symbol=("Wh" if i < 6 else "kWh"),

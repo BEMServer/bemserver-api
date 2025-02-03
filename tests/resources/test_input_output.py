@@ -134,7 +134,7 @@ class TestInputOutputSites:
             assert ret.status_code == 200
             assert len(ret.json) == 2
 
-        sites_csv = "Name,Description,IFC_ID,Area\n" "Site 2,Greatest site 2,,3000\n"
+        sites_csv = "Name,Description,IFC_ID,Area\nSite 2,Greatest site 2,,3000\n"
         buildings_csv = (
             "Name,Description,Site,IFC_ID,Area\n"
             "Building 2,Greatest building 2,Site 2,,3000\n"
@@ -221,9 +221,7 @@ class TestInputOutputSites:
         client = app.test_client()
 
         sites_csv = (
-            "Name,Description,IFC_ID\n"
-            "Site 1,Great site 1,\n"
-            "Site 1,Great site 2,\n"
+            "Name,Description,IFC_ID\nSite 1,Great site 1,\nSite 1,Great site 2,\n"
         )
 
         with auth_context:

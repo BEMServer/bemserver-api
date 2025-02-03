@@ -57,7 +57,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = f"{TIMESERIES_DATA_URL}campaign/{campaign_1_id}/stats"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             ret = client.get(
                 query_url,
@@ -89,7 +89,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_2_id,)
             else:
                 query_url = f"{TIMESERIES_DATA_URL}campaign/{campaign_2_id}/stats"
-                ts_l = (f"Timeseries {ts_2_id-1}",)
+                ts_l = (f"Timeseries {ts_2_id - 1}",)
 
             ret = client.get(
                 query_url,
@@ -129,7 +129,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = f"{TIMESERIES_DATA_URL}campaign/{campaign_1_id}/stats"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             ret = client.get(
                 query_url,
@@ -199,7 +199,7 @@ class TestTimeseriesDataApi:
                 ret_line_1 = "Datetime,1"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
                 ret_line_1 = "Datetime,Timeseries 0"
 
             ret = client.get(
@@ -366,7 +366,7 @@ class TestTimeseriesDataApi:
                 ret_line_1 = "Datetime,2"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_2_id}/"
-                ts_l = (f"Timeseries {ts_2_id-1}",)
+                ts_l = (f"Timeseries {ts_2_id - 1}",)
                 ret_line_1 = "Datetime,Timeseries 1"
 
             ret = client.get(
@@ -475,7 +475,7 @@ class TestTimeseriesDataApi:
                 ret_line_1 = "Datetime,1"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
                 ret_line_1 = "Datetime,Timeseries 0"
 
             ret = client.get(
@@ -512,7 +512,7 @@ class TestTimeseriesDataApi:
                 ret_line_1 = "Datetime,1"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
                 ret_line_1 = "Datetime,Timeseries 0"
 
             ret = client.get(
@@ -546,7 +546,7 @@ class TestTimeseriesDataApi:
                 ret_line_1 = "Datetime,1"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
                 ret_line_1 = "Datetime,Timeseries 0"
 
             ret = client.get(
@@ -583,7 +583,7 @@ class TestTimeseriesDataApi:
                 ret_line_1 = "Datetime,1"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
                 ret_line_1 = "Datetime,Timeseries 0"
 
             ret = client.get(
@@ -620,7 +620,7 @@ class TestTimeseriesDataApi:
                 ret_line_1 = "Datetime,2"
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_2_id}/"
-                ts_l = (f"Timeseries {ts_2_id-1}",)
+                ts_l = (f"Timeseries {ts_2_id - 1}",)
                 ret_line_1 = "Datetime,Timeseries 1"
 
             ret = client.get(
@@ -694,7 +694,7 @@ class TestTimeseriesDataApi:
             # Unknown campaign
             if for_campaign:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
                 ret = client.get(
                     f"{query_url}aggregate",
@@ -715,7 +715,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             ret = client.get(
                 f"{query_url}aggregate",
@@ -759,7 +759,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             ret = client.get(
                 f"{query_url}aggregate",
@@ -796,7 +796,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             ret = client.get(
                 f"{query_url}aggregate",
@@ -818,7 +818,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             ret = client.get(
                 f"{query_url}aggregate",
@@ -840,7 +840,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             ret = client.get(
                 f"{query_url}aggregate",
@@ -890,8 +890,8 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                header = f"Datetime,Timeseries {ts_1_id-1}\n"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                header = f"Datetime,Timeseries {ts_1_id - 1}\n"
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             if mime_type == "text/csv":
                 kwargs = {
@@ -944,8 +944,8 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_2_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_2_id}/"
-                header = f"Datetime,Timeseries {ts_2_id-1}\n"
-                ts_l = (f"Timeseries {ts_2_id-1}",)
+                header = f"Datetime,Timeseries {ts_2_id - 1}\n"
+                ts_l = (f"Timeseries {ts_2_id - 1}",)
 
             if mime_type == "text/csv":
                 kwargs = {
@@ -1010,8 +1010,8 @@ class TestTimeseriesDataApi:
             # Unknown campaign
             if for_campaign:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
-                header = f"Datetime,Timeseries {ts_1_id-1}\n"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                header = f"Datetime,Timeseries {ts_1_id - 1}\n"
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
                 if mime_type == "text/csv":
                     kwargs = {"data": header + "2020-01-01T00:00:00+00:00,0\n"}
                 else:
@@ -1033,8 +1033,8 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                header = f"Datetime,Timeseries {ts_1_id-1}\n"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                header = f"Datetime,Timeseries {ts_1_id - 1}\n"
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
             if mime_type == "text/csv":
                 kwargs = {"data": header + "2020-01-01T00:00:00+00:00,0\n"}
             else:
@@ -1186,7 +1186,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             if user == "admin":
                 # Check there is data before deleting
@@ -1234,7 +1234,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_2_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_2_id}/"
-                ts_l = (f"Timeseries {ts_2_id-1}",)
+                ts_l = (f"Timeseries {ts_2_id - 1}",)
 
             if user == "admin":
                 # Check there is data before deleting
@@ -1303,7 +1303,7 @@ class TestTimeseriesDataApi:
             # Unknown campaign
             if for_campaign:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{DUMMY_ID}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
                 ret = client_method(
                     query_url,
@@ -1323,7 +1323,7 @@ class TestTimeseriesDataApi:
                 ts_l = (ts_1_id,)
             else:
                 query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
-                ts_l = (f"Timeseries {ts_1_id-1}",)
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
 
             ret = client_method(
                 query_url,

@@ -122,7 +122,7 @@ class TestAuthentication:
     def test_auth_login_required_http_basic_auth(self, app, users):
         active_user_hba_creds = users["Active"]["hba_creds"]
         active_user_invalid_hba_creds = base64.b64encode(
-            f'{users["Active"]["user"].email}:bad_pwd'.encode()
+            f"{users['Active']['user'].email}:bad_pwd".encode()
         ).decode()
         inactive_user_hba_creds = users["Inactive"]["hba_creds"]
         active_user_jwt = users["Active"]["creds"]
