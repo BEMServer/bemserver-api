@@ -99,7 +99,7 @@ USERS = {
 for user in USERS.values():
     user["hba_creds"] = (
         "Basic "
-        + base64.b64encode(f'{user["email"]}:{user["password"]}'.encode()).decode()
+        + base64.b64encode(f"{user['email']}:{user['password']}".encode()).decode()
     )
     user["creds"] = "Bearer " + make_token(user["email"], "access")
 
