@@ -108,7 +108,8 @@ class Blueprint(flask_smorest.Blueprint):
     def login_required(func=None, **kwargs):
         def decorator(function):
             function = auth.login_required(**kwargs)(function)
-            getattr(function, "_apidoc", {})["auth"] = True
+            function._apidoc = getattr(function, "_apidoc", {})
+            function._apidoc["auth"] = True
             return function
 
         if func is None:
