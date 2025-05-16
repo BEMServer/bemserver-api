@@ -35,6 +35,7 @@ from . import (
     storey_property_data,
     storeys,
     structural_element_properties,
+    tasks,
     tasks_by_campaigns,
     timeseries,
     timeseries_by_buildings,
@@ -113,6 +114,7 @@ MODULES = (
     weather_timeseries_by_sites,
     input_output,
     analysis,
+    tasks,
     tasks_by_campaigns,
 )
 
