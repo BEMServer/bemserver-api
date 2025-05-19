@@ -14,12 +14,14 @@ class TaskByCampaignSchema(AutoSchema):
 
     id = msa.auto_field(dump_only=True)
     is_enabled = msa.auto_field(metadata={"default": True})
-    parameters = msa.auto_field(metadata={"default": {}})
+    parameters = ma.fields.Dict(metadata={"default": {}})
 
 
 class TaskByCampaignPutSchema(Schema):
     is_enabled = ma.fields.Bool()
+    parameters = ma.fields.Dict(metadata={"default": {}})
 
 
 class TaskByCampaignQueryArgsSchema(Schema):
     campaign_id = ma.fields.Int()
+    task_name = ma.fields.String()

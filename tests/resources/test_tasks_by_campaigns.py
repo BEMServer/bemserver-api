@@ -57,9 +57,10 @@ class TestTaskByCampaignApi:
 
             # PUT
             task_1_expected["is_enabled"] = False
+            task_1_expected["parameters"] = {"dummy": 42}
             ret = client.put(
                 f"{TASKS_BY_CAMPAIGNS_URL}{task_1_id}",
-                json={"is_enabled": False},
+                json={"is_enabled": False, "parameters": {"dummy": 42}},
                 headers={"If-Match": task_1_etag},
             )
             assert ret.status_code == 200
