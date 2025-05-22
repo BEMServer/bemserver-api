@@ -1,7 +1,5 @@
 """Tasks by campaigns routes tests"""
 
-from copy import deepcopy
-
 import pytest
 
 from tests.common import AuthHeader
@@ -26,19 +24,22 @@ class TestTaskByCampaignApi:
             assert ret.json == []
 
             # POST
-            task_1 = {"task_name": "Task 1", "campaign_id": campaign_1_id}
+            task_1 = {
+                "task_name": "Task 1",
+                "campaign_id": campaign_1_id,
+                "offset_unit": "day",
+            }
             ret = client.post(TASKS_BY_CAMPAIGNS_URL, json=task_1)
             assert ret.status_code == 201
             ret_val = ret.json
             task_1_id = ret_val.pop("id")
             task_1_etag = ret.headers["ETag"]
-            task_1_expected = deepcopy(task_1)
+            task_1_expected = task_1.copy()
             task_1_expected["is_enabled"] = True
+            task_1_expected["start_offset"] = -1
+            task_1_expected["end_offset"] = 0
             assert ret_val == task_1_expected
-
-            # POST violating unique constraint
-            ret = client.post(TASKS_BY_CAMPAIGNS_URL, json=task_1)
-            assert ret.status_code == 409
+            task_1 = task_1_expected
 
             # GET list
             ret = client.get(TASKS_BY_CAMPAIGNS_URL)
@@ -53,21 +54,24 @@ class TestTaskByCampaignApi:
             assert ret.headers["ETag"] == task_1_etag
             ret_val = ret.json
             ret_val.pop("id")
-            assert ret_val == task_1_expected
+            assert ret_val == task_1
 
             # PUT
-            task_1_expected["is_enabled"] = False
-            task_1_expected["parameters"] = {"dummy": 42}
+            task_1["is_enabled"] = False
+            task_1["parameters"] = {"dummy": 42}
+            task_1_put = task_1.copy()
+            del task_1_put["task_name"]
+            del task_1_put["campaign_id"]
             ret = client.put(
                 f"{TASKS_BY_CAMPAIGNS_URL}{task_1_id}",
-                json={"is_enabled": False, "parameters": {"dummy": 42}},
+                json=task_1_put,
                 headers={"If-Match": task_1_etag},
             )
             assert ret.status_code == 200
             ret_val = ret.json
             ret_val.pop("id")
             task_1_etag = ret.headers["ETag"]
-            assert ret_val == task_1_expected
+            assert ret_val == task_1
 
             # PUT wrong ID -> 404
             ret = client.put(
@@ -78,7 +82,13 @@ class TestTaskByCampaignApi:
             assert ret.status_code == 404
 
             # POST campaign 2
-            task_2 = {"task_name": "Task 2", "campaign_id": campaign_2_id}
+            task_2 = {
+                "task_name": "Task 2",
+                "campaign_id": campaign_2_id,
+                "offset_unit": "hour",
+                "start_offset": -6,
+                "is_enabled": True,
+            }
             ret = client.post(TASKS_BY_CAMPAIGNS_URL, json=task_2)
             ret_val = ret.json
             task_2_id = ret_val.pop("id")
@@ -99,6 +109,14 @@ class TestTaskByCampaignApi:
             ret_val = ret.json
             assert len(ret_val) == 1
             assert ret_val[0]["id"] == task_1_id
+            ret = client.get(
+                TASKS_BY_CAMPAIGNS_URL,
+                query_string={"is_enabled": True},
+            )
+            assert ret.status_code == 200
+            ret_val = ret.json
+            assert len(ret_val) == 1
+            assert ret_val[0]["id"] == task_2_id
 
             # DELETE wrong ID -> 404
             ret = client.delete(
@@ -151,7 +169,11 @@ class TestTaskByCampaignApi:
             assert task_1["id"] == task_1_id
 
             # POST
-            task_3 = {"task_name": "Task 3", "campaign_id": campaign_1_id}
+            task_3 = {
+                "task_name": "Task 3",
+                "campaign_id": campaign_1_id,
+                "offset_unit": "day",
+            }
             ret = client.post(TASKS_BY_CAMPAIGNS_URL, json=task_3)
             assert ret.status_code == 403
 
@@ -190,7 +212,11 @@ class TestTaskByCampaignApi:
         assert ret.status_code == 401
 
         # POST
-        task_3 = {"task_name": "Task 3", "campaign_id": campaign_1_id}
+        task_3 = {
+            "task_name": "Task 3",
+            "campaign_id": campaign_1_id,
+            "offset_unit": "day",
+        }
         ret = client.post(TASKS_BY_CAMPAIGNS_URL, json=task_3)
         assert ret.status_code == 401
 
