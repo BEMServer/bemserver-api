@@ -59,7 +59,7 @@ def run(args):
         task = next(
             task
             for name, task in current_app.tasks.items()
-            if name == args["task_name"]
+            if isinstance(task, BEMServerCoreAsyncTask) and name == args["task_name"]
         )
     except StopIteration:
         abort(422, message="Unknown task")

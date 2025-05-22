@@ -5,6 +5,11 @@ from unittest import mock
 
 from tests.common import AuthHeader
 
+from bemserver_core.tasks import (
+    BEMServerCoreAsyncTask,
+    BEMServerCoreScheduledTask,
+)
+
 TASKS_URL = "/tasks/"
 
 
@@ -58,7 +63,7 @@ class TestTasks:
 
         client = app.test_client()
 
-        task_mock = mock.MagicMock()
+        task_mock = mock.MagicMock(spec=BEMServerCoreAsyncTask)
 
         with mock.patch(
             "bemserver_core.celery.BEMServerCoreCelery.tasks",
@@ -66,7 +71,6 @@ class TestTasks:
             return_value={"Task": task_mock},
         ):
             with AuthHeader(creds):
-                # GET list
                 ret = client.post(
                     f"{TASKS_URL}run",
                     json={
@@ -85,3 +89,35 @@ class TestTasks:
                     end_dt,
                     **{"param_1": "value_1", "param_2": "value_2"},
                 )
+
+        task_mock = mock.MagicMock(spec=BEMServerCoreScheduledTask)
+
+        with mock.patch(
+            "bemserver_core.celery.BEMServerCoreCelery.tasks",
+            new_callable=mock.PropertyMock,
+            return_value={"Task": task_mock},
+        ):
+            with AuthHeader(creds):
+                # Task not BEMServerCoreAsyncTask
+                ret = client.post(
+                    f"{TASKS_URL}run",
+                    json={
+                        "task_name": "Task",
+                        "campaign_id": campaign_1_id,
+                        "start_time": start_dt.isoformat(),
+                        "end_time": end_dt.isoformat(),
+                        "parameters": {"param_1": "value_1", "param_2": "value_2"},
+                    },
+                )
+                assert ret.status_code == 422
+                # Unknown task
+                ret = client.post(
+                    f"{TASKS_URL}run",
+                    json={
+                        "task_name": "Dummy",
+                        "campaign_id": campaign_1_id,
+                        "start_time": start_dt.isoformat(),
+                        "end_time": end_dt.isoformat(),
+                    },
+                )
+                assert ret.status_code == 422
