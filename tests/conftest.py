@@ -9,10 +9,11 @@ from pytest_postgresql import factories as ppf
 
 import flask.testing
 
-from bemserver_core import common, model, scheduled_tasks
+from bemserver_core import common, model, tasks
 from bemserver_core.authorization import OpenBar
 from bemserver_core.commands import setup_db
 from bemserver_core.database import db
+from bemserver_core.time_utils import PeriodEnum
 
 import bemserver_api
 from tests.common import AUTH_HEADER, TestConfig, make_token
@@ -21,7 +22,7 @@ from tests.common import AUTH_HEADER, TestConfig, make_token
 @pytest.fixture(scope="session", autouse=True)
 def inhibit_celery():
     """Inhibit celery tasks by mocking the method launching tasks"""
-    with mock.patch("bemserver_core.celery.BEMServerCoreTask.apply_async"):
+    with mock.patch("bemserver_core.celery.BEMServerCoreSystemTask.apply_async"):
         yield
 
 
@@ -897,13 +898,16 @@ def weather_timeseries_by_sites(app, timeseries, sites):
 @pytest.fixture
 def tasks_by_campaigns(app, campaigns):
     with OpenBar():
-        task_1 = scheduled_tasks.TaskByCampaign.new(
+        task_1 = tasks.TaskByCampaign.new(
             task_name="Task 1",
             campaign_id=campaigns[0],
+            offset_unit=PeriodEnum.day,
         )
-        task_2 = scheduled_tasks.TaskByCampaign.new(
+        task_2 = tasks.TaskByCampaign.new(
             task_name="Task 2",
             campaign_id=campaigns[1],
+            offset_unit=PeriodEnum.hour,
+            start_offset=-6,
             is_enabled=False,
         )
         db.session.commit()

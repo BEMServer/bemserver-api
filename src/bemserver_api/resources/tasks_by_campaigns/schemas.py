@@ -3,7 +3,8 @@
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 
-from bemserver_core.scheduled_tasks import TaskByCampaign
+from bemserver_core.tasks import TaskByCampaign
+from bemserver_core.time_utils import PeriodEnum
 
 from bemserver_api import AutoSchema, Schema
 
@@ -15,6 +16,7 @@ class TaskByCampaignSchema(AutoSchema):
     id = msa.auto_field(dump_only=True)
     is_enabled = msa.auto_field(metadata={"default": True})
     parameters = ma.fields.Dict(metadata={"default": {}})
+    offset_unit = ma.fields.Enum(PeriodEnum)
 
 
 class TaskByCampaignPutSchema(Schema):
