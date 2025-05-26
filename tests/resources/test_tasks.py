@@ -8,7 +8,7 @@ import pytest
 from celery import current_app as current_celery_app
 from tests.common import AuthHeader
 
-from bemserver_core.tasks import (
+from bemserver_core.celery import (
     BEMServerCoreAsyncTask,
     BEMServerCoreScheduledTask,
 )
@@ -23,14 +23,9 @@ def dummy_function():
 @pytest.fixture
 def celery_tasks():
     @current_celery_app.register_task
-    class DummyTask(BEMServerCoreAsyncTask):
+    class Dummy(BEMServerCoreAsyncTask):
         TASK_FUNCTION = dummy_function
         DEFAULT_PARAMETERS = {"a_1": "1", "a_2": 2}
-
-    @current_celery_app.register_task
-    class DummyScheduledTask(BEMServerCoreScheduledTask):
-        TASK_FUNCTION = dummy_function
-        DEFAULT_PARAMETERS = {"s_1": "1", "s_2": 2}
 
 
 CELERY_CONFIG = {
@@ -58,20 +53,14 @@ class TestTasks:
             ret = client.get(TASKS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            for kind in ["async", "scheduled"]:
-                assert isinstance(ret_val, dict)
-                for task in ret_val[f"{kind}_tasks"]:
-                    assert isinstance(task["name"], str)
-                    assert isinstance(task["default_parameters"], dict)
-                assert {
-                    "name": "Dummy",
-                    "default_parameters": {"a_1": "1", "a_2": 2},
-                } in ret_val["async_tasks"]
-                assert {
-                    "name": "DummyScheduled",
-                    "default_parameters": {"s_1": "1", "s_2": 2},
-                    "schedule": {"dummy_task": "42"},
-                } in ret_val["scheduled_tasks"]
+            for task in ret_val:
+                assert isinstance(task["name"], str)
+                assert isinstance(task["default_parameters"], dict)
+            assert {
+                "name": "Dummy",
+                "default_parameters": {"a_1": "1", "a_2": 2},
+                "schedule": {"dummy_task": "42"},
+            } in ret_val
 
     def test_tasks_as_user_api(self, app, users):
         user_creds = users["Active"]["creds"]
@@ -83,11 +72,9 @@ class TestTasks:
             ret = client.get(TASKS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            for kind in ["async", "scheduled"]:
-                assert isinstance(ret_val, dict)
-                for task in ret_val[f"{kind}_tasks"]:
-                    assert isinstance(task["name"], str)
-                    assert isinstance(task["default_parameters"], dict)
+            for task in ret_val:
+                assert isinstance(task["name"], str)
+                assert isinstance(task["default_parameters"], dict)
 
     def test_tasks_as_anonym_api(self, app):
         client = app.test_client()

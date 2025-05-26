@@ -3,7 +3,7 @@
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 
-from bemserver_core.tasks import TaskByCampaign
+from bemserver_core.model import TaskByCampaign
 from bemserver_core.time_utils import PeriodEnum
 
 from bemserver_api import AutoSchema, Schema

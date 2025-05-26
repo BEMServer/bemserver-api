@@ -7,14 +7,11 @@ from flask_smorest import abort
 from celery import current_app as current_celery_app
 
 from bemserver_core.authorization import get_current_user
-from bemserver_core.tasks import (
-    BEMServerCoreAsyncTask,
-    BEMServerCoreScheduledTask,
-)
+from bemserver_core.celery import BEMServerCoreAsyncTask
 
 from bemserver_api import Blueprint
 
-from .schemas import TaskRunSchema, TasksSchema
+from .schemas import TaskRunSchema, TaskSchema
 
 blp = Blueprint(
     "Task",
@@ -26,7 +23,7 @@ blp = Blueprint(
 
 @blp.route("/")
 @blp.login_required
-@blp.response(200, TasksSchema)
+@blp.response(200, TaskSchema(many=True))
 def get():
     """List registered tasks"""
 
@@ -39,25 +36,19 @@ def get():
             task_schedules.setdefault(task, {})[name] = schedule
 
     # Get tasks
-    async_tasks = [
+    tasks = [
         {
             "name": name,
             "default_parameters": task.DEFAULT_PARAMETERS,
+            "schedule": task_schedules.get(
+                f"{name}{current_celery_app.SCHEDULED_TASKS_NAME_SUFFIX}", {}
+            ),
         }
         for name, task in current_celery_app.tasks.items()
         if isinstance(task, BEMServerCoreAsyncTask)
     ]
-    scheduled_tasks = [
-        {
-            "name": name,
-            "default_parameters": task.DEFAULT_PARAMETERS,
-            "schedule": task_schedules.get(name, {}),
-        }
-        for name, task in current_celery_app.tasks.items()
-        if isinstance(task, BEMServerCoreScheduledTask)
-    ]
 
-    return {"async_tasks": async_tasks, "scheduled_tasks": scheduled_tasks}
+    return tasks
 
 
 @blp.route("/run", methods=["POST"])
