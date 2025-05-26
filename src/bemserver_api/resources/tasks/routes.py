@@ -1,8 +1,10 @@
 """Tasks resources"""
 
+from flask import current_app as current_flask_app
+
 from flask_smorest import abort
 
-from celery import current_app
+from celery import current_app as current_celery_app
 
 from bemserver_core.authorization import get_current_user
 from bemserver_core.tasks import (
@@ -27,20 +29,31 @@ blp = Blueprint(
 @blp.response(200, TasksSchema)
 def get():
     """List registered tasks"""
+
+    # Get schedules for each task
+    bsc = current_flask_app.extensions["bemserver_core"]["app"]
+    beat_schedule = bsc.config.get("CELERY_CONFIG", {}).get("beat_schedule", {})
+    task_schedules = {}
+    for name, value in beat_schedule.items():
+        if (task := value.get("task")) and (schedule := value.get("schedule")):
+            task_schedules.setdefault(task, {})[name] = schedule
+
+    # Get tasks
     async_tasks = [
         {
             "name": name,
             "default_parameters": task.DEFAULT_PARAMETERS,
         }
-        for name, task in current_app.tasks.items()
+        for name, task in current_celery_app.tasks.items()
         if isinstance(task, BEMServerCoreAsyncTask)
     ]
     scheduled_tasks = [
         {
             "name": name,
             "default_parameters": task.DEFAULT_PARAMETERS,
+            "schedule": task_schedules.get(name, {}),
         }
-        for name, task in current_app.tasks.items()
+        for name, task in current_celery_app.tasks.items()
         if isinstance(task, BEMServerCoreScheduledTask)
     ]
 
@@ -58,7 +71,7 @@ def run(args):
     try:
         task = next(
             task
-            for name, task in current_app.tasks.items()
+            for name, task in current_celery_app.tasks.items()
             if isinstance(task, BEMServerCoreAsyncTask) and name == args["task_name"]
         )
     except StopIteration:

@@ -3,6 +3,9 @@
 import datetime as dt
 from unittest import mock
 
+import pytest
+
+from celery import current_app as current_celery_app
 from tests.common import AuthHeader
 
 from bemserver_core.tasks import (
@@ -13,7 +16,38 @@ from bemserver_core.tasks import (
 TASKS_URL = "/tasks/"
 
 
+def dummy_function():
+    """Dummy fonction"""
+
+
+@pytest.fixture
+def celery_tasks():
+    @current_celery_app.register_task
+    class DummyTask(BEMServerCoreAsyncTask):
+        TASK_FUNCTION = dummy_function
+        DEFAULT_PARAMETERS = {"a_1": "1", "a_2": 2}
+
+    @current_celery_app.register_task
+    class DummyScheduledTask(BEMServerCoreScheduledTask):
+        TASK_FUNCTION = dummy_function
+        DEFAULT_PARAMETERS = {"s_1": "1", "s_2": 2}
+
+
+CELERY_CONFIG = {
+    "beat_schedule": {
+        "dummy_task": {
+            "task": "DummyScheduled",
+            "schedule": 42,
+        },
+    },
+}
+
+
 class TestTasks:
+    @pytest.mark.usefixtures("celery_tasks")
+    @pytest.mark.parametrize(
+        "bsc_config", ({"CELERY_CONFIG": CELERY_CONFIG},), indirect=True
+    )
     def test_tasks_api(self, app, users, campaigns):
         creds = users["Chuck"]["creds"]
 
@@ -29,6 +63,15 @@ class TestTasks:
                 for task in ret_val[f"{kind}_tasks"]:
                     assert isinstance(task["name"], str)
                     assert isinstance(task["default_parameters"], dict)
+                assert {
+                    "name": "Dummy",
+                    "default_parameters": {"a_1": "1", "a_2": 2},
+                } in ret_val["async_tasks"]
+                assert {
+                    "name": "DummyScheduled",
+                    "default_parameters": {"s_1": "1", "s_2": 2},
+                    "schedule": {"dummy_task": "42"},
+                } in ret_val["scheduled_tasks"]
 
     def test_tasks_as_user_api(self, app, users):
         user_creds = users["Active"]["creds"]
