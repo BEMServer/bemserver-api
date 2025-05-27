@@ -40,7 +40,7 @@ def create_app():
     authentication.auth.init_app(app)
     register_blueprints(api)
 
-    BEMServerCore()
+    app.extensions["bemserver_core"] = {"app": BEMServerCore()}
 
     if profile_dir := app.config["PROFILE_DIR"]:
         app.wsgi_app = ProfilerMiddleware(

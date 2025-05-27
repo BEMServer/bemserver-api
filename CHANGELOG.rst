@@ -1,6 +1,20 @@
 Changelog
 ---------
 
+0.26.0 (unreleased)
++++++++++++++++++++
+
+Features:
+
+- Rework of the tasks feature:
+  - All scheduled tasks share the same interface and task x campaign ressource
+  - Add route to expose tasks names and default parameters
+  - Add route to run a task asynchronously
+
+Other changes:
+
+- Require bemserver-core 0.21.0
+
 0.25.0 (2025-01-03)
 +++++++++++++++++++
 
