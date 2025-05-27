@@ -20,7 +20,7 @@ async-timeout==5.0.1
     # via redis
 authlib==1.4.0
     # via bemserver-api (pyproject.toml)
-bemserver-core==0.20.0
+bemserver-core==0.21.0
     # via bemserver-api (pyproject.toml)
 billiard==4.2.1
     # via celery
