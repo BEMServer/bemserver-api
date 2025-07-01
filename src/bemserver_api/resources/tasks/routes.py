@@ -5,13 +5,19 @@ from flask import current_app as current_flask_app
 from flask_smorest import abort
 
 from celery import current_app as current_celery_app
+from celery.result import AsyncResult
 
 from bemserver_core.authorization import get_current_user
-from bemserver_core.celery import BEMServerCoreAsyncTask
+from bemserver_core.celery import BEMServerCoreAsyncTask, BEMServerCoreScheduledTask
 
 from bemserver_api import Blueprint
 
-from .schemas import TaskRunSchema, TaskSchema
+from .schemas import (
+    TaskListSchema,
+    TaskRunArgsSchema,
+    TaskRunResponseSchema,
+    TaskStatusSchema,
+)
 
 blp = Blueprint(
     "Task",
@@ -23,8 +29,8 @@ blp = Blueprint(
 
 @blp.route("/")
 @blp.login_required
-@blp.response(200, TaskSchema(many=True))
-def get():
+@blp.response(200, TaskListSchema)
+def get_tasks():
     """List registered tasks"""
 
     # Get schedules for each task
@@ -35,26 +41,38 @@ def get():
         if (task := value.get("task")) and (schedule := value.get("schedule")):
             task_schedules.setdefault(task, {})[name] = schedule
 
-    # Get tasks
-    tasks = [
+    # Get async tasks
+    async_tasks = [
         {
             "name": name,
             "default_parameters": task.DEFAULT_PARAMETERS,
-            "schedule": task_schedules.get(
-                f"{name}{current_celery_app.SCHEDULED_TASKS_NAME_SUFFIX}", {}
-            ),
         }
         for name, task in current_celery_app.tasks.items()
         if isinstance(task, BEMServerCoreAsyncTask)
     ]
 
-    return tasks
+    # Get scheduled tasks
+    scheduled_tasks = [
+        {
+            "name": name,
+            "default_parameters": task.DEFAULT_PARAMETERS,
+            "schedule": task_schedules.get(name),
+            "async_task": task.ASYNC_TASK.name if task.ASYNC_TASK is not None else None,
+        }
+        for name, task in current_celery_app.tasks.items()
+        if isinstance(task, BEMServerCoreScheduledTask)
+    ]
+
+    return {
+        "async_tasks": async_tasks,
+        "scheduled_tasks": scheduled_tasks,
+    }
 
 
 @blp.route("/run", methods=["POST"])
 @blp.login_required
-@blp.arguments(TaskRunSchema)
-@blp.response(204)
+@blp.arguments(TaskRunArgsSchema)
+@blp.response(200, TaskRunResponseSchema)
 def run(args):
     """Run async task"""
     user = get_current_user()
@@ -71,4 +89,25 @@ def run(args):
     campaign_id = args["campaign_id"]
     start_dt = args["start_time"]
     end_dt = args["end_time"]
-    task.delay(user.id, campaign_id, start_dt, end_dt, **args["parameters"])
+    task = task.delay(user.id, campaign_id, start_dt, end_dt, **args["parameters"])
+    return {"task_id": task.id}
+
+
+@blp.route("/<task_id>")
+@blp.login_required
+@blp.response(200, TaskStatusSchema)
+def get_task_status(task_id):
+    """Get task status"""
+    task = AsyncResult(task_id)
+    if task.state == "PENDING":
+        abort(
+            404,
+            message=(
+                f"Unknown task ID: {task_id}. "
+                "Either the task ID is wrong or the task was deleted."
+            ),
+        )
+    ret = {"task_id": task_id, "status": task.state}
+    if task.state in ("PROGRESS", "SUCCESS") and task.info is not None:
+        ret["info"] = task.info
+    return ret

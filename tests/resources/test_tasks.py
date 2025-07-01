@@ -16,16 +16,22 @@ from bemserver_core.celery import (
 TASKS_URL = "/tasks/"
 
 
-def dummy_function():
-    """Dummy fonction"""
-
-
 @pytest.fixture
 def celery_tasks():
     @current_celery_app.register_task
     class Dummy(BEMServerCoreAsyncTask):
-        TASK_FUNCTION = dummy_function
         DEFAULT_PARAMETERS = {"a_1": "1", "a_2": 2}
+
+        def do_run(self, campaign, start_dt, end_dt):
+            """Dummy function"""
+
+    @current_celery_app.register_task
+    class DummyScheduled(BEMServerCoreScheduledTask):
+        DEFAULT_PARAMETERS = {"a_1": "1", "a_2": 2}
+        ASYNC_TASK = Dummy
+
+        def do_run(self, campaign, start_dt, end_dt):
+            """Dummy function"""
 
 
 CELERY_CONFIG = {
@@ -53,14 +59,24 @@ class TestTasks:
             ret = client.get(TASKS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            for task in ret_val:
+            for task in ret_val["async_tasks"]:
                 assert isinstance(task["name"], str)
                 assert isinstance(task["default_parameters"], dict)
+            for task in ret_val["scheduled_tasks"]:
+                assert isinstance(task["name"], str)
+                assert isinstance(task["default_parameters"], dict)
+                assert "schedule" in task
+                assert "async_task" in task
             assert {
                 "name": "Dummy",
                 "default_parameters": {"a_1": "1", "a_2": 2},
+            } in ret_val["async_tasks"]
+            assert {
+                "name": "DummyScheduled",
+                "default_parameters": {"a_1": "1", "a_2": 2},
                 "schedule": {"dummy_task": "42"},
-            } in ret_val
+                "async_task": "Dummy",
+            } in ret_val["scheduled_tasks"]
 
     def test_tasks_as_user_api(self, app, users):
         user_creds = users["Active"]["creds"]
@@ -72,7 +88,10 @@ class TestTasks:
             ret = client.get(TASKS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
-            for task in ret_val:
+            for task in ret_val["async_tasks"]:
+                assert isinstance(task["name"], str)
+                assert isinstance(task["default_parameters"], dict)
+            for task in ret_val["scheduled_tasks"]:
                 assert isinstance(task["name"], str)
                 assert isinstance(task["default_parameters"], dict)
 
@@ -111,7 +130,7 @@ class TestTasks:
                         "parameters": {"param_1": "value_1", "param_2": "value_2"},
                     },
                 )
-                assert ret.status_code == 204
+                assert ret.status_code == 200
                 task_mock.delay.assert_called_with(
                     user_1["id"],
                     campaign_1_id,
