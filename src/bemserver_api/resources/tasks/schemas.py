@@ -2,6 +2,8 @@
 
 import marshmallow as ma
 
+from bemserver_core.celery import TaskStateEnum
+
 from bemserver_api import Schema
 from bemserver_api.extensions import ma_fields
 
@@ -37,5 +39,5 @@ class TaskRunResponseSchema(Schema):
 
 class TaskStatusSchema(Schema):
     task_id = ma.fields.String()
-    status = ma.fields.String()
+    status = ma.fields.Enum(TaskStateEnum)
     info = ma.fields.Dict(keys=ma.fields.String)
