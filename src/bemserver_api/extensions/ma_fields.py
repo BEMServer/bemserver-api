@@ -84,14 +84,15 @@ class SortField(DelimitedList):
 
 class DictStr(ma.fields.Dict):
     default_error_messages = {
-        "invalid": "Not a valid string.",
+        "invalid_str": "Not a valid string.",
         "invalid_utf8": "Not a valid utf-8 string.",
-        "invalid_json": "Not a valid json object.",
+        "invalid_json": "Not a valid json string.",
+        "invalid": "Not a valid json object.",
     }
 
     def _deserialize(self, value, attr, data, **kwargs):
         if not isinstance(value, (str, bytes)):
-            raise self.make_error("invalid")
+            raise self.make_error("invalid_str")
         try:
             if isinstance(value, bytes):
                 value = value.decode("utf-8")

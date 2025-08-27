@@ -33,5 +33,9 @@ class TestMaFields:
             field.deserialize(12)
         with pytest.raises(ma.ValidationError, match="Not a valid utf-8 string."):
             field.deserialize(b"\xf3")
-        with pytest.raises(ma.ValidationError, match="Not a valid json object."):
+        with pytest.raises(ma.ValidationError, match="Not a valid json string."):
+            field.deserialize("test")
+        with pytest.raises(ma.ValidationError, match="Not a valid json string."):
             field.deserialize("{'lol': 'rofl'}")
+        with pytest.raises(ma.ValidationError, match="Not a valid json object."):
+            field.deserialize('"dummy"')
