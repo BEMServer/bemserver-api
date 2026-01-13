@@ -18,19 +18,20 @@ port-for==0.7.4
     # via pytest-postgresql
 psutil==6.1.1
     # via mirakuru
+psycopg==3.3.2
+    # via pytest-postgresql
 pytest==8.3.4
     # via
-    #   -r requirements/tests.in
+    #   -r tests.in
     #   pytest-cov
     #   pytest-postgresql
 pytest-cov==6.0.0
-    # via -r requirements/tests.in
+    # via -r tests.in
 pytest-postgresql==6.1.1
-    # via -r requirements/tests.in
-setuptools==75.7.0
-    # via pytest-postgresql
+    # via -r tests.in
 typing-extensions==4.12.2
     # via psycopg
 
 # The following packages are considered to be unsafe in a requirements file:
-# psycopg
+setuptools==78.1.1
+    # via pytest-postgresql
