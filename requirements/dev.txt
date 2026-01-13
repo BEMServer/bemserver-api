@@ -51,5 +51,5 @@ virtualenv==20.28.1
     # via pre-commit
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==75.7.0
+setuptools==78.1.1
     # via pytest-postgresql
