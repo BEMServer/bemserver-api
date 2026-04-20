@@ -36,7 +36,7 @@ class TestAuthentication:
     @mock.patch("bemserver_api.extensions.authentication.datetime")
     @mock.patch("bemserver_api.extensions.authentication.jwt.encode")
     def test_auth_encode(self, mock_encode, mock_dt, app, users):
-        dt_now = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
+        dt_now = dt.datetime(2020, 1, 1, tzinfo=dt.UTC)
         mock_dt.now.return_value = dt_now
 
         user_1 = users["Active"]["user"]
@@ -102,7 +102,7 @@ class TestAuthentication:
 
         text = jwt.encode(
             auth.HEADER,
-            {"exp": dt.datetime.now(tz=dt.timezone.utc), "type": "access"},
+            {"exp": dt.datetime.now(tz=dt.UTC), "type": "access"},
             auth.key,
         )
         claims = auth.decode(text)
@@ -111,7 +111,7 @@ class TestAuthentication:
 
         text = jwt.encode(
             auth.HEADER,
-            {"exp": dt.datetime.now(tz=dt.timezone.utc), "email": "test@test.com"},
+            {"exp": dt.datetime.now(tz=dt.UTC), "email": "test@test.com"},
             auth.key,
         )
         claims = auth.decode(text)

@@ -26,12 +26,8 @@ class TestCampaignsApi:
             # POST
             campaign_1 = {
                 "name": "Campaign 1",
-                "start_time": (
-                    dt.datetime(2012, 9, 4, tzinfo=dt.timezone.utc).isoformat()
-                ),
-                "end_time": (
-                    dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
-                ),
+                "start_time": (dt.datetime(2012, 9, 4, tzinfo=dt.UTC).isoformat()),
+                "end_time": (dt.datetime(2017, 9, 29, tzinfo=dt.UTC).isoformat()),
                 "timezone": "Europe/Paris",
             }
             ret = client.post(CAMPAIGNS_URL, json=campaign_1)
@@ -84,12 +80,8 @@ class TestCampaignsApi:
             # POST campaign 2
             campaign_2 = {
                 "name": "Campaign 2",
-                "start_time": (
-                    dt.datetime(2016, 4, 8, tzinfo=dt.timezone.utc).isoformat()
-                ),
-                "end_time": (
-                    dt.datetime(2019, 9, 20, tzinfo=dt.timezone.utc).isoformat()
-                ),
+                "start_time": (dt.datetime(2016, 4, 8, tzinfo=dt.UTC).isoformat()),
+                "end_time": (dt.datetime(2019, 9, 20, tzinfo=dt.UTC).isoformat()),
                 "timezone": "UTC",
             }
             ret = client.post(CAMPAIGNS_URL, json=campaign_2)
@@ -222,12 +214,8 @@ class TestCampaignsApi:
             # POST
             campaign_3 = {
                 "name": "Campaign 3",
-                "start_time": (
-                    dt.datetime(2012, 9, 4, tzinfo=dt.timezone.utc).isoformat()
-                ),
-                "end_time": (
-                    dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()
-                ),
+                "start_time": (dt.datetime(2012, 9, 4, tzinfo=dt.UTC).isoformat()),
+                "end_time": (dt.datetime(2017, 9, 29, tzinfo=dt.UTC).isoformat()),
                 "timezone": "UTC",
             }
             ret = client.post(CAMPAIGNS_URL, json=campaign_3)
@@ -268,8 +256,8 @@ class TestCampaignsApi:
         # POST
         campaign_3 = {
             "name": "Campaign 3",
-            "start_time": (dt.datetime(2012, 9, 4, tzinfo=dt.timezone.utc).isoformat()),
-            "end_time": (dt.datetime(2017, 9, 29, tzinfo=dt.timezone.utc).isoformat()),
+            "start_time": (dt.datetime(2012, 9, 4, tzinfo=dt.UTC).isoformat()),
+            "end_time": (dt.datetime(2017, 9, 29, tzinfo=dt.UTC).isoformat()),
             "timezone": "UTC",
         }
         ret = client.post(CAMPAIGNS_URL, json=campaign_3)

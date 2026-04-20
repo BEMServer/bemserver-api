@@ -62,8 +62,7 @@ class Auth:
             "email": user.email,
             # datetime is imported in module namespace to allow test mock
             # kinda sucks, but oh well...
-            "exp": datetime.now(tz=dt.timezone.utc)
-            + dt.timedelta(seconds=token_lifetime),
+            "exp": datetime.now(tz=dt.UTC) + dt.timedelta(seconds=token_lifetime),
             "type": token_type,
         }
         return jwt.encode(self.HEADER.copy(), claims, self.key)

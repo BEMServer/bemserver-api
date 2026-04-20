@@ -24,8 +24,8 @@ with open(TIMEZONES_FILE, encoding="utf-8") as tz_f:
 # pd.Timestamp.min: Timestamp('1677-09-21 00:12:43.145224193')
 # pd.Timestamp.max: Timestamp('2262-04-11 23:47:16.854775807')
 DATETIME_RANGE_VALIDATOR = ma.validate.Range(
-    dt.datetime(1680, 1, 1, tzinfo=dt.timezone.utc),
-    dt.datetime(2260, 1, 1, tzinfo=dt.timezone.utc),
+    dt.datetime(1680, 1, 1, tzinfo=dt.UTC),
+    dt.datetime(2260, 1, 1, tzinfo=dt.UTC),
 )
 
 

@@ -162,13 +162,13 @@ def campaigns(app):
     with OpenBar():
         campaign_1 = model.Campaign.new(
             name="Campaign 1",
-            start_time=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
+            start_time=dt.datetime(2020, 1, 1, tzinfo=dt.UTC),
             timezone="UTC",
         )
         campaign_2 = model.Campaign.new(
             name="Campaign 2",
-            start_time=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
-            end_time=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
+            start_time=dt.datetime(2020, 1, 1, tzinfo=dt.UTC),
+            end_time=dt.datetime(2021, 1, 1, tzinfo=dt.UTC),
             timezone="Europe/Paris",
         )
         db.session.commit()
@@ -286,7 +286,7 @@ def timeseries_data(request, app, timeseries_by_data_states):
     with OpenBar():
         nb_tsd = request.param
         for tsbds_id in timeseries_by_data_states:
-            start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
+            start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.UTC)
             for i in range(nb_tsd):
                 timestamp = start_dt + dt.timedelta(hours=i)
                 model.TimeseriesData.new(
@@ -327,14 +327,14 @@ def events(app, campaigns, campaign_scopes, event_categories):
     with OpenBar():
         tse_1 = model.Event.new(
             campaign_scope_id=campaign_scopes[0],
-            timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
+            timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.UTC),
             source="Event source",
             category_id=event_categories[0],
             level=model.EventLevelEnum.WARNING,
         )
         tse_2 = model.Event.new(
             campaign_scope_id=campaign_scopes[1],
-            timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
+            timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.UTC),
             source="Another event source",
             category_id=event_categories[1],
             level=model.EventLevelEnum.DEBUG,
@@ -439,13 +439,13 @@ def notifications(app, events, users):
         notif_1 = model.Notification.new(
             event_id=events[0],
             user_id=users["Active"]["id"],
-            timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc),
+            timestamp=dt.datetime(2020, 1, 1, tzinfo=dt.UTC),
             read=False,
         )
         notif_2 = model.Notification.new(
             event_id=events[1],
             user_id=users["Inactive"]["id"],
-            timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc),
+            timestamp=dt.datetime(2021, 1, 1, tzinfo=dt.UTC),
             read=True,
         )
         db.session.commit()

@@ -19,8 +19,8 @@ class TestEventsApi:
         cs_1_id = campaign_scopes[0]
         cs_2_id = campaign_scopes[1]
         ec_1_id = event_categories[0]
-        c1_st = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
-        c2_et = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
+        c1_st = dt.datetime(2020, 1, 1, tzinfo=dt.UTC).isoformat()
+        c2_et = dt.datetime(2021, 1, 1, tzinfo=dt.UTC).isoformat()
         user_1_id = users["Active"]["id"]
 
         creds = users["Chuck"]["creds"]
@@ -311,7 +311,7 @@ class TestEventsApi:
         event_1_id = events[0]
         cs_1_id = campaign_scopes[0]
         ec_1_id = event_categories[0]
-        c1_st = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
+        c1_st = dt.datetime(2021, 1, 1, tzinfo=dt.UTC).isoformat()
 
         creds = users["Active"]["creds"]
 
@@ -350,7 +350,7 @@ class TestEventsApi:
         event_1_id = events[0]
         cs_1_id = campaign_scopes[0]
         ec_1_id = event_categories[0]
-        c1_st = dt.datetime(2021, 1, 1, tzinfo=dt.timezone.utc).isoformat()
+        c1_st = dt.datetime(2021, 1, 1, tzinfo=dt.UTC).isoformat()
 
         client = app.test_client()
 

@@ -28,8 +28,8 @@ ENERGY_CONSUMPTION_URL = "/analysis/energy_consumption/"
 
 class TestAnalysisApiEnergyConsumption:
     def _create_data(self, campaign_id, campaign_scope_id):
-        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.timezone.utc)
-        end_dt = dt.datetime(2020, 1, 1, 2, 0, tzinfo=dt.timezone.utc)
+        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.UTC)
+        end_dt = dt.datetime(2020, 1, 1, 2, 0, tzinfo=dt.UTC)
 
         timestamps = pd.date_range(start_dt, end_dt, inclusive="left", freq="h")
 

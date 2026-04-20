@@ -275,9 +275,9 @@ class TestSitesDownloadWeatherDataApi:
         site_1_id = sites[0]
         site_2_id = sites[1]
 
-        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.timezone.utc)
-        end_dt = dt.datetime(2020, 1, 1, 2, 0, tzinfo=dt.timezone.utc)
-        oik_end_dt = dt.datetime(2020, 1, 1, 1, 0, tzinfo=dt.timezone.utc)
+        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.UTC)
+        end_dt = dt.datetime(2020, 1, 1, 2, 0, tzinfo=dt.UTC)
+        oik_end_dt = dt.datetime(2020, 1, 1, 1, 0, tzinfo=dt.UTC)
 
         resp_data = {
             "columns": [
@@ -409,8 +409,8 @@ class TestSitesDownloadWeatherDataApi:
         creds = users["Active"]["creds"]
         site_2_id = sites[1]
 
-        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.timezone.utc)
-        end_dt = dt.datetime(2020, 1, 1, 2, 0, tzinfo=dt.timezone.utc)
+        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.UTC)
+        end_dt = dt.datetime(2020, 1, 1, 2, 0, tzinfo=dt.UTC)
 
         client = app.test_client()
 
@@ -429,8 +429,8 @@ class TestSitesDownloadWeatherDataApi:
     def test_sites_download_weather_data_api_as_anonym(self, mock_get, app, sites):
         site_2_id = sites[1]
 
-        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.timezone.utc)
-        end_dt = dt.datetime(2020, 1, 1, 2, 0, tzinfo=dt.timezone.utc)
+        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.UTC)
+        end_dt = dt.datetime(2020, 1, 1, 2, 0, tzinfo=dt.UTC)
 
         client = app.test_client()
 
@@ -448,8 +448,8 @@ class TestSitesDownloadWeatherDataApi:
         creds = users["Chuck"]["creds"]
         site_1_id = sites[0]
 
-        start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
-        end_dt = dt.datetime(2020, 1, 2, tzinfo=dt.timezone.utc)
+        start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.UTC)
+        end_dt = dt.datetime(2020, 1, 2, tzinfo=dt.UTC)
 
         client = app.test_client()
 
@@ -509,8 +509,8 @@ class TestSitesDownloadWeatherDataApi:
         creds = users["Chuck"]["creds"]
         site_1_id = sites[0]
 
-        start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc)
-        end_dt = dt.datetime(2020, 1, 2, tzinfo=dt.timezone.utc)
+        start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.UTC)
+        end_dt = dt.datetime(2020, 1, 2, tzinfo=dt.UTC)
 
         mock_get.return_value.status_code = 401
         mock_get.return_value.text = (
