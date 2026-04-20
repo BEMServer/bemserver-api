@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+0.27.0 (2026-04-20)
++++++++++++++++++++
+
+Other changes:
+
+- Require bemserver-core 0.22.0
+- Support Python 3.13 and Python 3.14
+- Remove official Python 3.9 and 3.10 support
+
 0.26.0 (2025-05-27)
 +++++++++++++++++++
 
