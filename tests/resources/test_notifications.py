@@ -19,8 +19,8 @@ class TestNotificationsApi:
         event_1_id = events[0]
         event_2_id = events[1]
 
-        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
-        dt_2 = dt.datetime(2020, 1, 2, tzinfo=dt.timezone.utc).isoformat()
+        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.UTC).isoformat()
+        dt_2 = dt.datetime(2020, 1, 2, tzinfo=dt.UTC).isoformat()
 
         client = app.test_client()
 
@@ -235,7 +235,7 @@ class TestNotificationsApi:
         notif_1_id = notifications[0]
         notif_2_id = notifications[1]
 
-        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
+        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.UTC).isoformat()
 
         client = app.test_client()
 
@@ -341,7 +341,7 @@ class TestNotificationsApi:
         event_1_id = events[0]
         notif_1_id = notifications[0]
 
-        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.timezone.utc).isoformat()
+        dt_1 = dt.datetime(2020, 1, 1, tzinfo=dt.UTC).isoformat()
 
         client = app.test_client()
 

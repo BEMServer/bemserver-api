@@ -413,12 +413,8 @@ class TestTimeseriesDataApi:
             ret = client.get(
                 query_url,
                 query_string={
-                    "start_time": dt.datetime(
-                        2500, 1, 1, tzinfo=dt.timezone.utc
-                    ).isoformat(),
-                    "end_time": dt.datetime(
-                        2500, 1, 2, tzinfo=dt.timezone.utc
-                    ).isoformat(),
+                    "start_time": dt.datetime(2500, 1, 1, tzinfo=dt.UTC).isoformat(),
+                    "end_time": dt.datetime(2500, 1, 2, tzinfo=dt.UTC).isoformat(),
                     "timeseries": ts_l,
                     "data_state": ds_id,
                 },
@@ -652,12 +648,8 @@ class TestTimeseriesDataApi:
             ret = client.get(
                 f"{query_url}aggregate",
                 query_string={
-                    "start_time": dt.datetime(
-                        2500, 1, 1, tzinfo=dt.timezone.utc
-                    ).isoformat(),
-                    "end_time": dt.datetime(
-                        2500, 1, 2, tzinfo=dt.timezone.utc
-                    ).isoformat(),
+                    "start_time": dt.datetime(2500, 1, 1, tzinfo=dt.UTC).isoformat(),
+                    "end_time": dt.datetime(2500, 1, 2, tzinfo=dt.UTC).isoformat(),
                     "timeseries": ts_l,
                     "data_state": ds_id,
                     "bucket_width_value": 1,

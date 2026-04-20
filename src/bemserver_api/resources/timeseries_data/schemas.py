@@ -182,7 +182,9 @@ class TimeseriesDataGetBaseQueryArgsSchema(TimeseriesDataBaseQueryArgsSchema):
         if "convert_to" in data:
             data["convert_to"] = {
                 ts_label: unit
-                for ts_label, unit in zip(data["timeseries"], data["convert_to"])
+                for ts_label, unit in zip(
+                    data["timeseries"], data["convert_to"], strict=True
+                )
                 if unit
             }
         return data

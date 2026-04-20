@@ -88,8 +88,8 @@ class TestTasks:
         creds = user_1["creds"]
 
         campaign_1_id = campaigns[0]
-        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.timezone.utc)
-        end_dt = dt.datetime(2020, 1, 2, 0, 0, tzinfo=dt.timezone.utc)
+        start_dt = dt.datetime(2020, 1, 1, 0, 0, tzinfo=dt.UTC)
+        end_dt = dt.datetime(2020, 1, 2, 0, 0, tzinfo=dt.UTC)
 
         client = app.test_client()
 
