@@ -20,7 +20,7 @@ async-timeout==5.0.1
     # via redis
 authlib==1.6.11
     # via bemserver-api (pyproject.toml)
-bemserver-core==0.21.0
+bemserver-core==0.22.0
     # via bemserver-api (pyproject.toml)
 billiard==4.2.1
     # via celery
@@ -34,7 +34,6 @@ cffi==1.17.1
     # via
     #   argon2-cffi-bindings
     #   cryptography
-    #   oso
 charset-normalizer==3.4.1
     # via requests
 click==8.1.8
@@ -92,14 +91,12 @@ marshmallow-sqlalchemy==1.1.1
     # via bemserver-api (pyproject.toml)
 numpy==2.0.2
     # via pandas
-oso==0.27.3
-    # via bemserver-core
 packaging==24.2
     # via
     #   apispec
     #   marshmallow
     #   webargs
-pandas==2.2.3
+pandas==3.0.2
     # via bemserver-core
 pint==0.24.4
     # via bemserver-core
@@ -117,9 +114,7 @@ python-dateutil==2.9.0.post0
     #   pandas
 python-dotenv==1.0.1
     # via bemserver-api (pyproject.toml)
-pytz==2024.2
-    # via pandas
-redis==4.6.0
+redis==7.4.0
     # via bemserver-core
 requests==2.32.4
     # via bemserver-core
@@ -143,7 +138,6 @@ tzdata==2024.2
     # via
     #   celery
     #   kombu
-    #   pandas
 urllib3==2.6.3
     # via requests
 vine==5.1.0
