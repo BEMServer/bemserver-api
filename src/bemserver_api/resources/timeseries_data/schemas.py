@@ -2,7 +2,7 @@
 
 import marshmallow as ma
 
-from bemserver_core.input_output.timeseries_data_io import AGGREGATION_FUNCTIONS
+from bemserver_core.common import AggregationFunctionsEnum
 from bemserver_core.time_utils import FIXED_SIZE_PERIODS, PERIODS
 
 from bemserver_api import Schema
@@ -242,9 +242,10 @@ class TimeseriesDataGetAggregateBaseQueryArgsSchema(
 ):
     """Timeseries values aggregate GET query parameters base schema"""
 
-    aggregation = ma.fields.String(
-        load_default="avg",
-        validate=ma.validate.OneOf(AGGREGATION_FUNCTIONS),
+    aggregation = ma.fields.Enum(
+        AggregationFunctionsEnum,
+        load_default=AggregationFunctionsEnum.AVG,
+        by_value=True,
     )
 
 

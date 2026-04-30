@@ -8,15 +8,15 @@ from flask.views import MethodView
 from flask_smorest import abort
 
 from bemserver_core.exceptions import (
-    BEMServerCoreDegreeDayProcessMissingTemperatureError,
+    BEMServerCoreDegreeDayProcessingMissingTemperatureError,
     BEMServerCoreDimensionalityError,
     BEMServerCoreSettingsError,
     BEMServerCoreWeatherAPIAuthenticationError,
-    BEMServerCoreWeatherProcessMissingCoordinatesError,
+    BEMServerCoreWeatherProcessingMissingCoordinatesError,
 )
 from bemserver_core.model import Site
-from bemserver_core.process.degree_days import compute_dd_for_site
-from bemserver_core.process.weather import wdp
+from bemserver_core.processing.degree_days import compute_dd_for_site
+from bemserver_core.processing.weather import wdp
 
 from bemserver_api import Blueprint
 from bemserver_api.database import db
@@ -130,7 +130,7 @@ def download_weather_data(args, item_id):
         )
     except (
         BEMServerCoreSettingsError,
-        BEMServerCoreWeatherProcessMissingCoordinatesError,
+        BEMServerCoreWeatherProcessingMissingCoordinatesError,
         BEMServerCoreWeatherAPIAuthenticationError,
     ) as exc:
         abort(409, message=str(exc))
@@ -161,7 +161,7 @@ def get_degree_days(args, item_id):
             base=args["base"],
             unit=args["unit"],
         )
-    except BEMServerCoreDegreeDayProcessMissingTemperatureError as exc:
+    except BEMServerCoreDegreeDayProcessingMissingTemperatureError as exc:
         abort(409, message=str(exc))
     except BEMServerCoreDimensionalityError as exc:
         abort(422, message=str(exc))
