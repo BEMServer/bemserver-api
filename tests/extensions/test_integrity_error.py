@@ -5,6 +5,8 @@ import pytest
 import psycopg.errors as ppe
 import sqlalchemy as sqla
 
+from bemserver_core.exceptions import BEMServerCoreIntegrityError
+
 from bemserver_api import Blueprint
 
 
@@ -12,6 +14,10 @@ class TestIntegrityError:
     @pytest.mark.parametrize(
         ("error", "message"),
         (
+            (
+                BEMServerCoreIntegrityError("Core integrity error"),
+                "Core integrity error",
+            ),
             (
                 sqla.exc.IntegrityError(None, None, ppe.UniqueViolation()),
                 "Unique constraint violation",

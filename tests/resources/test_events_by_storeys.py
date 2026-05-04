@@ -44,6 +44,20 @@ class TestEventByStoreyApi:
             ret = client.post(EVENTS_BY_STOREYS_URL, json=ebs_1)
             assert ret.status_code == 409
 
+            # POST non-existent storey_id -> 409
+            ret = client.post(
+                EVENTS_BY_STOREYS_URL,
+                json={"event_id": event_1_id, "storey_id": DUMMY_ID},
+            )
+            assert ret.status_code == 409
+
+            # POST non-existent event_id -> 409
+            ret = client.post(
+                EVENTS_BY_STOREYS_URL,
+                json={"event_id": DUMMY_ID, "storey_id": storey_1_id},
+            )
+            assert ret.status_code == 409
+
             # POST event + storey from different campaigns
             ebs = {
                 "event_id": event_2_id,

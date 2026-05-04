@@ -43,6 +43,20 @@ class TestEventByBuildingApi:
             ret = client.post(EVENTS_BY_BUILDINGS_URL, json=ebb_1)
             assert ret.status_code == 409
 
+            # POST non-existent building_id -> 409
+            ret = client.post(
+                EVENTS_BY_BUILDINGS_URL,
+                json={"event_id": event_1_id, "building_id": DUMMY_ID},
+            )
+            assert ret.status_code == 409
+
+            # POST non-existent event_id -> 409
+            ret = client.post(
+                EVENTS_BY_BUILDINGS_URL,
+                json={"event_id": DUMMY_ID, "building_id": building_1_id},
+            )
+            assert ret.status_code == 409
+
             # POST event + building from different campaigns
             ebb = {
                 "event_id": event_2_id,

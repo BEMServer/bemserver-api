@@ -44,6 +44,20 @@ class TestTimeseriesByEventApi:
             ret = client.post(TIMESERIES_BY_EVENTS_URL, json=tbs_1)
             assert ret.status_code == 409
 
+            # POST non-existent timeseries_id -> 409
+            ret = client.post(
+                TIMESERIES_BY_EVENTS_URL,
+                json={"event_id": event_1_id, "timeseries_id": DUMMY_ID},
+            )
+            assert ret.status_code == 409
+
+            # POST non-existent event_id -> 409
+            ret = client.post(
+                TIMESERIES_BY_EVENTS_URL,
+                json={"event_id": DUMMY_ID, "timeseries_id": ts_1_id},
+            )
+            assert ret.status_code == 409
+
             # POST event + TS from different campaign scopes
             tbs = {
                 "event_id": event_2_id,

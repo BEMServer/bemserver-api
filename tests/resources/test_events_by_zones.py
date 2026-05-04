@@ -42,6 +42,20 @@ class TestEventByZoneApi:
             ret = client.post(EVENTS_BY_ZONES_URL, json=ebz_1)
             assert ret.status_code == 409
 
+            # POST non-existent zone_id -> 409
+            ret = client.post(
+                EVENTS_BY_ZONES_URL,
+                json={"event_id": event_1_id, "zone_id": DUMMY_ID},
+            )
+            assert ret.status_code == 409
+
+            # POST non-existent event_id -> 409
+            ret = client.post(
+                EVENTS_BY_ZONES_URL,
+                json={"event_id": DUMMY_ID, "zone_id": zone_1_id},
+            )
+            assert ret.status_code == 409
+
             # POST event + zone from different campaigns
             ebz = {
                 "event_id": event_2_id,

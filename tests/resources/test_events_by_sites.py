@@ -42,6 +42,20 @@ class TestEventBySiteApi:
             ret = client.post(EVENTS_BY_SITES_URL, json=ebs_1)
             assert ret.status_code == 409
 
+            # POST non-existent site_id -> 409
+            ret = client.post(
+                EVENTS_BY_SITES_URL,
+                json={"event_id": event_1_id, "site_id": DUMMY_ID},
+            )
+            assert ret.status_code == 409
+
+            # POST non-existent event_id -> 409
+            ret = client.post(
+                EVENTS_BY_SITES_URL,
+                json={"event_id": DUMMY_ID, "site_id": site_1_id},
+            )
+            assert ret.status_code == 409
+
             # POST event + site from different campaigns
             ebs = {
                 "event_id": event_2_id,

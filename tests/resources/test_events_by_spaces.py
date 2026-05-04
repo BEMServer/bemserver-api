@@ -45,6 +45,20 @@ class TestEventBySpaceApi:
             ret = client.post(EVENTS_BY_SPACES_URL, json=ebs_1)
             assert ret.status_code == 409
 
+            # POST non-existent space_id -> 409
+            ret = client.post(
+                EVENTS_BY_SPACES_URL,
+                json={"event_id": event_1_id, "space_id": DUMMY_ID},
+            )
+            assert ret.status_code == 409
+
+            # POST non-existent event_id -> 409
+            ret = client.post(
+                EVENTS_BY_SPACES_URL,
+                json={"event_id": DUMMY_ID, "space_id": space_1_id},
+            )
+            assert ret.status_code == 409
+
             # POST event + space from different campaigns
             ebs = {
                 "event_id": event_2_id,
