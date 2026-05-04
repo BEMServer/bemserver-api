@@ -6,7 +6,7 @@ import pytest
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 BUILDING_PROPERTY_DATA_URL = "/building_property_data/"
 BUILDINGS_URL = "/buildings/"

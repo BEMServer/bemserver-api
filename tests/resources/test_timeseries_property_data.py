@@ -6,7 +6,7 @@ import pytest
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 TIMESERIES_PROPERTY_DATA_URL = "/timeseries_property_data/"
 

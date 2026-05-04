@@ -4,7 +4,7 @@ import datetime as dt
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 NOTIFICATIONS_URL = "/notifications/"
 

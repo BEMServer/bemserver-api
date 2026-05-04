@@ -4,7 +4,7 @@ import pytest
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 TIMESERIES_BY_ZONES_URL = "/timeseries_by_zones/"
 ZONES_URL = "/zones/"

@@ -6,7 +6,7 @@ import pytest
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 SPACE_PROPERTY_DATA_URL = "/space_property_data/"
 SPACES_URL = "/spaces/"

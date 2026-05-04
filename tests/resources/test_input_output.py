@@ -13,7 +13,7 @@ INPUT_OUTPUT_TIMESERIES_URL = f"{INPUT_OUTPUT_URL}timeseries"
 BUILDINGS_URL = "/buildings/"
 TIMESERIES_URL = "/timeseries/"
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 
 class TestInputOutputSites:

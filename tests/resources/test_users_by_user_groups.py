@@ -2,7 +2,7 @@
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 USERS_URL = "/users/"
 USER_GROUPS_URL = "/user_groups/"

@@ -13,7 +13,7 @@ from bemserver_core.model import Timeseries
 from bemserver_api.database import db
 
 TIMESERIES_DATA_URL = "/timeseries_data/"
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 
 class TestTimeseriesDataApi:

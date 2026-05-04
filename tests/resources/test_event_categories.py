@@ -2,7 +2,7 @@
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 EVENT_CATEGORIES_URL = "/event_categories/"
 

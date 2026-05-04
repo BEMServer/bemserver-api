@@ -4,7 +4,7 @@ import pytest
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 ENERGIES_URL = "/energies/"
 ENERGY_END_USES_URL = "/energy_end_uses/"

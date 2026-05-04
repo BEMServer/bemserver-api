@@ -18,7 +18,7 @@ from bemserver_core.model import Timeseries, TimeseriesDataState
 
 from bemserver_api.database import db
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 SITES_URL = "/sites/"
 

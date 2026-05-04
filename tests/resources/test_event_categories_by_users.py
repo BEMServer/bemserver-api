@@ -4,7 +4,7 @@ import pytest
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 EVENT_CATEGORIES_BY_USERS_URL = "/event_categories_by_users/"
 

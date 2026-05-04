@@ -4,7 +4,7 @@ import pytest
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 EVENTS_BY_ZONES_URL = "/events_by_zones/"
 EVENTS_URL = "/events/"

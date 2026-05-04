@@ -4,7 +4,7 @@ import pytest
 
 from tests.common import AuthHeader
 
-DUMMY_ID = "69"
+DUMMY_ID = 69
 
 TASKS_BY_CAMPAIGNS_URL = "/tasks_by_campaigns/"
 
