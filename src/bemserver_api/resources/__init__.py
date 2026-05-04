@@ -23,6 +23,8 @@ from . import (
     events_by_spaces,
     events_by_storeys,
     events_by_zones,
+    expression_variables,
+    expressions,
     input_output,
     notifications,
     site_properties,
@@ -116,6 +118,8 @@ MODULES = (
     analysis,
     tasks,
     tasks_by_campaigns,
+    expressions,
+    expression_variables,
 )
 
 
