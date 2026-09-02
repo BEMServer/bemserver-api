@@ -4,13 +4,22 @@ from flask.views import MethodView
 
 from flask_smorest import abort
 
-from bemserver_core.exceptions import BEMServerCoreCampaignScopeError
+from bemserver_core.exceptions import (
+    BEMServerCoreCampaignScopeError,
+    BEMServerCoreExpressionValidationError,
+)
 from bemserver_core.model import Expression
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
-from .schemas import ExpressionPutSchema, ExpressionQueryArgsSchema, ExpressionSchema
+from .schemas import (
+    ExpressionFullPutSchema,
+    ExpressionFullSchema,
+    ExpressionPutSchema,
+    ExpressionQueryArgsSchema,
+    ExpressionSchema,
+)
 
 blp = Blueprint(
     "Expression",
@@ -85,5 +94,95 @@ class ExpressionByIdViews(MethodView):
         if item is None:
             abort(404)
         blp.check_etag(item, ExpressionSchema)
+        item.delete()
+        db.session.commit()
+
+
+@blp.route("/full/")
+class ExpressionFullViews(MethodView):
+    @blp.login_required
+    @blp.etag
+    @blp.arguments(ExpressionQueryArgsSchema, location="query")
+    @blp.response(200, ExpressionFullSchema(many=True))
+    @blp.paginate()
+    def get(self, args, pagination_parameters):
+        """List expressions"""
+        exprs = Expression.get(**args)
+        pagination_parameters.item_count = exprs.count()
+        return [
+            e.to_dict()
+            for e in exprs[
+                pagination_parameters.first_item : pagination_parameters.last_item + 1
+            ]
+        ]
+
+    @blp.login_required
+    @blp.etag
+    @blp.arguments(ExpressionFullSchema)
+    @blp.response(201, ExpressionFullSchema)
+    @blp.catch_integrity_error
+    def post(self, new_item):
+        """Add a new expression"""
+        item = Expression.from_dict(new_item)
+        try:
+            item.validate()
+        except (
+            BEMServerCoreExpressionValidationError,
+            BEMServerCoreCampaignScopeError,
+        ) as exc:
+            abort(422, errors={"json": {"_schema": str(exc)}})
+        try:
+            db.session.commit()
+        except BEMServerCoreCampaignScopeError as exc:
+            abort(422, errors={"json": {"_schema": str(exc)}})
+        return item.to_dict()
+
+
+@blp.route("/full/<int:item_id>")
+class ExpressionFullByIdViews(MethodView):
+    @blp.login_required
+    @blp.etag
+    @blp.response(200, ExpressionFullSchema)
+    def get(self, item_id):
+        """Get expression by ID"""
+        item = Expression.get_by_id(item_id)
+        if item is None:
+            abort(404)
+        return item.to_dict()
+
+    @blp.login_required
+    @blp.etag
+    @blp.arguments(ExpressionFullPutSchema)
+    @blp.response(200, ExpressionFullSchema)
+    @blp.catch_integrity_error
+    def put(self, new_item, item_id):
+        """Update an existing expression"""
+        item = Expression.get_by_id(item_id)
+        if item is None:
+            abort(404)
+        blp.check_etag(item.to_dict(), ExpressionFullSchema)
+        try:
+            item.update_from_dict(new_item)
+        except BEMServerCoreCampaignScopeError as exc:
+            abort(422, errors={"json": {"_schema": str(exc)}})
+        try:
+            item.validate()
+        except BEMServerCoreExpressionValidationError as exc:
+            abort(422, errors={"json": {"_schema": str(exc)}})
+        try:
+            db.session.commit()
+        except BEMServerCoreCampaignScopeError as exc:
+            abort(422, errors={"json": {"_schema": str(exc)}})
+        return item.to_dict()
+
+    @blp.login_required
+    @blp.etag
+    @blp.response(204)
+    def delete(self, item_id):
+        """Delete an expression"""
+        item = Expression.get_by_id(item_id)
+        if item is None:
+            abort(404)
+        blp.check_etag(item.to_dict(), ExpressionFullSchema)
         item.delete()
         db.session.commit()

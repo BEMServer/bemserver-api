@@ -3,7 +3,8 @@
 import marshmallow as ma
 import marshmallow_sqlalchemy as msa
 
-from bemserver_core.model import Expression
+from bemserver_core.common import AggregationFunctionsEnum
+from bemserver_core.model import Expression, ExpressionVariable
 
 from bemserver_api import AutoSchema, Schema
 from bemserver_api.extensions import ma_fields
@@ -25,3 +26,25 @@ class ExpressionQueryArgsSchema(Schema):
     sort = ma_fields.SortField(("id",))
     campaign_scope_id = ma.fields.Int()
     timeseries_id = ma.fields.Int()
+
+
+class ExpressionVariableSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        model = ExpressionVariable
+        exclude = ("id", "campaign_scope_id", "expression_id")
+
+    aggregation = ma.fields.Enum(
+        AggregationFunctionsEnum,
+        by_value=True,
+    )
+
+
+class ExpressionFullSchema(ExpressionSchema):
+    variables = ma.fields.List(
+        ma.fields.Nested(ExpressionVariableSchema), required=True
+    )
+
+
+class ExpressionFullPutSchema(ExpressionFullSchema):
+    class Meta(ExpressionFullSchema.Meta):
+        exclude = ("campaign_scope_id",)
