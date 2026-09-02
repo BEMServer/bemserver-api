@@ -826,6 +826,29 @@ class TestTimeseriesDataApi:
             )
             assert ret.status_code == 422
 
+            # Conversions: wrong convert_to unit
+            if not for_campaign:
+                query_url = TIMESERIES_DATA_URL
+                ts_l = (ts_1_id,)
+            else:
+                query_url = TIMESERIES_DATA_URL + f"campaign/{campaign_1_id}/"
+                ts_l = (f"Timeseries {ts_1_id - 1}",)
+
+            ret = client.get(
+                f"{query_url}aggregate",
+                query_string={
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat(),
+                    "timeseries": ts_l,
+                    "data_state": ds_id,
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                    "aggregation": "avg",
+                    "convert_to": ("m/s"),
+                },
+            )
+            assert ret.status_code == 422
+
             # Conversions: wrong convert_to list size
             if not for_campaign:
                 query_url = TIMESERIES_DATA_URL
@@ -841,8 +864,8 @@ class TestTimeseriesDataApi:
                     "end_time": end_time.isoformat(),
                     "timeseries": ts_l,
                     "data_state": ds_id,
-                    "bucket_width_value": 2,
-                    "bucket_width_unit": "week",
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
                     "aggregation": "avg",
                     "convert_to": ("mm", "m/s"),
                 },
