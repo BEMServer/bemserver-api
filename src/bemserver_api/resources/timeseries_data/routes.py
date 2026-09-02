@@ -278,33 +278,35 @@ def get_aggregate(args):
     timeseries = _get_many_timeseries_by_id(args["timeseries"])
     data_state = _get_data_state(args["data_state"])
 
-    if mime_type == "text/csv":
-        resp = tsdcsvio.export_csv_bucket(
-            args["start_time"],
-            args["end_time"],
-            timeseries,
-            data_state,
-            args["bucket_width_value"],
-            args["bucket_width_unit"],
-            args["aggregation"],
-            convert_to=args.get("convert_to"),
-            timezone=args["timezone"],
-            col_label="id",
-        )
-    else:
-        resp = tsdjsonio.export_json_bucket(
-            args["start_time"],
-            args["end_time"],
-            timeseries,
-            data_state,
-            args["bucket_width_value"],
-            args["bucket_width_unit"],
-            args["aggregation"],
-            convert_to=args.get("convert_to"),
-            timezone=args["timezone"],
-            col_label="id",
-        )
-
+    try:
+        if mime_type == "text/csv":
+            resp = tsdcsvio.export_csv_bucket(
+                args["start_time"],
+                args["end_time"],
+                timeseries,
+                data_state,
+                args["bucket_width_value"],
+                args["bucket_width_unit"],
+                args["aggregation"],
+                convert_to=args.get("convert_to"),
+                timezone=args["timezone"],
+                col_label="id",
+            )
+        else:
+            resp = tsdjsonio.export_json_bucket(
+                args["start_time"],
+                args["end_time"],
+                timeseries,
+                data_state,
+                args["bucket_width_value"],
+                args["bucket_width_unit"],
+                args["aggregation"],
+                convert_to=args.get("convert_to"),
+                timezone=args["timezone"],
+                col_label="id",
+            )
+    except BEMServerCoreDimensionalityError as exc:
+        abort(422, message=str(exc))
     return flask.Response(resp, mimetype=mime_type)
 
 
@@ -487,32 +489,35 @@ def get_aggregate_for_campaign(args, campaign_id):
     timeseries = _get_many_timeseries_by_name(campaign, args["timeseries"])
     data_state = _get_data_state(args["data_state"])
 
-    if mime_type == "text/csv":
-        resp = tsdcsvio.export_csv_bucket(
-            args["start_time"],
-            args["end_time"],
-            timeseries,
-            data_state,
-            args["bucket_width_value"],
-            args["bucket_width_unit"],
-            args["aggregation"],
-            convert_to=args.get("convert_to"),
-            timezone=args["timezone"],
-            col_label="name",
-        )
-    else:
-        resp = tsdjsonio.export_json_bucket(
-            args["start_time"],
-            args["end_time"],
-            timeseries,
-            data_state,
-            args["bucket_width_value"],
-            args["bucket_width_unit"],
-            args["aggregation"],
-            convert_to=args.get("convert_to"),
-            timezone=args["timezone"],
-            col_label="name",
-        )
+    try:
+        if mime_type == "text/csv":
+            resp = tsdcsvio.export_csv_bucket(
+                args["start_time"],
+                args["end_time"],
+                timeseries,
+                data_state,
+                args["bucket_width_value"],
+                args["bucket_width_unit"],
+                args["aggregation"],
+                convert_to=args.get("convert_to"),
+                timezone=args["timezone"],
+                col_label="name",
+            )
+        else:
+            resp = tsdjsonio.export_json_bucket(
+                args["start_time"],
+                args["end_time"],
+                timeseries,
+                data_state,
+                args["bucket_width_value"],
+                args["bucket_width_unit"],
+                args["aggregation"],
+                convert_to=args.get("convert_to"),
+                timezone=args["timezone"],
+                col_label="name",
+            )
+    except BEMServerCoreDimensionalityError as exc:
+        abort(422, message=str(exc))
 
     return flask.Response(resp, mimetype=mime_type)
 
