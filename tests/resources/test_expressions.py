@@ -6,11 +6,11 @@ from tests.common import AuthHeader
 
 DUMMY_ID = 69
 
-EXPRESSIONS_FULL_URL = "/expressions/full/"
+EXPRESSIONS_URL = "/expressions/"
 
 
-class TestExpressionsFullApi:
-    def test_expressions_full_api(self, app, users, campaign_scopes, timeseries):
+class TestExpressionsApi:
+    def test_expressions_api(self, app, users, campaign_scopes, timeseries):
         creds = users["Chuck"]["creds"]
         cs_1_id = campaign_scopes[0]
         cs_2_id = campaign_scopes[1]
@@ -21,7 +21,7 @@ class TestExpressionsFullApi:
 
         with AuthHeader(creds):
             # GET list
-            ret = client.get(EXPRESSIONS_FULL_URL)
+            ret = client.get(EXPRESSIONS_URL)
             assert ret.status_code == 200
             assert ret.json == []
 
@@ -36,7 +36,7 @@ class TestExpressionsFullApi:
                 "expr": "a",
                 "variables": [var_1],
             }
-            ret = client.post(EXPRESSIONS_FULL_URL, json=expr_1)
+            ret = client.post(EXPRESSIONS_URL, json=expr_1)
             assert ret.status_code == 201
             ret_val = ret.json
             expr_1_id = ret_val.pop("id")
@@ -45,7 +45,7 @@ class TestExpressionsFullApi:
             assert ret_val == expr_1
 
             # GET list
-            ret = client.get(EXPRESSIONS_FULL_URL)
+            ret = client.get(EXPRESSIONS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
@@ -54,7 +54,7 @@ class TestExpressionsFullApi:
             assert ret_val[0] == expr_1
 
             # GET by id
-            ret = client.get(f"{EXPRESSIONS_FULL_URL}{expr_1_id}")
+            ret = client.get(f"{EXPRESSIONS_URL}{expr_1_id}")
             assert ret.status_code == 200
             assert ret.headers["ETag"] == expr_1_etag
             ret_val = ret.json
@@ -68,7 +68,7 @@ class TestExpressionsFullApi:
             put_expr = expr_1.copy()
             del put_expr["campaign_scope_id"]
             ret = client.put(
-                f"{EXPRESSIONS_FULL_URL}{expr_1_id}",
+                f"{EXPRESSIONS_URL}{expr_1_id}",
                 json=put_expr,
                 headers={"If-Match": expr_1_etag},
             )
@@ -85,7 +85,7 @@ class TestExpressionsFullApi:
             put_expr["expr"] = "2*x"
             del put_expr["campaign_scope_id"]
             ret = client.put(
-                f"{EXPRESSIONS_FULL_URL}{expr_1_id}",
+                f"{EXPRESSIONS_URL}{expr_1_id}",
                 json=put_expr,
                 headers={"If-Match": expr_1_etag},
             )
@@ -93,7 +93,7 @@ class TestExpressionsFullApi:
 
             # PUT wrong ID -> 404
             ret = client.put(
-                f"{EXPRESSIONS_FULL_URL}{DUMMY_ID}",
+                f"{EXPRESSIONS_URL}{DUMMY_ID}",
                 json=put_expr,
                 headers={"If-Match": expr_1_etag},
             )
@@ -110,7 +110,7 @@ class TestExpressionsFullApi:
                 "expr": "b",
                 "variables": [var_2],
             }
-            ret = client.post(EXPRESSIONS_FULL_URL, json=expr_2)
+            ret = client.post(EXPRESSIONS_URL, json=expr_2)
             assert ret.status_code == 201
             ret_val = ret.json
             expr_2_id = ret_val.pop("id")
@@ -127,7 +127,7 @@ class TestExpressionsFullApi:
                 "expr": "c",
                 "variables": [var_3],
             }
-            ret = client.post(EXPRESSIONS_FULL_URL, json=expr_3)
+            ret = client.post(EXPRESSIONS_URL, json=expr_3)
             assert ret.status_code == 422
 
             # POST with TS not in CS
@@ -141,14 +141,14 @@ class TestExpressionsFullApi:
                 "expr": "a",
                 "variables": [var_1],
             }
-            ret = client.post(EXPRESSIONS_FULL_URL, json=expr_1)
+            ret = client.post(EXPRESSIONS_URL, json=expr_1)
             assert ret.status_code == 422
 
             # PUT with TS not in CS
             put_expr = expr_1.copy()
             del put_expr["campaign_scope_id"]
             ret = client.put(
-                f"{EXPRESSIONS_FULL_URL}{expr_1_id}",
+                f"{EXPRESSIONS_URL}{expr_1_id}",
                 json=put_expr,
                 headers={"If-Match": expr_1_etag},
             )
@@ -165,14 +165,14 @@ class TestExpressionsFullApi:
                 "expr": "a",
                 "variables": [var_1],
             }
-            ret = client.post(EXPRESSIONS_FULL_URL, json=expr_1)
+            ret = client.post(EXPRESSIONS_URL, json=expr_1)
             assert ret.status_code == 409
 
             # PUT with unknown TS
             put_expr = expr_1.copy()
             del put_expr["campaign_scope_id"]
             ret = client.put(
-                f"{EXPRESSIONS_FULL_URL}{expr_1_id}",
+                f"{EXPRESSIONS_URL}{expr_1_id}",
                 json=put_expr,
                 headers={"If-Match": expr_1_etag},
             )
@@ -180,7 +180,7 @@ class TestExpressionsFullApi:
 
             # GET list (filtered by campaign_scope_id)
             ret = client.get(
-                EXPRESSIONS_FULL_URL,
+                EXPRESSIONS_URL,
                 query_string={"campaign_scope_id": cs_1_id},
             )
             assert ret.status_code == 200
@@ -190,7 +190,7 @@ class TestExpressionsFullApi:
 
             # GET list with pagination
             ret = client.get(
-                EXPRESSIONS_FULL_URL,
+                EXPRESSIONS_URL,
                 query_string={"page_size": 1, "page": 2, "sort": "id"},
             )
             assert ret.status_code == 200
@@ -199,40 +199,40 @@ class TestExpressionsFullApi:
             assert ret_val[0]["id"] == expr_2_id
 
             # GET by id wrong ID -> 404
-            ret = client.get(f"{EXPRESSIONS_FULL_URL}{DUMMY_ID}")
+            ret = client.get(f"{EXPRESSIONS_URL}{DUMMY_ID}")
             assert ret.status_code == 404
 
             # DELETE wrong ID -> 404
             ret = client.delete(
-                f"{EXPRESSIONS_FULL_URL}{DUMMY_ID}",
+                f"{EXPRESSIONS_URL}{DUMMY_ID}",
                 headers={"If-Match": "Dummy-ETag"},
             )
             assert ret.status_code == 404
 
             # DELETE
             ret = client.delete(
-                f"{EXPRESSIONS_FULL_URL}{expr_1_id}",
+                f"{EXPRESSIONS_URL}{expr_1_id}",
                 headers={"If-Match": expr_1_etag},
             )
             assert ret.status_code == 204
             ret = client.delete(
-                f"{EXPRESSIONS_FULL_URL}{expr_2_id}",
+                f"{EXPRESSIONS_URL}{expr_2_id}",
                 headers={"If-Match": expr_2_etag},
             )
             assert ret.status_code == 204
 
             # GET list
-            ret = client.get(EXPRESSIONS_FULL_URL)
+            ret = client.get(EXPRESSIONS_URL)
             assert ret.status_code == 200
             assert ret.json == []
 
             # GET by id -> 404
-            ret = client.get(f"{EXPRESSIONS_FULL_URL}{expr_1_id}")
+            ret = client.get(f"{EXPRESSIONS_URL}{expr_1_id}")
             assert ret.status_code == 404
 
     @pytest.mark.usefixtures("users_by_user_groups")
     @pytest.mark.usefixtures("user_groups_by_campaign_scopes")
-    def test_expressions_full_as_user_api(
+    def test_expressions_as_user_api(
         self, app, users, campaign_scopes, timeseries, expressions
     ):
         user_creds = users["Active"]["creds"]
@@ -245,7 +245,7 @@ class TestExpressionsFullApi:
 
         with AuthHeader(user_creds):
             # GET list - user only sees cs_1
-            ret = client.get(EXPRESSIONS_FULL_URL)
+            ret = client.get(EXPRESSIONS_URL)
             assert ret.status_code == 200
             ret_val = ret.json
             assert len(ret_val) == 1
@@ -264,36 +264,36 @@ class TestExpressionsFullApi:
 
             # POST -> 403 (no authorize_create defined)
             ret = client.post(
-                EXPRESSIONS_FULL_URL,
+                EXPRESSIONS_URL,
                 json=expr_1,
             )
             assert ret.status_code == 403
 
             # GET by id in scope
-            ret = client.get(f"{EXPRESSIONS_FULL_URL}{expr_1_id}")
+            ret = client.get(f"{EXPRESSIONS_URL}{expr_1_id}")
             assert ret.status_code == 200
             expr_1_etag = ret.headers["ETag"]
 
             # PUT -> 403
             ret = client.put(
-                f"{EXPRESSIONS_FULL_URL}{expr_1_id}",
+                f"{EXPRESSIONS_URL}{expr_1_id}",
                 json={"name": "2 times a", "expr": "2*a", "variables": [var_1]},
                 headers={"If-Match": expr_1_etag},
             )
             assert ret.status_code == 403
 
             # GET by id not in scope -> 403
-            ret = client.get(f"{EXPRESSIONS_FULL_URL}{expr_2_id}")
+            ret = client.get(f"{EXPRESSIONS_URL}{expr_2_id}")
             assert ret.status_code == 403
 
             # DELETE -> 403
             ret = client.delete(
-                f"{EXPRESSIONS_FULL_URL}{expr_1_id}",
+                f"{EXPRESSIONS_URL}{expr_1_id}",
                 headers={"If-Match": expr_1_etag},
             )
             assert ret.status_code == 403
 
-    def test_expressions_full_as_anonym_api(
+    def test_expressions_as_anonym_api(
         self, app, campaign_scopes, timeseries, expressions
     ):
         cs_1_id = campaign_scopes[0]
@@ -303,7 +303,7 @@ class TestExpressionsFullApi:
         client = app.test_client()
 
         # GET list
-        ret = client.get(EXPRESSIONS_FULL_URL)
+        ret = client.get(EXPRESSIONS_URL)
         assert ret.status_code == 401
 
         var_1 = {
@@ -319,18 +319,18 @@ class TestExpressionsFullApi:
 
         # POST
         ret = client.post(
-            EXPRESSIONS_FULL_URL,
+            EXPRESSIONS_URL,
             json=expr_1,
         )
         assert ret.status_code == 401
 
         # GET by id
-        ret = client.get(f"{EXPRESSIONS_FULL_URL}{expr_1_id}")
+        ret = client.get(f"{EXPRESSIONS_URL}{expr_1_id}")
         assert ret.status_code == 401
 
         # PUT
         ret = client.put(
-            f"{EXPRESSIONS_FULL_URL}{expr_1_id}",
+            f"{EXPRESSIONS_URL}{expr_1_id}",
             json={"name": "2 times a", "expr": "2*a", "variables": [var_1]},
             headers={"If-Match": "Dummy-ETag"},
         )
@@ -338,7 +338,7 @@ class TestExpressionsFullApi:
 
         # DELETE
         ret = client.delete(
-            f"{EXPRESSIONS_FULL_URL}{expr_1_id}",
+            f"{EXPRESSIONS_URL}{expr_1_id}",
             headers={"If-Match": "Dummy-ETag"},
         )
         assert ret.status_code == 401

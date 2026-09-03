@@ -14,9 +14,9 @@ from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
 from .schemas import (
-    ExpressionFullPutSchema,
-    ExpressionFullSchema,
+    ExpressionPutSchema,
     ExpressionQueryArgsSchema,
+    ExpressionSchema,
 )
 
 blp = Blueprint(
@@ -27,12 +27,12 @@ blp = Blueprint(
 )
 
 
-@blp.route("/full/")
-class ExpressionFullViews(MethodView):
+@blp.route("/")
+class ExpressionViews(MethodView):
     @blp.login_required
     @blp.etag
     @blp.arguments(ExpressionQueryArgsSchema, location="query")
-    @blp.response(200, ExpressionFullSchema(many=True))
+    @blp.response(200, ExpressionSchema(many=True))
     @blp.paginate(SQLCursorPage)
     def get(self, args):
         """List expressions"""
@@ -40,8 +40,8 @@ class ExpressionFullViews(MethodView):
 
     @blp.login_required
     @blp.etag
-    @blp.arguments(ExpressionFullSchema)
-    @blp.response(201, ExpressionFullSchema)
+    @blp.arguments(ExpressionSchema)
+    @blp.response(201, ExpressionSchema)
     @blp.catch_integrity_error
     def post(self, new_item):
         """Add a new expression"""
@@ -60,11 +60,11 @@ class ExpressionFullViews(MethodView):
         return item
 
 
-@blp.route("/full/<int:item_id>")
-class ExpressionFullByIdViews(MethodView):
+@blp.route("/<int:item_id>")
+class ExpressionByIdViews(MethodView):
     @blp.login_required
     @blp.etag
-    @blp.response(200, ExpressionFullSchema)
+    @blp.response(200, ExpressionSchema)
     def get(self, item_id):
         """Get expression by ID"""
         item = Expression.get_by_id(item_id)
@@ -74,15 +74,15 @@ class ExpressionFullByIdViews(MethodView):
 
     @blp.login_required
     @blp.etag
-    @blp.arguments(ExpressionFullPutSchema)
-    @blp.response(200, ExpressionFullSchema)
+    @blp.arguments(ExpressionPutSchema)
+    @blp.response(200, ExpressionSchema)
     @blp.catch_integrity_error
     def put(self, new_item, item_id):
         """Update an existing expression"""
         item = Expression.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, ExpressionFullSchema)
+        blp.check_etag(item, ExpressionSchema)
         try:
             item.update_from_dict(new_item)
         except BEMServerCoreCampaignScopeError as exc:
@@ -105,6 +105,6 @@ class ExpressionFullByIdViews(MethodView):
         item = Expression.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item, ExpressionFullSchema)
+        blp.check_etag(item, ExpressionSchema)
         item.delete()
         db.session.commit()

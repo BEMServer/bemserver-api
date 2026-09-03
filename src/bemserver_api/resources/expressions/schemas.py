@@ -10,19 +10,6 @@ from bemserver_api import AutoSchema, Schema
 from bemserver_api.extensions import ma_fields
 
 
-class ExpressionSchema(AutoSchema):
-    class Meta(AutoSchema.Meta):
-        model = Expression
-
-    id = msa.auto_field(dump_only=True)
-
-
-class ExpressionQueryArgsSchema(Schema):
-    sort = ma_fields.SortField(("id",))
-    campaign_scope_id = ma.fields.Int()
-    timeseries_id = ma.fields.Int()
-
-
 class ExpressionVariableSchema(AutoSchema):
     class Meta(AutoSchema.Meta):
         model = ExpressionVariable
@@ -34,7 +21,11 @@ class ExpressionVariableSchema(AutoSchema):
     )
 
 
-class ExpressionFullSchema(ExpressionSchema):
+class ExpressionSchema(AutoSchema):
+    class Meta(AutoSchema.Meta):
+        model = Expression
+
+    id = msa.auto_field(dump_only=True)
     variables = ma.fields.List(
         ma.fields.Nested(ExpressionVariableSchema), required=True
     )
@@ -44,6 +35,12 @@ class ExpressionFullSchema(ExpressionSchema):
         return data.to_dict()
 
 
-class ExpressionFullPutSchema(ExpressionFullSchema):
-    class Meta(ExpressionFullSchema.Meta):
+class ExpressionPutSchema(ExpressionSchema):
+    class Meta(ExpressionSchema.Meta):
         exclude = ("campaign_scope_id",)
+
+
+class ExpressionQueryArgsSchema(Schema):
+    sort = ma_fields.SortField(("id",))
+    campaign_scope_id = ma.fields.Int()
+    timeseries_id = ma.fields.Int()
