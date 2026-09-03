@@ -44,6 +44,10 @@ class ExpressionFullSchema(ExpressionSchema):
         ma.fields.Nested(ExpressionVariableSchema), required=True
     )
 
+    @ma.pre_dump
+    def to_dict(self, data, many, **kwargs):
+        return data.to_dict()
+
 
 class ExpressionFullPutSchema(ExpressionFullSchema):
     class Meta(ExpressionFullSchema.Meta):

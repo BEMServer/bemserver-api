@@ -104,17 +104,10 @@ class ExpressionFullViews(MethodView):
     @blp.etag
     @blp.arguments(ExpressionQueryArgsSchema, location="query")
     @blp.response(200, ExpressionFullSchema(many=True))
-    @blp.paginate()
-    def get(self, args, pagination_parameters):
+    @blp.paginate(SQLCursorPage)
+    def get(self, args):
         """List expressions"""
-        exprs = Expression.get(**args)
-        pagination_parameters.item_count = exprs.count()
-        return [
-            e.to_dict()
-            for e in exprs[
-                pagination_parameters.first_item : pagination_parameters.last_item + 1
-            ]
-        ]
+        return Expression.get(**args)
 
     @blp.login_required
     @blp.etag
@@ -135,7 +128,7 @@ class ExpressionFullViews(MethodView):
             db.session.commit()
         except BEMServerCoreCampaignScopeError as exc:
             abort(422, errors={"json": {"_schema": str(exc)}})
-        return item.to_dict()
+        return item
 
 
 @blp.route("/full/<int:item_id>")
@@ -148,7 +141,7 @@ class ExpressionFullByIdViews(MethodView):
         item = Expression.get_by_id(item_id)
         if item is None:
             abort(404)
-        return item.to_dict()
+        return item
 
     @blp.login_required
     @blp.etag
@@ -160,7 +153,7 @@ class ExpressionFullByIdViews(MethodView):
         item = Expression.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item.to_dict(), ExpressionFullSchema)
+        blp.check_etag(item, ExpressionFullSchema)
         try:
             item.update_from_dict(new_item)
         except BEMServerCoreCampaignScopeError as exc:
@@ -173,7 +166,7 @@ class ExpressionFullByIdViews(MethodView):
             db.session.commit()
         except BEMServerCoreCampaignScopeError as exc:
             abort(422, errors={"json": {"_schema": str(exc)}})
-        return item.to_dict()
+        return item
 
     @blp.login_required
     @blp.etag
@@ -183,6 +176,6 @@ class ExpressionFullByIdViews(MethodView):
         item = Expression.get_by_id(item_id)
         if item is None:
             abort(404)
-        blp.check_etag(item.to_dict(), ExpressionFullSchema)
+        blp.check_etag(item, ExpressionFullSchema)
         item.delete()
         db.session.commit()
