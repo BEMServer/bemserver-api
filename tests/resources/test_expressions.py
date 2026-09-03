@@ -403,3 +403,67 @@ class TestExpressionsApi:
                 },
             )
             assert ret.status_code == 403
+
+    def test_expressions_evaluate_by_id(
+        self, app, users, campaign_scopes, timeseries, timeseries_data
+    ):
+        admin_creds = users["Chuck"]["creds"]
+        user_creds = users["Active"]["creds"]
+        cs_1_id = campaign_scopes[0]
+        ts_1_id = timeseries[0]  # in cs_1
+
+        start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.UTC)
+        end_dt = dt.datetime(2020, 1, 2, tzinfo=dt.UTC)
+
+        client = app.test_client()
+
+        var_1 = {
+            "name": "a",
+            "timeseries_id": ts_1_id,
+        }
+        expr_1 = {
+            "campaign_scope_id": cs_1_id,
+            "name": "a",
+            "expr": "a",
+            "variables": [var_1],
+        }
+        ds_id = 1
+        query_string = {
+            "start_time": start_dt.isoformat(),
+            "end_time": end_dt.isoformat(),
+            "data_state": ds_id,
+            "timezone": "UTC",
+            "bucket_width_value": 1,
+            "bucket_width_unit": "hour",
+        }
+
+        with AuthHeader(admin_creds):
+            ret = client.post(EXPRESSIONS_URL, json=expr_1)
+            assert ret.status_code == 201
+            expr_1_id = ret.json["id"]
+
+            ret = client.get(
+                f"{EXPRESSIONS_URL}{expr_1_id}/evaluate",
+                query_string=query_string,
+            )
+            assert ret.status_code == 200
+            assert ret.json == {
+                "2020-01-01T00:00:00+00:00": 0.0,
+                "2020-01-01T01:00:00+00:00": 1.0,
+                "2020-01-01T02:00:00+00:00": 2.0,
+                "2020-01-01T03:00:00+00:00": 3.0,
+            }
+
+            # Evaluate by ID, wrong ID -> 404
+            ret = client.get(
+                f"{EXPRESSIONS_URL}{DUMMY_ID}/evaluate",
+                query_string=query_string,
+            )
+            assert ret.status_code == 404
+
+        with AuthHeader(user_creds):
+            ret = client.get(
+                f"{EXPRESSIONS_URL}{expr_1_id}/evaluate",
+                query_string=query_string,
+            )
+            assert ret.status_code == 403

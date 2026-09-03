@@ -12,7 +12,7 @@ from bemserver_core.exceptions import (
     BEMServerCoreExpressionValidationError,
 )
 from bemserver_core.model import Expression, TimeseriesDataState
-from bemserver_core.processing.expressions import evaluate_from_dict
+from bemserver_core.processing.expressions import evaluate, evaluate_from_dict
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
@@ -116,12 +116,43 @@ class ExpressionByIdViews(MethodView):
         db.session.commit()
 
 
+@blp.route("/<int:item_id>/evaluate", methods=("GET",))
+@blp.login_required
+@blp.arguments(ExpressionEvaluateQueryArgsSchema, location="query")
+@blp.response(200, content_type="application/json")
+def evaluate_expression_by_id(query_args, item_id):
+    """Evaluate an expression"""
+    expression = Expression.get_by_id(item_id)
+    if expression is None:
+        abort(404)
+
+    data_state = TimeseriesDataState.get_by_id(query_args["data_state"]) or abort(
+        422, errors={"query": {"data_state": "Unknown data state ID"}}
+    )
+
+    data_s = evaluate(
+        expression,
+        query_args["start_time"],
+        query_args["end_time"],
+        data_state,
+        query_args["bucket_width_value"],
+        query_args["bucket_width_unit"],
+        query_args["timezone"],
+    )
+
+    data_s = data_s.dropna().replace(np.nan, None)
+    data_s.index = pd.Series(data_s.index).apply(lambda x: x.isoformat())
+
+    return data_s.to_dict()
+
+
 @blp.route("/evaluate", methods=("POST",))
 @blp.login_required
 @blp.arguments(ExpressionEvaluateSchema)
 @blp.arguments(ExpressionEvaluateQueryArgsSchema, location="query")
 @blp.response(200, content_type="application/json")
-def evaluate(expression, query_args):
+def evaluate_expression_from_dict(expression, query_args):
+    """Evaluate an expression provided in request body"""
     data_state = TimeseriesDataState.get_by_id(query_args["data_state"]) or abort(
         422, errors={"query": {"data_state": "Unknown data state ID"}}
     )
