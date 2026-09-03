@@ -47,6 +47,7 @@ from . import (
     timeseries_by_zones,
     timeseries_data,
     timeseries_data_states,
+    timeseries_expressions,
     timeseries_properties,
     timeseries_property_data,
     user_groups,
@@ -118,6 +119,7 @@ MODULES = (
     tasks,
     tasks_by_campaigns,
     expressions,
+    timeseries_expressions,
 )
 
 

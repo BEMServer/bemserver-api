@@ -942,3 +942,29 @@ def expressions(app, campaign_scopes, timeseries):
         )
         db.session.commit()
     return (expr_1.id, expr_2.id)
+
+
+@pytest.fixture
+def ts_expressions(app, campaign_scopes, timeseries, expressions):
+    with OpenBar():
+        ts_expr_1 = model.TimeseriesExpression.new(
+            campaign_scope_id=campaign_scopes[0],
+            expression_id=expressions[0],
+            timeseries_id=timeseries[0],
+            src_data_state_id=1,
+            dest_data_state_id=2,
+            bucket_width_value=1,
+            bucket_width_unit=PeriodEnum.hour,
+        )
+        ts_expr_2 = model.TimeseriesExpression.new(
+            campaign_scope_id=campaign_scopes[1],
+            expression_id=expressions[1],
+            timeseries_id=timeseries[1],
+            src_data_state_id=1,
+            dest_data_state_id=2,
+            bucket_width_value=1,
+            bucket_width_unit=PeriodEnum.day,
+            timezone="UTC",
+        )
+        db.session.commit()
+    return (ts_expr_1.id, ts_expr_2.id)
