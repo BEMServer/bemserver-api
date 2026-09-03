@@ -915,7 +915,7 @@ def tasks_by_campaigns(app, campaigns):
 
 
 @pytest.fixture
-def expressions(app, campaign_scopes):
+def expressions(app, campaign_scopes, timeseries):
     with OpenBar():
         expr_1 = model.Expression.new(
             campaign_scope_id=campaign_scopes[0],
@@ -927,24 +927,18 @@ def expressions(app, campaign_scopes):
             name="a squared",
             expr="a**2",
         )
-        db.session.commit()
-    return (expr_1.id, expr_2.id)
-
-
-@pytest.fixture
-def expression_variables(app, campaign_scopes, timeseries, expressions):
-    with OpenBar():
-        ev_1 = model.ExpressionVariable.new(
+        db.session.flush()
+        model.ExpressionVariable.new(
             campaign_scope_id=campaign_scopes[0],
-            expression_id=expressions[0],
+            expression_id=expr_1.id,
             name="x",
             timeseries_id=timeseries[0],
         )
-        ev_2 = model.ExpressionVariable.new(
+        model.ExpressionVariable.new(
             campaign_scope_id=campaign_scopes[1],
-            expression_id=expressions[1],
+            expression_id=expr_2.id,
             name="y",
             timeseries_id=timeseries[1],
         )
         db.session.commit()
-    return (ev_1.id, ev_2.id)
+    return (expr_1.id, expr_2.id)
