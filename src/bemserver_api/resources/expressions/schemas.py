@@ -17,11 +17,6 @@ class ExpressionSchema(AutoSchema):
     id = msa.auto_field(dump_only=True)
 
 
-class ExpressionPutSchema(ExpressionSchema):
-    class Meta(ExpressionSchema.Meta):
-        exclude = ("campaign_scope_id",)
-
-
 class ExpressionQueryArgsSchema(Schema):
     sort = ma_fields.SortField(("id",))
     campaign_scope_id = ma.fields.Int()
