@@ -4,16 +4,22 @@ from flask.views import MethodView
 
 from flask_smorest import abort
 
+import numpy as np
+import pandas as pd
+
 from bemserver_core.exceptions import (
     BEMServerCoreCampaignScopeError,
     BEMServerCoreExpressionValidationError,
 )
-from bemserver_core.model import Expression
+from bemserver_core.model import Expression, TimeseriesDataState
+from bemserver_core.processing.expressions import evaluate_from_dict
 
 from bemserver_api import Blueprint, SQLCursorPage
 from bemserver_api.database import db
 
 from .schemas import (
+    ExpressionEvaluateQueryArgsSchema,
+    ExpressionEvaluateSchema,
     ExpressionPutSchema,
     ExpressionQueryArgsSchema,
     ExpressionSchema,
@@ -108,3 +114,29 @@ class ExpressionByIdViews(MethodView):
         blp.check_etag(item, ExpressionSchema)
         item.delete()
         db.session.commit()
+
+
+@blp.route("/evaluate", methods=("POST",))
+@blp.login_required
+@blp.arguments(ExpressionEvaluateSchema)
+@blp.arguments(ExpressionEvaluateQueryArgsSchema, location="query")
+@blp.response(200, content_type="application/json")
+def evaluate(expression, query_args):
+    data_state = TimeseriesDataState.get_by_id(query_args["data_state"]) or abort(
+        422, errors={"query": {"data_state": "Unknown data state ID"}}
+    )
+
+    data_s = evaluate_from_dict(
+        expression,
+        query_args["start_time"],
+        query_args["end_time"],
+        data_state,
+        query_args["bucket_width_value"],
+        query_args["bucket_width_unit"],
+        query_args["timezone"],
+    )
+
+    data_s = data_s.dropna().replace(np.nan, None)
+    data_s.index = pd.Series(data_s.index).apply(lambda x: x.isoformat())
+
+    return data_s.to_dict()

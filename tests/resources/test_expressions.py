@@ -1,5 +1,7 @@
 """Expressions tests"""
 
+import datetime as dt
+
 import pytest
 
 from tests.common import AuthHeader
@@ -342,3 +344,62 @@ class TestExpressionsApi:
             headers={"If-Match": "Dummy-ETag"},
         )
         assert ret.status_code == 401
+
+    def test_expressions_evaluate(
+        self, app, users, campaign_scopes, timeseries, timeseries_data
+    ):
+        admin_creds = users["Chuck"]["creds"]
+        user_creds = users["Active"]["creds"]
+        ts_1_id = timeseries[0]  # in cs_1
+
+        start_dt = dt.datetime(2020, 1, 1, tzinfo=dt.UTC)
+        end_dt = dt.datetime(2020, 1, 2, tzinfo=dt.UTC)
+
+        client = app.test_client()
+
+        var_1 = {
+            "name": "a",
+            "timeseries_id": ts_1_id,
+        }
+        expr_1 = {
+            "name": "a",
+            "expr": "a",
+            "variables": [var_1],
+        }
+        ds_id = 1
+
+        with AuthHeader(admin_creds):
+            ret = client.post(
+                f"{EXPRESSIONS_URL}evaluate",
+                json=expr_1,
+                query_string={
+                    "start_time": start_dt.isoformat(),
+                    "end_time": end_dt.isoformat(),
+                    "data_state": ds_id,
+                    "timezone": "UTC",
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                },
+            )
+            assert ret.status_code == 200
+            assert ret.json == {
+                "2020-01-01T00:00:00+00:00": 0.0,
+                "2020-01-01T01:00:00+00:00": 1.0,
+                "2020-01-01T02:00:00+00:00": 2.0,
+                "2020-01-01T03:00:00+00:00": 3.0,
+            }
+
+        with AuthHeader(user_creds):
+            ret = client.post(
+                f"{EXPRESSIONS_URL}evaluate",
+                json=expr_1,
+                query_string={
+                    "start_time": start_dt.isoformat(),
+                    "end_time": end_dt.isoformat(),
+                    "data_state": ds_id,
+                    "timezone": "UTC",
+                    "bucket_width_value": 1,
+                    "bucket_width_unit": "hour",
+                },
+            )
+            assert ret.status_code == 403
