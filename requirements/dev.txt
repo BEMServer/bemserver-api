@@ -27,9 +27,7 @@ packaging==26.1
     #   pytest
     #   pytest-postgresql
 platformdirs==4.9.6
-    # via
-    #   python-discovery
-    #   virtualenv
+    # via virtualenv
 pluggy==1.6.0
     # via
     #   pytest
@@ -37,27 +35,27 @@ pluggy==1.6.0
 port-for==1.0.0
     # via pytest-postgresql
 pre-commit==4.5.1
-    # via -r requirements/dev.in
+    # via -r dev.in
 psutil==7.2.2
     # via mirakuru
 pygments==2.20.0
     # via pytest
 pytest==9.0.3
     # via
-    #   -r requirements/tests.in
+    #   -r tests.in
     #   pytest-cov
     #   pytest-postgresql
 pytest-cov==7.1.0
-    # via -r requirements/tests.in
+    # via -r tests.in
 pytest-postgresql==8.0.0
-    # via -r requirements/tests.in
-python-discovery==1.2.2
+    # via -r tests.in
+python-discovery==1.6.1
     # via virtualenv
 pyyaml==6.0.3
     # via pre-commit
 typing-extensions==4.15.0
     # via psycopg
-virtualenv==21.2.4
+virtualenv==21.7.13
     # via pre-commit
 
 # The following packages are considered to be unsafe in a requirements file:
